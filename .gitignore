@@ -1,0 +1,8 @@
+.DS_Store
+node_modules
+.vscode
+.data
+/bin
+
+# secrets
+.env
