@@ -1,0 +1,51 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+
+	"required": [
+		"idempotency_key",
+		"owner",
+		"ai_relay_options"
+	],
+
+	"properties": {
+		"idempotency_key": {
+			"type": "string",
+			"minLength": 1
+		},
+
+		"owner": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "identifier"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": ["user"]
+				},
+				"identifier": {
+					"type": "string",
+					"minLength": 1
+				}
+			}
+		},
+
+		"ai_relay_options": {
+			"type": "object",
+			"additionalProperties": false,
+
+			"required": ["provider_id", "model_id"],
+
+			"properties": {
+				"provider_id": {
+					"type": "string",
+					"enum": ["open_ai"]
+				},
+				"model_id": {
+					"type": "string",
+					"minLength": 1
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,86 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+
+	"required": [
+		"conversation_id",
+		"idempotency_key",
+		"message_content",
+		"file_ids",
+		"owner",
+		"ai_relay_options",
+		"options"
+	],
+
+	"properties": {
+		"conversation_id": {
+			"type": "string",
+			"minLength": 1
+		},
+
+		"idempotency_key": {
+			"type": "string",
+			"minLength": 1
+		},
+
+		"message_content": {
+			"type": "string",
+			"minLength": 1
+		},
+
+		"file_ids": {
+			"type": "array",
+			"items": {
+				"type": "string",
+				"minLength": 1
+			}
+		},
+
+		"owner": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "identifier"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": ["user"]
+				},
+				"identifier": {
+					"type": "string",
+					"minLength": 1
+				}
+			}
+		},
+
+		"ai_relay_options": {
+			"type": ["object", "null"],
+			"additionalProperties": false,
+
+			"required": ["provider_id", "model_id"],
+
+			"properties": {
+				"provider_id": {
+					"type": "string",
+					"enum": ["open_ai"]
+				},
+				"model_id": {
+					"type": "string",
+					"minLength": 1
+				}
+			}
+		},
+
+		"options": {
+			"type": "object",
+			"additionalProperties": false,
+
+			"required": ["use_streaming"],
+
+			"properties": {
+				"use_streaming": {
+					"type": "boolean"
+				}
+			}
+		}
+	}
+}

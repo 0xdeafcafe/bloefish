@@ -11,6 +11,7 @@ import (
 	"github.com/0xdeafcafe/bloefish/libraries/contexts"
 
 	serviceAIRelay "github.com/0xdeafcafe/bloefish/services/airelay/cmd"
+	serviceConversation "github.com/0xdeafcafe/bloefish/services/conversation/cmd"
 	serviceFileUpload "github.com/0xdeafcafe/bloefish/services/fileupload/cmd"
 	serviceStream "github.com/0xdeafcafe/bloefish/services/stream/cmd"
 	serviceUser "github.com/0xdeafcafe/bloefish/services/user/cmd"
@@ -21,6 +22,7 @@ type ServiceBoot func(ctx context.Context, args []string) error
 var (
 	serviceDefinitions = map[string]ServiceBoot{
 		"ai_relay":     serviceAIRelay.Root,
+		"conversation": serviceConversation.Root,
 		"file_upload":  serviceFileUpload.Root,
 		"stream":       serviceStream.Root,
 		"user":         serviceUser.Root,

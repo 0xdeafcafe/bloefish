@@ -61,6 +61,25 @@ services:
     extra_hosts:
       - "svc_ai_relay.bloefish.local:127.0.0.1"
 
+  svc_conversation:
+    build:
+      context: .
+      dockerfile: go_service.Dockerfile
+    command: ["conversation"]
+    hostname: svc_conversation
+    environment:
+      MONGO_URI: mongodb://db_mongodb:27017
+      AI_RELAY_SERVICE_BASE_URL: http://svc_ai_relay:4000/rpc
+      USER_SERVICE_BASE_URL: http://svc_user:4000/rpc
+    depends_on:
+      - db_mongodb
+    ports:
+      - "4002:4000"
+    networks:
+      - bloefish_network
+    extra_hosts:
+      - "svc_conversation.bloefish.local:127.0.0.1"
+
   svc_user:
     build:
       context: .

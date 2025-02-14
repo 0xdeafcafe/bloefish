@@ -10,6 +10,7 @@ AI models and providers, via a few simple to use touch points.
 | Service        | Port   | Description                                                         | Readme                            |
 | -------------- | ------ | ------------------------------------------------------------------- | --------------------------------- |
 | `ai_relay`     | `4003` | Handles relaying requests to various AI models and providers.       | [View](./services/airelay/README.md) |
+| `conversation` | `4002` | Handles the creation and management of interactions (messages).     | [View](./services/conversation/README.md) |
 | `user`         | `4001` | Handles the creation and management of users.                       | [View](./services/user/README.md) |
 | `stream`       | `4004` | Handles streaming.                                                  | [View](./services/stream/README.md) |
 | `file_upload`   | `4005` | Handles management, including uploading, of files.                   | [View](./services/fileupload/README.md) |
@@ -35,6 +36,7 @@ To run the project, fire the following commands into your terminal:
 
 ```
 $ echo "127.0.0.1 svc_ai_relay.bloefish.local" | sudo tee -a /etc/hosts
+$ echo "127.0.0.1 svc_conversation.bloefish.local" | sudo tee -a /etc/hosts
 $ echo "127.0.0.1 svc_file_upload.bloefish.local" | sudo tee -a /etc/hosts
 $ echo "127.0.0.1 svc_stream.bloefish.local" | sudo tee -a /etc/hosts
 $ echo "127.0.0.1 svc_user.bloefish.local" | sudo tee -a /etc/hosts

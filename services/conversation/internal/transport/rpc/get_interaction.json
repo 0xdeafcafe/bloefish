@@ -1,0 +1,15 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+
+	"required": [
+		"interaction_id"
+	],
+
+	"properties": {
+		"interaction_id": {
+			"type": "string",
+			"minLength": 1
+		}
+	}
+}
