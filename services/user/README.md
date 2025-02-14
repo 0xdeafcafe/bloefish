@@ -8,21 +8,19 @@ This service is a simple user service that is used to manage users.
 
 `http://svc_user.bloefish.local:4001/`
 
-## Transports
+## CRPC - RPC transport
 
-### CRPC - RPC interface
-
-#### Base URL
+### Base URL
 
 `http://svc_user.bloefish.local:4001/rpc/<version>/<endpoint>`
 
-#### Versions
+### Versions
 
 - `2025-02-12` - Initial version
 
-#### Endpoints
+### Endpoints
 
-##### `get_user_by_id`
+#### `get_user_by_id`
 
 Gets a user by their user ID.
 
@@ -44,7 +42,7 @@ interface Response {
 }
 ```
 
-##### `get_or_create_default_user`
+#### `get_or_create_default_user`
 
 Get the default user for the platform. If the user does not exist, it will be created.
 
