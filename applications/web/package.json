@@ -1,0 +1,40 @@
+{
+  "name": "@bloefish/web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "start": "vite preview",
+    "typecheck": "react-router typegen && tsc"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^3.8.0",
+    "@emotion/react": "^11.14.0",
+    "@reduxjs/toolkit": "^2.5.1",
+    "isbot": "^5.1.17",
+    "motion": "^12.4.2",
+    "next-themes": "^0.4.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.4.0",
+    "react-markdown": "^9.0.3",
+    "react-redux": "^9.2.0",
+    "react-router": "^7.1.5",
+    "styled-components": "^6.1.15"
+  },
+  "devDependencies": {
+    "@chakra-ui/cli": "^3.8.0",
+    "@react-router/dev": "^7.1.5",
+    "@types/node": "^20",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "react-router-devtools": "^1.1.0",
+    "serve": "^14.2.4",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11",
+    "vite-tsconfig-paths": "^5.1.4"
+  }
+}
