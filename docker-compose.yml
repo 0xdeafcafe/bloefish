@@ -1,0 +1,59 @@
+version: '3.8'
+
+networks:
+  bloefish_network:
+    name: bloefish_network
+    driver: bridge
+
+services:
+  # Utilities
+  db_redis:
+    image: "redis:latest"
+    hostname: db_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - bloefish_network
+
+  db_mongodb:
+    image: "mongo:latest"
+    hostname: db_mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - bloefish_network
+
+  storage_minio:
+    image: "minio/minio:latest"
+    hostname: storageminio
+    environment:
+      MINIO_ACCESS_KEY: "admin"
+      MINIO_SECRET_KEY: "adminsecretkey"
+    command: server /data
+    volumes:
+      - ./.data:/data
+    ports:
+      - "9000:9000"
+    networks:
+      - bloefish_network
+    extra_hosts:
+      - "storageminio.bloefish.local:127.0.0.1"
+
+  # Services
+  svc_user:
+    build:
+      context: .
+      dockerfile: go_service.Dockerfile
+    command: ["user"]
+    hostname: svc_user
+    environment:
+      MONGO_URI: mongodb://db_mongodb:27017
+    depends_on:
+      - db_mongodb
+    ports:
+      - "4001:4000"
+    networks:
+      - bloefish_network
+    extra_hosts:
+      - "svc_user.bloefish.local:127.0.0.1"
+
