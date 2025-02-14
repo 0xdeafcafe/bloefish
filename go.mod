@@ -6,8 +6,10 @@ require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/google/go-cmp v0.6.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/jamescun/basex v0.0.0-20180407124237-e1bcb39ab18e
 	github.com/matryer/is v1.4.1
+	github.com/minio/minio-go/v7 v7.0.85
 	github.com/openai/openai-go v0.1.0-alpha.57
 	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.7.0
@@ -15,6 +17,7 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.mongodb.org/mongo-driver v1.17.2
 	go.opentelemetry.io/otel/trace v1.34.0
+	golang.org/x/sync v0.11.0
 	gopkg.in/h2non/gock.v1 v1.1.2
 )
 
@@ -22,6 +25,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/goccy/go-json v0.10.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -30,7 +34,6 @@ require (
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.9 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.85 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/tidwall/gjson v1.14.4 // indirect
@@ -46,7 +49,6 @@ require (
 	go.opentelemetry.io/otel v1.34.0 // indirect
 	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/net v0.33.0 // indirect
-	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 )
