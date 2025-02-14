@@ -35,6 +35,7 @@ backend service exposes a full readme, and an API definition can be found [here]
 To run the project, fire the following commands into your terminal:
 
 ```
+$ echo "127.0.0.1 app.bloefish.local" | sudo tee -a /etc/hosts
 $ echo "127.0.0.1 svc_ai_relay.bloefish.local" | sudo tee -a /etc/hosts
 $ echo "127.0.0.1 svc_conversation.bloefish.local" | sudo tee -a /etc/hosts
 $ echo "127.0.0.1 svc_file_upload.bloefish.local" | sudo tee -a /etc/hosts
