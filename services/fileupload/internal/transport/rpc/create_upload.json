@@ -1,0 +1,44 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+
+	"required": [
+		"name",
+		"size",
+		"mime_type",
+		"owner"
+	],
+
+	"properties": {
+		"name": {
+			"type": "string",
+			"minLength": 1
+		},
+
+		"size": {
+			"type": "integer",
+			"minimum": 1
+		},
+
+		"mime_type": {
+			"type": "string",
+			"minLength": 1
+		},
+
+		"owner": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["type", "identifier"],
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": ["user"]
+				},
+				"identifier": {
+					"type": "string",
+					"minLength": 1
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,15 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+
+	"required": [
+		"file_id"
+	],
+
+	"properties": {
+		"file_id": {
+			"type": "string",
+			"minLength": 1
+		}
+	}
+}

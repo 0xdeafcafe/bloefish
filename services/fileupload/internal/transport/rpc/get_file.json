@@ -1,0 +1,26 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+
+	"required": [
+		"file_id",
+		"include_access_url",
+		"access_url_expiry_seconds"
+	],
+
+	"properties": {
+		"file_id": {
+			"type": "string",
+			"minLength": 1
+		},
+
+		"include_access_url": {
+			"type": "boolean"
+		},
+
+		"access_url_expiry_seconds": {
+			"type": ["integer", "null"],
+			"minimum": 1
+		}
+	}
+}

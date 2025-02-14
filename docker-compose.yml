@@ -57,3 +57,24 @@ services:
     extra_hosts:
       - "svc_user.bloefish.local:127.0.0.1"
 
+  svc_file_upload:
+    build:
+      context: .
+      dockerfile: go_service.Dockerfile
+    command: ["file_upload"]
+    hostname: svc_file_upload
+    environment:
+      MONGO_URI: mongodb://db_mongodb:27017
+      MINIO_ENDPOINT: storageminio:9000
+      MINIO_ACCESS_KEY_ID: admin
+      MINIO_SECRET_ACCESS_KEY: adminsecretkey
+    depends_on:
+      - db_mongodb
+      - storage_minio
+    ports:
+      - "4005:4000"
+    networks:
+      - bloefish_network
+    extra_hosts:
+      - "svc_file_upload.bloefish.local:127.0.0.1"
+

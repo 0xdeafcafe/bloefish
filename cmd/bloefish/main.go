@@ -10,6 +10,7 @@ import (
 	"github.com/0xdeafcafe/bloefish/libraries/config"
 	"github.com/0xdeafcafe/bloefish/libraries/contexts"
 
+	serviceFileUpload "github.com/0xdeafcafe/bloefish/services/fileupload/cmd"
 	serviceUser "github.com/0xdeafcafe/bloefish/services/user/cmd"
 )
 
@@ -17,6 +18,7 @@ type ServiceBoot func(ctx context.Context, args []string) error
 
 var (
 	serviceDefinitions = map[string]ServiceBoot{
+		"file_upload":  serviceFileUpload.Root,
 		"user":         serviceUser.Root,
 	}
 )
