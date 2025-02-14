@@ -8,21 +8,19 @@ This service
 
 `http://svc_ai_relay.bloefish.local:4002/`
 
-## Transports
+### RPC transport
 
-### CRPC - RPC interface
-
-#### Base URL
+### Base URL
 
 `http://svc_ai_relay.bloefish.local:4002/rpc/<version>/<endpoint>`
 
-#### Versions
+### Versions
 
 - `2025-02-12` - Initial version
 
-#### Endpoints
+### Endpoints
 
-##### `list_supported`
+#### `list_supported`
 
 Lists the supported AI providers and models.
 
@@ -43,7 +41,7 @@ interface Response {
 }
 ```
 
-##### `invoke_conversation_message`
+#### `invoke_conversation_message`
 
 This will invoke a call to an AI model, passing in a full conversation, wait for the response, and return it.
 
@@ -74,7 +72,7 @@ interface Response {
 }
 ```
 
-##### `invoke_streaming_conversation_message`
+#### `invoke_streaming_conversation_message`
 
 This will invoke a call to an AI model, passing in a full conversation, and stream the response back via the provided streaming channel id. The full response will be returned in the response of the request.
 

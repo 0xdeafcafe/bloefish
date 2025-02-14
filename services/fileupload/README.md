@@ -8,21 +8,19 @@ This service handles the management of files, including uploading and downloadin
 
 `http://svc_file_upload.bloefish.local:4005/`
 
-## Transports
+## RPC transport
 
-### CRPC - RPC interface
-
-#### Base URL
+### Base URL
 
 `http://svc_file_upload.bloefish.local:4005/rpc/<version>/<endpoint>`
 
-#### Versions
+### Versions
 
 - `2025-02-12` - Initial version
 
-#### Endpoints
+### Endpoints
 
-##### `create_upload`
+#### `create_upload`
 
 Creates a new file upload, which will create a file object and return a URL to upload the file to.
 
@@ -45,7 +43,7 @@ interface Response {
 }
 ```
 
-##### `confirm_upload`
+#### `confirm_upload`
 
 Confirms that the file has been uploaded, until this is called an uploaded file can not be used. This will also validate that the uploaded file matches the data that was provided in the `create_upload` endpoint.
 
@@ -59,7 +57,7 @@ interface Request {
 type Response = null;
 ```
 
-##### `get_file`
+#### `get_file`
 
 Gets a file object by its ID. If `include_access_url` is set to `true`, then the `presigned_access_url` will be included in the response.
 

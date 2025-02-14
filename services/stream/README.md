@@ -8,21 +8,19 @@ This service is responsible for handling streaming.
 
 `http://svc_stream.bloefish.local:4004/`
 
-## Transports
+## RPC transport
 
-### CRPC - RPC interface
-
-#### Base URL
+### Base URL
 
 `http://svc_stream.bloefish.local:4004/rpc/<version>/<endpoint>`
 
-#### Versions
+### Versions
 
 - `2025-02-12` - Initial version
 
-#### Endpoints
+### Endpoints
 
-##### `send_message_full`
+#### `send_message_full`
 
 Sends a full message.
 
@@ -37,7 +35,7 @@ interface Request {
 type Response = null;
 ```
 
-##### `send_message_fragment`
+#### `send_message_fragment`
 
 Sends a message fragment.
 
@@ -52,13 +50,13 @@ interface Request {
 type Response = null;
 ```
 
-### WS - WebSocket interface
+## WebSocket transport
 
-#### Base URL
+### Base URL
 
 `http://svc_stream.bloefish.local:4004/ws`
 
-#### Message Structure
+### Message Structure
 
 ```typescript
 interface Message {

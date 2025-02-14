@@ -8,7 +8,7 @@ This service is a simple user service that is used to manage users.
 
 `http://svc_user.bloefish.local:4001/`
 
-## CRPC - RPC transport
+## RPC transport
 
 ### Base URL
 

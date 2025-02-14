@@ -8,21 +8,19 @@ This service
 
 `http://svc_conversation.bloefish.local:4002/`
 
-## Transports
+## RPC transport
 
-### CRPC - RPC interface
-
-#### Base URL
+### Base URL
 
 `http://svc_conversation.bloefish.local:4002/rpc/<version>/<endpoint>`
 
-#### Versions
+### Versions
 
 - `2025-02-12` - Initial version
 
-#### Endpoints
+### Endpoints
 
-##### `create_conversation`
+#### `create_conversation`
 
 Creates a new conversation.
 
@@ -49,7 +47,7 @@ interface Response {
 }
 ```
 
-##### `create_conversation_message`
+#### `create_conversation_message`
 
 Creates a new message in a conversation. This message will be appended to the conversation, and the entire conversation chain will be sent to the AI relay.
 
@@ -85,7 +83,7 @@ interface Response {
 }
 ```
 
-##### `get_conversation_with_interactions`
+#### `get_conversation_with_interactions`
 
 Gets a conversation with all of its interactions.
 
@@ -124,7 +122,7 @@ interface Response {
 }
 ```
 
-##### `list_conversations_with_interactions`
+#### `list_conversations_with_interactions`
 
 Lists all conversations with all of their interactions.
 
