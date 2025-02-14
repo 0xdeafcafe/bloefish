@@ -1,0 +1,20 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+
+	"required": [
+		"channel_id",
+		"message_content"
+	],
+
+	"properties": {
+		"channel_id": {
+			"type": "string",
+			"minLength": 1
+		},
+
+		"message_content": {
+			"type": "string"
+		}
+	}
+}

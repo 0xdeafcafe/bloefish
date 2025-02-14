@@ -78,3 +78,16 @@ services:
     extra_hosts:
       - "svc_file_upload.bloefish.local:127.0.0.1"
 
+  svc_stream:
+    build:
+      context: .
+      dockerfile: go_service.Dockerfile
+    command: ["stream"]
+    hostname: svc_stream
+    ports:
+      - "4004:4000"
+    networks:
+      - bloefish_network
+    extra_hosts:
+      - "svc_stream.bloefish.local:127.0.0.1"
+
