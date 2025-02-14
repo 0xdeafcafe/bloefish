@@ -1,0 +1,98 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+
+	"required": [
+		"streaming_channel_id",
+		"owner",
+		"messages",
+		"ai_relay_options"
+	],
+
+	"properties": {
+		"streaming_channel_id": {
+			"type": "string",
+			"minLength": 1
+		},
+
+		"owner": {
+			"type": "object",
+			"additionalProperties": false,
+
+			"required": ["type", "identifier"],
+
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": ["user"]
+				},
+				"identifier": {
+					"type": "string",
+					"minLength": 1
+				}
+			}
+		},
+
+		"messages": {
+			"type": "array",
+			"minItems": 1,
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+
+				"required": ["content", "owner", "file_ids"],
+
+				"properties": {
+					"content": {
+						"type": "string",
+						"minLength": 1
+					},
+
+					"owner": {
+						"type": "object",
+						"additionalProperties": false,
+
+						"required": ["type", "identifier"],
+
+						"properties": {
+							"type": {
+								"type": "string",
+								"enum": ["user", "bot"]
+							},
+							"identifier": {
+								"type": "string",
+								"minLength": 1
+							}
+						}
+					},
+
+					"file_ids": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"minLength": 1
+						}
+					}
+				}
+			}
+		},
+
+		"ai_relay_options": {
+			"type": "object",
+			"additionalProperties": false,
+
+			"required": ["provider_id", "model_id"],
+
+			"properties": {
+				"provider_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"model_id": {
+					"type": "string",
+					"minLength": 1
+				}
+			}
+		}
+	}
+}

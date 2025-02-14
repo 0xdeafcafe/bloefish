@@ -40,6 +40,27 @@ services:
       - "storageminio.bloefish.local:127.0.0.1"
 
   # Services
+  svc_ai_relay:
+    build:
+      context: .
+      dockerfile: go_service.Dockerfile
+    command: ["ai_relay"]
+    hostname: svc_ai_relay
+    env_file: "services/airelay/.env"
+    environment:
+      MONGO_URI: mongodb://db_mongodb:27017
+      STREAM_SERVICE_BASE_URL: http://svc_stream:4000/rpc
+      FILE_UPLOAD_SERVICE_BASE_URL: http://svc_file_upload:4000/rpc
+      CONVERSATION_SERVICE_BASE_URL: http://svc_conversation:4000/rpc
+    depends_on:
+      - db_mongodb
+    ports:
+      - "4003:4000"
+    networks:
+      - bloefish_network
+    extra_hosts:
+      - "svc_ai_relay.bloefish.local:127.0.0.1"
+
   svc_user:
     build:
       context: .
