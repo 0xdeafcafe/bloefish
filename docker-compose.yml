@@ -131,3 +131,17 @@ services:
     extra_hosts:
       - "svc_stream.bloefish.local:127.0.0.1"
 
+  # Apps
+  app_web:
+    restart: always
+    image: nginx:latest
+    volumes:
+      - ./applications/web/build/client:/var/www/html
+      - ./config/infra/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    hostname: app
+    ports:
+      - "4169:4169"
+    networks:
+      - bloefish_network
+    extra_hosts:
+      - "app.bloefish.local:127.0.0.1"
