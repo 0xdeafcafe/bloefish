@@ -1,0 +1,30 @@
+{
+	"id": "request_000000D1jnZWtsbxbwKhRQu5LQ2AU",
+	"verb": "post",
+	"url": [
+		{
+			"type": "variable_group_item",
+			"payload": {
+				"itemId": "item_000000D1jhs1A68yspI37E0b10cHq"
+			}
+		},
+		"/rpc/2025-02-12/list_supported"
+	],
+	"query": {},
+	"headers": {
+		"header_000000D1hfbBAKPZs7WvxRjD94d3u": {
+			"name": "Accept",
+			"value": [
+				"application/json"
+			],
+			"enabled": true
+		}
+	},
+	"body": {
+		"type": "text",
+		"payload": ""
+	},
+	"options": {
+		"followRedirects": false
+	}
+}

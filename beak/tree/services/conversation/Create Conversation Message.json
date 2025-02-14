@@ -1,0 +1,162 @@
+{
+	"id": "request_000000D1jJdCkw9wRxmkX0oD1MXle",
+	"verb": "post",
+	"url": [
+		{
+			"type": "variable_group_item",
+			"payload": {
+				"itemId": "item_000000D1jJedxq0crIujqEZ8f0RMB"
+			}
+		},
+		"/rpc/2025-02-12/create_conversation_message"
+	],
+	"query": {},
+	"headers": {
+		"header_000000D1hfbBAKPZs7WvxRjD94d3u": {
+			"name": "Accept",
+			"value": [
+				"application/json"
+			],
+			"enabled": true
+		}
+	},
+	"body": {
+		"type": "json",
+		"payload": {
+			"jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ": {
+				"id": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"name": "<Root>",
+				"enabled": true,
+				"parentId": null,
+				"type": "object"
+			},
+			"jsonentry_000000D1jaBQhZS6jU9H2Uyy95s8F": {
+				"id": "jsonentry_000000D1jaBQhZS6jU9H2Uyy95s8F",
+				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"type": "string",
+				"name": "conversation_id",
+				"enabled": true,
+				"value": [
+					{
+						"type": "response_body_json",
+						"payload": {
+							"requestId": "request_000000D1jnRYpCMmsyXgUfKJxOS3z",
+							"dotPath": [
+								"conversation_id"
+							]
+						}
+					}
+				]
+			},
+			"jsonentry_000000D1jaBXZ1avgfJQWaoGt4AfQ": {
+				"id": "jsonentry_000000D1jaBXZ1avgfJQWaoGt4AfQ",
+				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"type": "string",
+				"name": "idempotency_key",
+				"enabled": true,
+				"value": [
+					{
+						"type": "uuid",
+						"payload": {
+							"version": "v4"
+						}
+					}
+				]
+			},
+			"jsonentry_000000D1jaBXZ1avgfJQWaoGt4AgL": {
+				"id": "jsonentry_000000D1jaBXZ1avgfJQWaoGt4AgL",
+				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"type": "string",
+				"name": "message_content",
+				"enabled": true,
+				"value": [
+					"what is the weather in toronto?"
+				]
+			},
+			"jsonentry_000000D1jaBXZ1avgfJQWaoGt4AiB": {
+				"id": "jsonentry_000000D1jaBXZ1avgfJQWaoGt4AiB",
+				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"type": "object",
+				"name": "owner",
+				"enabled": true
+			},
+			"jsonentry_000000D1jaPomZwwotRA8iYGXWq9j": {
+				"id": "jsonentry_000000D1jaPomZwwotRA8iYGXWq9j",
+				"parentId": "jsonentry_000000D1jaBXZ1avgfJQWaoGt4AiB",
+				"type": "string",
+				"name": "type",
+				"enabled": true,
+				"value": [
+					"user"
+				]
+			},
+			"jsonentry_000000D1jaPve25lm4bJcoNZHV8gy": {
+				"id": "jsonentry_000000D1jaPve25lm4bJcoNZHV8gy",
+				"parentId": "jsonentry_000000D1jaBXZ1avgfJQWaoGt4AiB",
+				"type": "string",
+				"name": "identifier",
+				"enabled": true,
+				"value": [
+					{
+						"type": "variable_group_item",
+						"payload": {
+							"itemId": "item_000000D1jaU8PHV02up84Np3SSWwN"
+						}
+					}
+				]
+			},
+			"jsonentry_000000D1jaQGEOWEdc5m55rTVQ2SW": {
+				"id": "jsonentry_000000D1jaQGEOWEdc5m55rTVQ2SW",
+				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"type": "object",
+				"name": "ai_relay_options",
+				"enabled": true
+			},
+			"jsonentry_000000D1jabYAh23zynNagGJ8cc6Y": {
+				"id": "jsonentry_000000D1jabYAh23zynNagGJ8cc6Y",
+				"parentId": "jsonentry_000000D1jaQGEOWEdc5m55rTVQ2SW",
+				"type": "string",
+				"name": "provider_id",
+				"enabled": true,
+				"value": [
+					"open_ai"
+				]
+			},
+			"jsonentry_000000D1jabYAh23zynNagGJ8cc7E": {
+				"id": "jsonentry_000000D1jabYAh23zynNagGJ8cc7E",
+				"parentId": "jsonentry_000000D1jaQGEOWEdc5m55rTVQ2SW",
+				"type": "string",
+				"name": "model_id",
+				"enabled": true,
+				"value": [
+					"gpt-4o"
+				]
+			},
+			"jsonentry_000000D1jabltbJhuL7gYruucZDH4": {
+				"id": "jsonentry_000000D1jabltbJhuL7gYruucZDH4",
+				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"type": "object",
+				"name": "options",
+				"enabled": true
+			},
+			"jsonentry_000000D1jaczNaskPJvMtu1EmGViY": {
+				"id": "jsonentry_000000D1jaczNaskPJvMtu1EmGViY",
+				"parentId": "jsonentry_000000D1jabltbJhuL7gYruucZDH4",
+				"type": "boolean",
+				"name": "use_streaming",
+				"enabled": true,
+				"value": true
+			},
+			"jsonentry_000000D1jafJU7s0S6Ma5sOaLgnze": {
+				"id": "jsonentry_000000D1jafJU7s0S6Ma5sOaLgnze",
+				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"type": "array",
+				"name": "file_ids",
+				"enabled": true
+			}
+		}
+	},
+	"options": {
+		"followRedirects": false
+	}
+}

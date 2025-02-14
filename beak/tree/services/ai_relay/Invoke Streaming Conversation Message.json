@@ -1,0 +1,175 @@
+{
+	"id": "request_000000D1m5lInqJiCqRWy0oRSHgZk",
+	"verb": "post",
+	"headers": {},
+	"url": [
+		{
+			"type": "variable_group_item",
+			"payload": {
+				"itemId": "item_000000D1jhs1A68yspI37E0b10cHq"
+			}
+		},
+		"/rpc/2025-02-12/invoke_streaming_conversation_message"
+	],
+	"query": {},
+	"body": {
+		"type": "json",
+		"payload": {
+			"jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys": {
+				"id": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"name": "<Root>",
+				"enabled": true,
+				"parentId": null,
+				"type": "object"
+			},
+			"jsonentry_000000D1jngwfI91Z0IwxjLL1a7Oc": {
+				"id": "jsonentry_000000D1jngwfI91Z0IwxjLL1a7Oc",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "array",
+				"name": "messages",
+				"enabled": true
+			},
+			"jsonentry_000000D1jngwfI91Z0IwxjLL1a7QF": {
+				"id": "jsonentry_000000D1jngwfI91Z0IwxjLL1a7QF",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "object",
+				"name": "ai_relay_options",
+				"enabled": true
+			},
+			"jsonentry_000000D1jnibb6HLshlFF8ks9Ac6A": {
+				"id": "jsonentry_000000D1jnibb6HLshlFF8ks9Ac6A",
+				"parentId": "jsonentry_000000D1jngwfI91Z0IwxjLL1a7QF",
+				"type": "string",
+				"name": "provider_id",
+				"enabled": true,
+				"value": [
+					"open_ai"
+				]
+			},
+			"jsonentry_000000D1jnibb6HLshlFF8ks9Ac7R": {
+				"id": "jsonentry_000000D1jnibb6HLshlFF8ks9Ac7R",
+				"parentId": "jsonentry_000000D1jngwfI91Z0IwxjLL1a7QF",
+				"type": "string",
+				"name": "model_id",
+				"enabled": true,
+				"value": [
+					"gpt-4o"
+				]
+			},
+			"jsonentry_000000D1loSvJk9T2taVggFHUGBJw": {
+				"id": "jsonentry_000000D1loSvJk9T2taVggFHUGBJw",
+				"parentId": "jsonentry_000000D1jngwfI91Z0IwxjLL1a7Oc",
+				"type": "object",
+				"enabled": true
+			},
+			"jsonentry_000000D1loTMlYikrcF7d3YUS9Nft": {
+				"id": "jsonentry_000000D1loTMlYikrcF7d3YUS9Nft",
+				"parentId": "jsonentry_000000D1loSvJk9T2taVggFHUGBJw",
+				"type": "string",
+				"name": "content",
+				"enabled": true,
+				"value": [
+					"give me 50 bullet points on the origins of the bible"
+				]
+			},
+			"jsonentry_000000D1loTMlYikrcF7d3YUS9Ngh": {
+				"id": "jsonentry_000000D1loTMlYikrcF7d3YUS9Ngh",
+				"parentId": "jsonentry_000000D1loSvJk9T2taVggFHUGBJw",
+				"type": "object",
+				"name": "owner",
+				"enabled": true
+			},
+			"jsonentry_000000D1loTMlYikrcF7d3YUS9Nj2": {
+				"id": "jsonentry_000000D1loTMlYikrcF7d3YUS9Nj2",
+				"parentId": "jsonentry_000000D1loSvJk9T2taVggFHUGBJw",
+				"type": "array",
+				"name": "file_ids",
+				"enabled": true
+			},
+			"jsonentry_000000D1lquYTb5OjZw6fRrPKgqWu": {
+				"id": "jsonentry_000000D1lquYTb5OjZw6fRrPKgqWu",
+				"parentId": "jsonentry_000000D1loTMlYikrcF7d3YUS9Nj2",
+				"type": "string",
+				"enabled": false,
+				"value": [
+					"file_000000D1lfeUZ6lcoOhiJqRnBwCLx"
+				]
+			},
+			"jsonentry_000000D1lqvsp2nGBjtwUZn2EMRa8": {
+				"id": "jsonentry_000000D1lqvsp2nGBjtwUZn2EMRa8",
+				"parentId": "jsonentry_000000D1loTMlYikrcF7d3YUS9Ngh",
+				"type": "string",
+				"name": "type",
+				"enabled": true,
+				"value": [
+					"user"
+				]
+			},
+			"jsonentry_000000D1lqvzgUw58v45yfcKyKk7C": {
+				"id": "jsonentry_000000D1lqvzgUw58v45yfcKyKk7C",
+				"parentId": "jsonentry_000000D1loTMlYikrcF7d3YUS9Ngh",
+				"type": "string",
+				"name": "identifier",
+				"enabled": true,
+				"value": [
+					{
+						"type": "variable_group_item",
+						"payload": {
+							"itemId": "item_000000D1jaU8PHV02up84Np3SSWwN"
+						}
+					}
+				]
+			},
+			"jsonentry_000000D1lrKmoAoAxFkMhiy34Bt7i": {
+				"id": "jsonentry_000000D1lrKmoAoAxFkMhiy34Bt7i",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "object",
+				"name": "owner",
+				"enabled": true
+			},
+			"jsonentry_000000D1lrLYqLnvdVtR6NlAFzzCo": {
+				"id": "jsonentry_000000D1lrLYqLnvdVtR6NlAFzzCo",
+				"parentId": "jsonentry_000000D1lrKmoAoAxFkMhiy34Bt7i",
+				"type": "string",
+				"name": "type",
+				"enabled": true,
+				"value": [
+					"user"
+				]
+			},
+			"jsonentry_000000D1lrLYqLnvdVtR6NlAFzzE4": {
+				"id": "jsonentry_000000D1lrLYqLnvdVtR6NlAFzzE4",
+				"parentId": "jsonentry_000000D1lrKmoAoAxFkMhiy34Bt7i",
+				"type": "string",
+				"name": "identifier",
+				"enabled": true,
+				"value": [
+					{
+						"type": "variable_group_item",
+						"payload": {
+							"itemId": "item_000000D1jaU8PHV02up84Np3SSWwN"
+						}
+					}
+				]
+			},
+			"jsonentry_000000D1m5mxjeS2WXtpFQDyZsBLO": {
+				"id": "jsonentry_000000D1m5mxjeS2WXtpFQDyZsBLO",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "string",
+				"name": "streaming_channel_id",
+				"enabled": true,
+				"value": [
+					{
+						"type": "uuid",
+						"payload": {
+							"version": "v4"
+						}
+					}
+				]
+			}
+		}
+	},
+	"options": {
+		"followRedirects": false
+	}
+}

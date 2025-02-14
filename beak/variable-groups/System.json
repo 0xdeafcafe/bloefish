@@ -1,0 +1,56 @@
+{
+	"groups": {
+		"group_000000D1hX1aCn89xC2nucN5oz4VP": "Docker",
+		"group_000000D1hX1aCn89xC2nucN5oz4VQ": "Local"
+	},
+	"items": {
+		"item_000000D1hX1aCn89xC2nucN5oz4VR": "system_identifier",
+		"item_000000D1hfC3SI71CFMCm6tapIaJi": "svc_user_url",
+		"item_000000D1jJedxq0crIujqEZ8f0RMB": "svc_conversation_url",
+		"item_000000D1jaU8PHV02up84Np3SSWwN": "actor_default_user_id",
+		"item_000000D1jhs1A68yspI37E0b10cHq": "svc_ai_relay_url",
+		"item_000000D1la34WQEmrAee6Ar7OIfYp": "svc_file_upload_url",
+		"item_000000D1m0lOjiNAiKiSWBahdLC56": "svc_stream_url"
+	},
+	"values": {
+		"group_000000D1hX1aCn89xC2nucN5oz4VP&item_000000D1hX1aCn89xC2nucN5oz4VR": [
+			"docker"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VQ&item_000000D1hX1aCn89xC2nucN5oz4VR": [
+			"local"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VP&item_000000D1hfC3SI71CFMCm6tapIaJi": [
+			"http://svc_user.bloefish.local:4001"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VQ&item_000000D1hfC3SI71CFMCm6tapIaJi": [
+			"http://localhost:4001"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VP&item_000000D1jJedxq0crIujqEZ8f0RMB": [
+			"http://svc_conversation.bloefish.local:4002"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VQ&item_000000D1jJedxq0crIujqEZ8f0RMB": [
+			"http://localhost:4002"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VP&item_000000D1jaU8PHV02up84Np3SSWwN": [
+			"user_000000D1jZTNHmi4YpzDQQvwkLzqz"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VP&item_000000D1jhs1A68yspI37E0b10cHq": [
+			"http://svc_ai_relay.bloefish.local:4003"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VQ&item_000000D1jhs1A68yspI37E0b10cHq": [
+			"http://localhost:4003"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VP&item_000000D1la34WQEmrAee6Ar7OIfYp": [
+			"http://svc_file_upload.bloefish.local:4005"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VQ&item_000000D1la34WQEmrAee6Ar7OIfYp": [
+			"http://localhost:4005"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VP&item_000000D1m0lOjiNAiKiSWBahdLC56": [
+			"http://svc_stream.bloefish.local:4004"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VQ&item_000000D1m0lOjiNAiKiSWBahdLC56": [
+			"http://localhost:4004"
+		]
+	}
+}

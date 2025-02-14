@@ -1,0 +1,92 @@
+{
+	"id": "request_000000D1lafhQnwGWqctRUymPrQFb",
+	"verb": "post",
+	"headers": {},
+	"url": [
+		{
+			"type": "variable_group_item",
+			"payload": {
+				"itemId": "item_000000D1la34WQEmrAee6Ar7OIfYp"
+			}
+		},
+		"/rpc/2025-02-12/create_upload"
+	],
+	"query": {},
+	"body": {
+		"type": "json",
+		"payload": {
+			"jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys": {
+				"id": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"name": "<Root>",
+				"enabled": true,
+				"parentId": null,
+				"type": "object"
+			},
+			"jsonentry_000000D1jngwfI91Z0IwxjLL1a7Li": {
+				"id": "jsonentry_000000D1jngwfI91Z0IwxjLL1a7Li",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "string",
+				"name": "name",
+				"enabled": true,
+				"value": [
+					"file-text.txt"
+				]
+			},
+			"jsonentry_000000D1jngwfI91Z0IwxjLL1a7Mz": {
+				"id": "jsonentry_000000D1jngwfI91Z0IwxjLL1a7Mz",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "number",
+				"name": "size",
+				"enabled": true,
+				"value": [
+					"946"
+				]
+			},
+			"jsonentry_000000D1jngwfI91Z0IwxjLL1a7Oc": {
+				"id": "jsonentry_000000D1jngwfI91Z0IwxjLL1a7Oc",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "string",
+				"name": "mime_type",
+				"enabled": true,
+				"value": [
+					"text/plain"
+				]
+			},
+			"jsonentry_000000D1lalEXV3MFqoXiCLtUUPVy": {
+				"id": "jsonentry_000000D1lalEXV3MFqoXiCLtUUPVy",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "object",
+				"name": "owner",
+				"enabled": true
+			},
+			"jsonentry_000000D1lalfzJce4ZT9eZf6SNbrn": {
+				"id": "jsonentry_000000D1lalfzJce4ZT9eZf6SNbrn",
+				"parentId": "jsonentry_000000D1lalEXV3MFqoXiCLtUUPVy",
+				"type": "string",
+				"name": "type",
+				"enabled": true,
+				"value": [
+					"user"
+				]
+			},
+			"jsonentry_000000D1lalfzJce4ZT9eZf6SNbsb": {
+				"id": "jsonentry_000000D1lalfzJce4ZT9eZf6SNbsb",
+				"parentId": "jsonentry_000000D1lalEXV3MFqoXiCLtUUPVy",
+				"type": "string",
+				"name": "identifier",
+				"enabled": true,
+				"value": [
+					{
+						"type": "variable_group_item",
+						"payload": {
+							"itemId": "item_000000D1jaU8PHV02up84Np3SSWwN"
+						}
+					}
+				]
+			}
+		}
+	},
+	"options": {
+		"followRedirects": false
+	}
+}

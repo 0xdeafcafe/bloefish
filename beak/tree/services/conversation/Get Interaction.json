@@ -1,0 +1,46 @@
+{
+	"id": "request_000000D1jnRL6I58ycDNWTfiTRqtj",
+	"verb": "post",
+	"url": [
+		{
+			"type": "variable_group_item",
+			"payload": {
+				"itemId": "item_000000D1jJedxq0crIujqEZ8f0RMB"
+			}
+		},
+		"/rpc/2025-02-12/get_interaction"
+	],
+	"query": {},
+	"headers": {
+		"header_000000D1hfbBAKPZs7WvxRjD94d3u": {
+			"name": "Accept",
+			"value": [
+				"application/json"
+			],
+			"enabled": true
+		}
+	},
+	"body": {
+		"type": "json",
+		"payload": {
+			"jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ": {
+				"id": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"name": "<Root>",
+				"enabled": true,
+				"parentId": null,
+				"type": "object"
+			},
+			"jsonentry_000000D1jaBQhZS6jU9H2Uyy95s8F": {
+				"id": "jsonentry_000000D1jaBQhZS6jU9H2Uyy95s8F",
+				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"type": "string",
+				"name": "interaction_id",
+				"enabled": true,
+				"value": []
+			}
+		}
+	},
+	"options": {
+		"followRedirects": false
+	}
+}

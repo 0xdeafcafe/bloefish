@@ -1,0 +1,69 @@
+{
+	"id": "request_000000D1ldQabddCIrT6scZVHWFBg",
+	"verb": "put",
+	"headers": {},
+	"url": [
+		"http://storageminio.bloefish.local:9000/bloefish-svc-files/file_000000D1ldWfjVInywfVDtwm4bBqb"
+	],
+	"query": {
+		"query_000000D1ldaltzTb598eCBD53INH8": {
+			"name": "X-Amz-Algorithm",
+			"value": [
+				"AWS4-HMAC-SHA256"
+			],
+			"enabled": true
+		},
+		"query_000000D1ldaslRcQ2KIngH2NnGfqg": {
+			"name": "X-Amz-Credential",
+			"value": [
+				{
+					"type": "url_decode",
+					"payload": {
+						"input": [
+							"admin%2F20250212%2Fus-east-1%2Fs3%2Faws4_request"
+						]
+					}
+				}
+			],
+			"enabled": true
+		},
+		"query_000000D1ldaslRcQ2KIngH2NnGft0": {
+			"name": "X-Amz-Date",
+			"value": [
+				"20250212T151229Z"
+			],
+			"enabled": true
+		},
+		"query_000000D1ldazctlEzVSxAMrgXEySi": {
+			"name": "X-Amz-Expires",
+			"value": [
+				"900"
+			],
+			"enabled": true
+		},
+		"query_000000D1ldazctlEzVSxAMrgXEyV2": {
+			"name": "X-Amz-SignedHeaders",
+			"value": [
+				"host"
+			],
+			"enabled": true
+		},
+		"query_000000D1ldb6ULu3wgd6eSgzHDH1u": {
+			"name": "X-Amz-Signature",
+			"value": [
+				"7ba14b66f4511f7e68538c1a2a70c4316a55ac9aa120a2a84c1fac3f82af3d9b"
+			],
+			"enabled": true
+		}
+	},
+	"body": {
+		"type": "file",
+		"payload": {
+			"fileReferenceId": "fileref_000000D1ldkBD6cmahw7BE47gXe2i",
+			"contentType": "text/plain"
+		}
+	},
+	"options": {
+		"followRedirects": false
+	}
+}

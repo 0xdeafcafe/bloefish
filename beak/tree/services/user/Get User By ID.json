@@ -1,0 +1,53 @@
+{
+	"id": "request_000000D1hX1aCn89xC2nucN5oz4VN",
+	"verb": "post",
+	"url": [
+		{
+			"type": "variable_group_item",
+			"payload": {
+				"itemId": "item_000000D1hfC3SI71CFMCm6tapIaJi"
+			}
+		},
+		"/rpc/2025-02-12/get_user_by_id"
+	],
+	"query": {},
+	"headers": {
+		"header_000000D1hfbBAKPZs7WvxRjD94d3u": {
+			"name": "Accept",
+			"value": [
+				"application/json"
+			],
+			"enabled": true
+		}
+	},
+	"body": {
+		"type": "json",
+		"payload": {
+			"jsonentry_000000D1hfrmUPkr385slXqYMxam8": {
+				"id": "jsonentry_000000D1hfrmUPkr385slXqYMxam8",
+				"name": "<Root>",
+				"enabled": true,
+				"parentId": null,
+				"type": "object"
+			},
+			"jsonentry_000000D1hfs74mBJufaLDpKSasUYM": {
+				"id": "jsonentry_000000D1hfs74mBJufaLDpKSasUYM",
+				"parentId": "jsonentry_000000D1hfrmUPkr385slXqYMxam8",
+				"type": "string",
+				"name": "user_id",
+				"enabled": true,
+				"value": [
+					{
+						"type": "variable_group_item",
+						"payload": {
+							"itemId": "item_000000D1jaU8PHV02up84Np3SSWwN"
+						}
+					}
+				]
+			}
+		}
+	},
+	"options": {
+		"followRedirects": false
+	}
+}

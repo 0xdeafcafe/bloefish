@@ -1,0 +1,30 @@
+{
+	"id": "request_000000D1hgLDp9bSx1eZsXwxbfKM4",
+	"verb": "post",
+	"url": [
+		{
+			"type": "variable_group_item",
+			"payload": {
+				"itemId": "item_000000D1hfC3SI71CFMCm6tapIaJi"
+			}
+		},
+		"/rpc/2025-02-12/get_or_create_default_user"
+	],
+	"query": {},
+	"headers": {
+		"header_000000D1hfbBAKPZs7WvxRjD94d3u": {
+			"name": "Accept",
+			"value": [
+				"application/json"
+			],
+			"enabled": true
+		}
+	},
+	"body": {
+		"type": "text",
+		"payload": ""
+	},
+	"options": {
+		"followRedirects": false
+	}
+}

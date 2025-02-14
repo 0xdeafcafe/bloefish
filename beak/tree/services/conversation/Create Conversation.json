@@ -1,0 +1,112 @@
+{
+	"id": "request_000000D1jnRYpCMmsyXgUfKJxOS3z",
+	"verb": "post",
+	"url": [
+		{
+			"type": "variable_group_item",
+			"payload": {
+				"itemId": "item_000000D1jJedxq0crIujqEZ8f0RMB"
+			}
+		},
+		"/rpc/2025-02-12/create_conversation"
+	],
+	"query": {},
+	"headers": {
+		"header_000000D1hfbBAKPZs7WvxRjD94d3u": {
+			"name": "Accept",
+			"value": [
+				"application/json"
+			],
+			"enabled": true
+		}
+	},
+	"body": {
+		"type": "json",
+		"payload": {
+			"jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ": {
+				"id": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"name": "<Root>",
+				"enabled": true,
+				"parentId": null,
+				"type": "object"
+			},
+			"jsonentry_000000D1mDDVBMVkGmIPwWGlvlSkR": {
+				"id": "jsonentry_000000D1mDDVBMVkGmIPwWGlvlSkR",
+				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"type": "string",
+				"name": "idempotency_key",
+				"enabled": true,
+				"value": [
+					{
+						"type": "uuid",
+						"payload": {
+							"version": "v4"
+						}
+					}
+				]
+			},
+			"jsonentry_000000D1mDDVBMVkGmIPwWGlvlSlh": {
+				"id": "jsonentry_000000D1mDDVBMVkGmIPwWGlvlSlh",
+				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"type": "object",
+				"name": "owner",
+				"enabled": true
+			},
+			"jsonentry_000000D1mDDc2oeZDxSZQc64fjlHK": {
+				"id": "jsonentry_000000D1mDDc2oeZDxSZQc64fjlHK",
+				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"type": "object",
+				"name": "ai_relay_options",
+				"enabled": true
+			},
+			"jsonentry_000000D1mDGUScLw2diY33bvx1YUk": {
+				"id": "jsonentry_000000D1mDGUScLw2diY33bvx1YUk",
+				"parentId": "jsonentry_000000D1mDDc2oeZDxSZQc64fjlHK",
+				"type": "string",
+				"name": "provider_id",
+				"enabled": true,
+				"value": [
+					"open_ai"
+				]
+			},
+			"jsonentry_000000D1mDGUScLw2diY33bvx1YVe": {
+				"id": "jsonentry_000000D1mDGUScLw2diY33bvx1YVe",
+				"parentId": "jsonentry_000000D1mDDc2oeZDxSZQc64fjlHK",
+				"type": "string",
+				"name": "model_id",
+				"enabled": true,
+				"value": [
+					"gpt-4o"
+				]
+			},
+			"jsonentry_000000D1mDGUScLw2diY33bvx1YYg": {
+				"id": "jsonentry_000000D1mDGUScLw2diY33bvx1YYg",
+				"parentId": "jsonentry_000000D1mDDVBMVkGmIPwWGlvlSlh",
+				"type": "string",
+				"name": "type",
+				"enabled": true,
+				"value": [
+					"user"
+				]
+			},
+			"jsonentry_000000D1mDGUScLw2diY33bvx1YZa": {
+				"id": "jsonentry_000000D1mDGUScLw2diY33bvx1YZa",
+				"parentId": "jsonentry_000000D1mDDVBMVkGmIPwWGlvlSlh",
+				"type": "string",
+				"name": "identifier",
+				"enabled": true,
+				"value": [
+					{
+						"type": "variable_group_item",
+						"payload": {
+							"itemId": "item_000000D1jaU8PHV02up84Np3SSWwN"
+						}
+					}
+				]
+			}
+		}
+	},
+	"options": {
+		"followRedirects": false
+	}
+}

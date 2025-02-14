@@ -1,0 +1,6 @@
+# Beak specific files, DO NOT REMOVE THIS
+.beak
+
+# Platform files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,13 @@
+{
+	"groups": {
+		"group_000000D1hfLuBgmA9GvoyTXUorGMO": "Production"
+	},
+	"items": {
+		"item_000000D1hfLuBgmA9GvoyTXUorGMP": "env_identifier"
+	},
+	"values": {
+		"group_000000D1hfLuBgmA9GvoyTXUorGMO&item_000000D1hfLuBgmA9GvoyTXUorGMP": [
+			"prod"
+		]
+	}
+}

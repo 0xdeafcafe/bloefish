@@ -1,0 +1,48 @@
+{
+	"id": "request_000000D1lflnjl4FaovIMqhrfq4mI",
+	"verb": "post",
+	"headers": {},
+	"url": [
+		{
+			"type": "variable_group_item",
+			"payload": {
+				"itemId": "item_000000D1la34WQEmrAee6Ar7OIfYp"
+			}
+		},
+		"/rpc/2025-02-12/confirm_upload"
+	],
+	"query": {},
+	"body": {
+		"type": "json",
+		"payload": {
+			"jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys": {
+				"id": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"name": "<Root>",
+				"enabled": true,
+				"parentId": null,
+				"type": "object"
+			},
+			"jsonentry_000000D1jngwfI91Z0IwxjLL1a7Li": {
+				"id": "jsonentry_000000D1jngwfI91Z0IwxjLL1a7Li",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "string",
+				"name": "file_id",
+				"enabled": true,
+				"value": [
+					{
+						"type": "response_body_json",
+						"payload": {
+							"requestId": "request_000000D1lafhQnwGWqctRUymPrQFb",
+							"dotPath": [
+								"id"
+							]
+						}
+					}
+				]
+			}
+		}
+	},
+	"options": {
+		"followRedirects": false
+	}
+}
