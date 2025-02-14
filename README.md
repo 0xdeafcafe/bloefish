@@ -15,7 +15,7 @@ AI models and providers, via a few simple to use touch points.
 | `stream`       | `4004` | Handles streaming.                                                  | [View](./services/stream/README.md) |
 | `file_upload`   | `4005` | Handles management, including uploading, of files.                   | [View](./services/fileupload/README.md) |
 
-## Applications
+## Applications
 
 | Application | Port   | Description                                                         | Readme                            |
 | ----------- | ------ | ------------------------------------------------------------------- | --------------------------------- |
