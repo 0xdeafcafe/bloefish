@@ -1,10 +1,10 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import { user } from './user';
+import { userApi } from './user';
 
-export const bloefishApiReducer = combineReducers({
-	[user.reducerPath]: user.reducer,
-});
+export const bloefishApiReducers = {
+	[userApi.reducerPath]: userApi.reducer,
+};
 
 export const bloefishApiMiddleware = [
-	user.middleware,
+	userApi.middleware,
 ];

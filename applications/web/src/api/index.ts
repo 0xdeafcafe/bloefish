@@ -1,9 +1,9 @@
 import { combineReducers } from '@reduxjs/toolkit';
-import { bloefishApiMiddleware, bloefishApiReducer } from './bloefish';
+import { bloefishApiMiddleware, bloefishApiReducers } from './bloefish';
 
-export const apiReducer = combineReducers({
-	bloefish: bloefishApiReducer,
-});
+export const apiReducers = {
+	...bloefishApiReducers,
+};
 
 export const apiMiddleware = [
 	...bloefishApiMiddleware,

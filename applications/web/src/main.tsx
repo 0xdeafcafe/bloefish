@@ -6,6 +6,7 @@ import { Welcome } from './welcome/welcome';
 import { Provider as ChakraProvider } from './components/ui/provider';
 import { Provider as ReduxProvider } from 'react-redux';
 import { store } from './store';
+import { EnsureReadiness } from './components/molecules/EnsureReadiness';
 
 const root = createRoot(document.getElementById('root')!);
 
@@ -15,10 +16,12 @@ root.render(
 			<BrowserRouter>
 				<ReduxProvider store={store}>
 					<App>
-						<Routes>
-							<Route path="/" element={<h1>home</h1>} />
-							<Route path="testing" element={<Welcome />} />
-						</Routes>
+						<EnsureReadiness>
+							<Routes>
+								<Route path="/" element={<h1>home</h1>} />
+								<Route path="testing" element={<Welcome />} />
+							</Routes>
+						</EnsureReadiness>
 					</App>
 				</ReduxProvider>
 			</BrowserRouter>
