@@ -49,6 +49,7 @@ $ echo "127.0.0.1 storageminio" | sudo tee -a /etc/hosts
 $ make install
 $ make build
 $ make start
+$ open http://app.bloefish.local:5000/testing
 ```
 
 ## Current annoyances
