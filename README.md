@@ -20,6 +20,7 @@ AI models and providers, via a few simple to use touch points.
 | Application | Port   | Description                                                         | Readme                            |
 | ----------- | ------ | ------------------------------------------------------------------- | --------------------------------- |
 | `web`       | `5000` | A web application for interacting with Bloefish's backend.           | [View](./applications/web/README.md) |
+| `cli`	      | `N/A`  | A command line interface for interacting with Bloefish's backend.    | [View](./applications/cli/README.md) |
 
 Bloefish also exposes a full RPC API, which Bloefish itself uses, which can be used. Each
 backend service exposes a full readme, and an API definition can be found [here](./beak).
@@ -35,6 +36,7 @@ backend service exposes a full readme, and an API definition can be found [here]
 To run the project, fire the following commands into your terminal:
 
 ```
+# This is temporary until I think of a better solution
 $ echo "127.0.0.1 app.bloefish.local" | sudo tee -a /etc/hosts
 $ echo "127.0.0.1 svc_ai_relay.bloefish.local" | sudo tee -a /etc/hosts
 $ echo "127.0.0.1 svc_conversation.bloefish.local" | sudo tee -a /etc/hosts
@@ -43,10 +45,10 @@ $ echo "127.0.0.1 svc_stream.bloefish.local" | sudo tee -a /etc/hosts
 $ echo "127.0.0.1 svc_user.bloefish.local" | sudo tee -a /etc/hosts
 $ echo "127.0.0.1 storageminio" | sudo tee -a /etc/hosts
 
-# This is the setup for the project
-$ yarn install --frozen-lockfile
-$ go mod tidy
-$ make all
+# Get the project going
+$ make install
+$ make build
+$ make start
 ```
 
 ## Current annoyances

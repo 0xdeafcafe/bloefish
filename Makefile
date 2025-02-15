@@ -4,21 +4,21 @@ build-go:
 	mkdir -p ./bin
 	GOOS=linux go build -o ./bin/bloefish ./cmd/bloefish/...
 
-# Build the JS code
 build-js:
 	yarn build
 
-# Build the Docker image
 docker-build:
 	docker build -t go_service -f go_service.Dockerfile .
 
-# Start Docker Compose
-docker-up:
-	docker-compose up --build -d
+install:
+	yarn
+	go mod download
 
-# Combined command to build Go code, build Docker image, and start Docker Compose
-all: build-js build-go docker-build docker-up
+build: build-js build-go docker-build
 
-services: build-go docker-build docker-up
-web: build-js docker-build docker-up
-infra: docker-build docker-up
+start: docker-compose up --build -d
+
+# Aliases for build&start, but only does what is necessary
+services: build-go docker-build start
+web: build-js docker-build start
+infra: docker-build start
