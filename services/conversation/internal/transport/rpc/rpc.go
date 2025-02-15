@@ -17,12 +17,16 @@ import (
 	"github.com/0xdeafcafe/bloefish/libraries/crpc/middlewares"
 	"github.com/0xdeafcafe/bloefish/libraries/jsonschema"
 	"github.com/0xdeafcafe/bloefish/libraries/version"
+	"github.com/0xdeafcafe/bloefish/services/conversation"
 	"github.com/0xdeafcafe/bloefish/services/conversation/internal/app"
 )
 
 //go:embed *.json
 var fs embed.FS
 var schema = jsonschema.NewFS(fs).LoadJSONExt
+
+// Ensure RPC implements fileupload.Service.
+var _ conversation.Service = (*RPC)(nil)
 
 type RPC struct {
 	app *app.App
@@ -41,9 +45,9 @@ func New(ctx context.Context, app *app.App) *RPC {
 	svr := crpc.NewServer(middlewares.UnsafeNoAuthentication)
 	svr.Use(crpc.Logger())
 
-	svr.Register("create_conversation", "2025-02-12", schema("create_conversation"), rpc.HandleCreateConversation)
-	svr.Register("create_conversation_message", "2025-02-12", schema("create_conversation_message"), rpc.HandleCreateConversationMessage)
-	svr.Register("get_interaction", "2025-02-12", schema("get_interaction"), rpc.HandleGetInteraction)
+	svr.Register("create_conversation", "2025-02-12", schema("create_conversation"), rpc.CreateConversation)
+	svr.Register("create_conversation_message", "2025-02-12", schema("create_conversation_message"), rpc.CreateConversationMessage)
+	svr.Register("get_interaction", "2025-02-12", schema("get_interaction"), rpc.GetInteraction)
 
 	mux := chi.NewRouter()
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))

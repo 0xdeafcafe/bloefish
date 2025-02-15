@@ -17,12 +17,16 @@ import (
 	"github.com/0xdeafcafe/bloefish/libraries/crpc/middlewares"
 	"github.com/0xdeafcafe/bloefish/libraries/jsonschema"
 	"github.com/0xdeafcafe/bloefish/libraries/version"
+	"github.com/0xdeafcafe/bloefish/services/airelay"
 	"github.com/0xdeafcafe/bloefish/services/airelay/internal/app"
 )
 
 //go:embed *.json
 var fs embed.FS
 var schema = jsonschema.NewFS(fs).LoadJSONExt
+
+// Ensure RPC implements fileupload.Service.
+var _ airelay.Service = (*RPC)(nil)
 
 type RPC struct {
 	app *app.App
@@ -41,9 +45,9 @@ func New(ctx context.Context, app *app.App) *RPC {
 	svr := crpc.NewServer(middlewares.UnsafeNoAuthentication)
 	svr.Use(crpc.Logger())
 
-	svr.Register("list_supported", "2025-02-12", nil, rpc.HandleListSupported)
-	svr.Register("invoke_conversation_message", "2025-02-12", schema("invoke_conversation_message"), rpc.HandleInvokeConversationMessage)
-	svr.Register("invoke_streaming_conversation_message", "2025-02-12", schema("invoke_streaming_conversation_message"), rpc.HandleInvokeStreamingConversationMessage)
+	svr.Register("list_supported", "2025-02-12", nil, rpc.ListSupported)
+	svr.Register("invoke_conversation_message", "2025-02-12", schema("invoke_conversation_message"), rpc.InvokeConversationMessage)
+	svr.Register("invoke_streaming_conversation_message", "2025-02-12", schema("invoke_streaming_conversation_message"), rpc.InvokeStreamingConversationMessage)
 
 	mux := chi.NewRouter()
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))

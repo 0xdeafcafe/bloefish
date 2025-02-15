@@ -6,7 +6,7 @@ import (
 	"github.com/0xdeafcafe/bloefish/services/user"
 )
 
-func (r *RPC) HandleGetOrCreateDefaultUser(ctx context.Context) (*user.GetOrCreateDefaultUserResponse, error) {
+func (r *RPC) GetOrCreateDefaultUser(ctx context.Context) (*user.GetOrCreateDefaultUserResponse, error) {
 	userResponse, err := r.app.GetOrCreateDefaultUser(ctx)
 	if err != nil {
 		return nil, err

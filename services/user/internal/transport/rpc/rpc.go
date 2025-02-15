@@ -13,6 +13,7 @@ import (
 	"github.com/0xdeafcafe/bloefish/libraries/crpc/middlewares"
 	"github.com/0xdeafcafe/bloefish/libraries/jsonschema"
 	"github.com/0xdeafcafe/bloefish/libraries/version"
+	"github.com/0xdeafcafe/bloefish/services/user"
 	"github.com/0xdeafcafe/bloefish/services/user/internal/app"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
@@ -22,6 +23,9 @@ import (
 //go:embed *.json
 var fs embed.FS
 var schema = jsonschema.NewFS(fs).LoadJSONExt
+
+// Ensure RPC implements user.Service.
+var _ user.Service = (*RPC)(nil)
 
 type RPC struct {
 	app *app.App
@@ -40,8 +44,8 @@ func New(ctx context.Context, app *app.App) *RPC {
 	svr := crpc.NewServer(middlewares.UnsafeNoAuthentication)
 	svr.Use(crpc.Logger())
 
-	svr.Register("get_user_by_id", "2025-02-12", schema("get_user_by_id"), rpc.HandleGetUserByID)
-	svr.Register("get_or_create_default_user", "2025-02-12", nil, rpc.HandleGetOrCreateDefaultUser)
+	svr.Register("get_user_by_id", "2025-02-12", schema("get_user_by_id"), rpc.GetUserByID)
+	svr.Register("get_or_create_default_user", "2025-02-12", nil, rpc.GetOrCreateDefaultUser)
 
 	mux := chi.NewRouter()
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))

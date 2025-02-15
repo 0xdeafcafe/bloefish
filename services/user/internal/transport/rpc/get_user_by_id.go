@@ -6,7 +6,7 @@ import (
 	"github.com/0xdeafcafe/bloefish/services/user"
 )
 
-func (r *RPC) HandleGetUserByID(ctx context.Context, req *user.GetUserByIDRequest) (*user.GetUserByIDResponse, error) {
+func (r *RPC) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) (*user.GetUserByIDResponse, error) {
 	userResponse, err := r.app.GetUserByID(ctx, req.UserID)
 	if err != nil {
 		return nil, err

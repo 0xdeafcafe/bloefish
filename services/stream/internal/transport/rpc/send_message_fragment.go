@@ -6,6 +6,6 @@ import (
 	"github.com/0xdeafcafe/bloefish/services/stream"
 )
 
-func (r *RPC) HandleSendMessageFragment(ctx context.Context, req *stream.SendMessageFragmentRequest) error {
+func (r *RPC) SendMessageFragment(ctx context.Context, req *stream.SendMessageFragmentRequest) error {
 	return r.app.SendMessageFragment(ctx, req)
 }

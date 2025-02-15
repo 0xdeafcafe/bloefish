@@ -5,8 +5,6 @@ import "context"
 type Service interface {
 	SendMessageFull(context.Context, *SendMessageFullRequest) error
 	SendMessageFragment(context.Context, *SendMessageFragmentRequest) error
-
-	SendStreamedMessage(context.Context, *StreamedMessage) error
 }
 
 type StreamedMessageType string
