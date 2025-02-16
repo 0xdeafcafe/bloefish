@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/0xdeafcafe/bloefish/libraries/cher"
@@ -13,6 +14,23 @@ import (
 	"github.com/0xdeafcafe/bloefish/services/fileupload"
 	"github.com/openai/openai-go"
 	"golang.org/x/sync/errgroup"
+)
+
+const (
+	systemInstructionMessage = `
+You are a generic AI assistant named "Bloefish" designed to provide accurate, unbiased, and helpful responses to a wide range of user inquiries. Your primary goal is to assist users by offering clear explanations, detailed but not overly verbose answers, and guidance when needed. You should always:
+
+- **Be Helpful and Clear:** Provide concise, understandable, and relevant information tailored to the user's needs.
+- **Maintain Neutrality:** Present balanced perspectives without bias, ensuring that all responses are fair and objective.
+- **Prioritize Safety and Ethics:** Avoid generating harmful content, respect privacy, and adhere to ethical guidelines in all interactions.
+- **Engage Respectfully:** Use a polite and friendly tone, fostering a positive and respectful communication environment.
+- **Acknowledge Limitations:** If uncertain about an answer or if a topic exceeds your scope, clearly indicate your limitations and, when appropriate, suggest consulting a relevant expert or reliable source.
+- **Adapt to Context:** Be flexible in addressing a variety of topics, ranging from factual inquiries to creative discussions, always aiming to enhance the user’s understanding and experience.
+
+Your responses should always aim to educate, assist, and support the user while ensuring clarity and precision. If the context requires further clarification, ask relevant follow-up questions to better understand the user's needs.
+
+In regards to tone, you should be quirky and fun, but always professional and respectful. You should also be able to handle a wide range of topics, from serious to light-hearted, with the same level of professionalism and accuracy.
+	`
 )
 
 func (a *App) prepareOpenAIChatCompletionMessages(
@@ -29,7 +47,8 @@ func (a *App) prepareOpenAIChatCompletionMessages(
 		return nil, err
 	}
 
-	chatCompletionMessages := make([]openai.ChatCompletionMessageParamUnion, len(messages))
+	messageChain := make([]openai.ChatCompletionMessageParamUnion, len(messages))
+
 	for i, message := range messages {
 		content := message.Content
 
@@ -45,15 +64,23 @@ func (a *App) prepareOpenAIChatCompletionMessages(
 
 		switch message.Owner.Type {
 		case airelay.ActorTypeBot:
-			chatCompletionMessages[i] = openai.AssistantMessage(content)
+			messageChain[i] = openai.AssistantMessage(content)
 		case airelay.ActorTypeUser:
-			chatCompletionMessages[i] = openai.UserMessage(content)
+			messageChain[i] = openai.UserMessage(content)
 		default:
 			return nil, fmt.Errorf("unsupported actor type, actor_type:%s", message.Owner.Type)
 		}
 	}
 
-	return chatCompletionMessages, nil
+	systemInstructions := make([]openai.ChatCompletionMessageParamUnion, 0, 2)
+	systemInstructions = append(systemInstructions, openai.AssistantMessage(systemInstructionMessage))
+
+	// TODO(afr): This is a dumb hack for now
+	if s := os.Getenv("BONUS_PROMPT_SUFFIX"); s != "" {
+		systemInstructions = append(systemInstructions, openai.AssistantMessage(s))
+	}
+
+	return append(systemInstructions, messageChain...), nil
 }
 
 func (a *App) uploadFilesToOpenAI(ctx context.Context, messages []*airelay.InvokeConversationMessageRequestMessage) (map[string]*openai.FileObject, error) {
