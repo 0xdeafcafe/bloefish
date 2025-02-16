@@ -6,7 +6,7 @@ Bloefish is a local AI framework, aiming to provide a simple way to interact wit
 AI models and providers, via a few simple to use touch points.
 
 <p align="center">
-	<img height="700" src="./assets/web.png">
+	<img src="./assets/web.png">
 </p>
 
 ## Services
