@@ -1,19 +1,35 @@
 import { Center, EmptyState, Icon, VStack } from "@chakra-ui/react";
 import { LuFishOff } from "react-icons/lu";
 
-export const NotFound: React.FC = () => (
+interface NotFoundProps {
+	Icon?: React.FC;
+	title?: string;
+	description?: string;
+}
+
+export const NotFound: React.FC<NotFoundProps> = ({
+	Icon,
+	title,
+	description,
+}) => (
 	<Center height={'full'}>
 		<EmptyState.Root size={'lg'}>
 			<EmptyState.Content>
 				<EmptyState.Indicator>
-					<LuFishOff style={{
-						'transform': 'scaleY(-1);',
-					}} />
+					{Icon ? (
+						<Icon />
+					) : (
+						<LuFishOff style={{
+							'transform': 'scaleY(-1);',
+						}} />
+					)}
 				</EmptyState.Indicator>
 				<VStack textAlign="center">
-					<EmptyState.Title>That page doesn't exist...</EmptyState.Title>
+					<EmptyState.Title>
+						{title ?? 'That page doesn\'t exist...'}
+					</EmptyState.Title>
 					<EmptyState.Description>
-						Have you tried looking harder?
+						{description ?? 'Have you tried looking harder?'}
 					</EmptyState.Description>
 				</VStack>
 			</EmptyState.Content>

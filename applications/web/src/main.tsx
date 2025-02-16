@@ -11,6 +11,7 @@ import { NotFound } from './pages/NotFound';
 import { PanelRoot } from './components/molecules/PanelRoot';
 import { NewConversation } from './features/new-conversation/NewConversation';
 import { Theme } from '@chakra-ui/react';
+import { Conversation } from './features/conversations/Conversation';
 
 const root = createRoot(document.getElementById('root')!);
 
@@ -24,6 +25,7 @@ root.render(
 							<EnsureReadiness>
 								<Routes>
 									<Route path="/" element={wrap(NewConversation)} />
+									<Route path="/conversations/:conversationId" element={wrap(Conversation)} />
 									<Route path="testing" element={wrap(Welcome)} />
 
 									<Route path="*" element={wrap(NotFound)} />

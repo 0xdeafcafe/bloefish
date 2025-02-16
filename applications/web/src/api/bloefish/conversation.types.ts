@@ -8,7 +8,7 @@ export interface CreateConversationRequest {
 
 export interface CreateConversationResponse {
 	conversationId: string;
-	streamChannelId: string;
+	streamChannelIdPrefix: string;
 }
 
 export interface CreateConversationMessageRequest {
@@ -28,5 +28,6 @@ export interface CreateConversationMessageRequestOptions {
 export interface CreateConversationMessageResponse {
 	conversationId: string;
 	interactionId: string;
+	responseInteractionId: string;
 	streamChannelId: string;
 }

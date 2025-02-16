@@ -2,28 +2,27 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { conversationApi } from "../bloefish/conversation";
 import type { RootState } from "~/store";
 import { userApi } from "../bloefish/user";
-import type { useNavigate } from "react-router";
 import { addActiveInteraction, addInteraction, startConversation } from "~/features/conversations/store";
 import type { Actor, AiRelayOptions } from "../bloefish/shared.types";
 
-interface StartConversation {
+interface ContinueConversation {
+	conversationId: string;
 	idempotencyKey: string;
 	messageContent: string;
-	navigate: ReturnType<typeof useNavigate>;
 }
 
-interface StartConversationReturned {
+interface ContinueConversationReturned {
 	conversationId: string;
 	interactionId: string;
 	streamChannelId: string;
 }
 
-export const startConversationChain = createAsyncThunk<
-	StartConversationReturned,
-	StartConversation,
+export const continueConversationChain = createAsyncThunk<
+	ContinueConversationReturned,
+	ContinueConversation,
 	{ state: RootState }
 >(
-	'flow/start-conversation',
+	'flow/continue-conversation',
 	async (params, { dispatch, rejectWithValue, getState }) => {
 		const state = getState();
 		const user = userApi.endpoints.getOrCreateDefaultUser.select()(state);
@@ -41,22 +40,9 @@ export const startConversationChain = createAsyncThunk<
 		};
 
 		try {
-			const conversation = await dispatch(conversationApi.endpoints.createConversation.initiate({
-				idempotencyKey: params.idempotencyKey,
-				owner,
-				aiRelayOptions,
-			})).unwrap();
-
-			dispatch(startConversation({
-				conversationId: conversation.conversationId,
-				owner,
-				aiRelayOptions,
-				streamChannelIdPrefix: conversation.streamChannelIdPrefix,
-			}));
-
 			const interaction = await dispatch(conversationApi.endpoints.createConversationMessage.initiate({
 				idempotencyKey: params.idempotencyKey,
-				conversationId: conversation.conversationId,
+				conversationId: params.conversationId,
 				messageContent: params.messageContent,
 				fileIds: [],
 				owner,
@@ -67,7 +53,7 @@ export const startConversationChain = createAsyncThunk<
 			})).unwrap();
 
 			dispatch(addInteraction({
-				conversationId: conversation.conversationId,
+				conversationId: params.conversationId,
 				interactionId: interaction.interactionId,
 				messageContent: params.messageContent,
 				streamChannelId: interaction.streamChannelId,
@@ -75,17 +61,15 @@ export const startConversationChain = createAsyncThunk<
 				owner,
 			}));
 			dispatch(addActiveInteraction({
-				conversationId: conversation.conversationId,
+				conversationId: params.conversationId,
 				interactionId: interaction.responseInteractionId,
 				messageContent: '',
 				streamChannelId: interaction.streamChannelId,
 				aiRelayOptions,
 			}));
 
-			params.navigate(`/conversations/${conversation.conversationId}`, { replace: true });
-
 			return {
-				conversationId: conversation.conversationId,
+				conversationId: params.conversationId,
 				interactionId: interaction.interactionId,
 				streamChannelId: interaction.streamChannelId,
 			};

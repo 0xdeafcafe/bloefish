@@ -6,11 +6,8 @@ export const EnsureReadiness: React.FC<React.PropsWithChildren> = ({ children })
 		isError,
 		isFetching,
 		isLoading,
-		isSuccess,
 		isUninitialized,
 	} = userApi.useGetOrCreateDefaultUserQuery();
-
-	console.log({ isError, isFetching, isLoading, isSuccess, isUninitialized });
 
 	if (isFetching || isLoading || isUninitialized) {
 		// render loading

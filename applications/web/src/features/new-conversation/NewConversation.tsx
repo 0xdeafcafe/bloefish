@@ -1,12 +1,12 @@
-import { Box, Card, Flex, HStack, Icon, IconButton, Status, Text, Textarea } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
-import { LuBot, LuFish, LuSend } from 'react-icons/lu';
+import { Box, Flex, HStack, Icon, Text } from '@chakra-ui/react';
+import { useState } from 'react';
+import { LuFish } from 'react-icons/lu';
 import { TagButton } from '~/components/ui/tag-button';
 import { motion } from 'framer-motion';
 import { useAppDispatch } from '~/store';
 import { startConversationChain } from '~/api/flows/start-conversation';
-
-const maxPromptLength = 5000;
+import { useNavigate } from 'react-router';
+import { ChatInput } from '../chat-input/ChatInput';
 
 const starterPrompts: string[] = [
 	'What is the meaning of life?',
@@ -18,12 +18,8 @@ const starterPrompts: string[] = [
 
 export const NewConversation: React.FC = () => {
 	const [timeOfDay, timeOfDayEmphasis, timeOfDayEmoji] = generateTimeOfDayText();
-	const [typedPrompt, setTypedPrompt] = useState('');
-	const [promptCount, setPromptCount] = useState(0);
-	const [promptStatusColor, setPromptStatusColor] = useState<'green' | 'red' | 'yellow'>('green');
-	const inputRef = useRef<HTMLTextAreaElement>(null);
-	const [isFocused, setIsFocused] = useState(false);
-	
+	const [question, setQuestion] = useState('');
+	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
 	const [working, setWorking] = useState(false);
 
@@ -31,33 +27,16 @@ export const NewConversation: React.FC = () => {
 		if (working) return;
 
 		setWorking(true);
-		dispatch(startConversationChain({
-			idempotencyKey: typedPrompt,
-			messageContent: typedPrompt,
-		}));
+		try {
+			await dispatch(startConversationChain({
+				idempotencyKey: question,
+				messageContent: question,
+				navigate,
+			})).unwrap();
+		} finally {
+			setWorking(false);
+		}
 	}
-
-	useEffect(() => {
-		if (typedPrompt.length > maxPromptLength) {
-			setTypedPrompt(typedPrompt.slice(0, maxPromptLength));
-		}
-
-		if (typedPrompt.length > maxPromptLength - 500) {
-			setPromptStatusColor('red');
-		} else if (typedPrompt.length > maxPromptLength - 1000) {
-			setPromptStatusColor('yellow');
-		} else {
-			setPromptStatusColor('green');
-		}
-
-		setPromptCount(typedPrompt.length);
-	}, [typedPrompt]);
-
-	useEffect(() => {
-		if (inputRef.current) {
-			inputRef.current.focus();
-		}
-	}, []);
 
 	return (
 		<Box
@@ -171,7 +150,8 @@ export const NewConversation: React.FC = () => {
 								key={prompt}
 								borderRadius={'full'}
 								onClicked={prompt => {
-									setTypedPrompt(prompt);
+									setQuestion(prompt);
+									askQuestion();
 								}}
 							>
 								{prompt}
@@ -180,56 +160,14 @@ export const NewConversation: React.FC = () => {
 					</Flex>
 				</Flex>
 
-				<Card.Root
-					variant={'outline'}
-					w={'2xl'}
-					marginBottom={6}
-					borderColor={isFocused ? 'purple.500' : 'border'}
-					blur={'10px'}
-					// TODO(afr): Fix light theme
-					background={'rgb(17 17 17 / 60%)'}
-				>
-					<Card.Body p={2}>
-						<HStack alignItems={'flex-start'} pb={2} pl={1} gap={0}>
-							<Icon mt={2} color={isFocused ? 'purple.500' : void 0}>
-								<LuBot />
-							</Icon>
-							<Textarea
-								border={'none'}
-								autoresize
-								maxH={'40'}
-								placeholder={'What are you too lazy to do today?'}
-								variant={'outline'}
-								_focus={{ border: 'transparent', outline: 'transparent' }}
-								value={typedPrompt}
-								onChange={(e) => setTypedPrompt(e.target.value)}
-								ref={inputRef}
-								onFocus={() => setIsFocused(true)}
-								onBlur={() => setIsFocused(false)}
-								onKeyDown={(e) => {
-									if (e.key === 'Enter' && e.shiftKey) {
-										e.preventDefault();
-										askQuestion();
-									}
-								}}
-							/>
-						</HStack>
-						<Flex justify={'flex-end'} align={'center'} gap={2}>
-							<Status.Root colorPalette={promptStatusColor} userSelect={'none'}>
-								{promptCount === 5000 ? '😱 ' : <Status.Indicator />}
-								{`${promptCount}/5000`}
-							</Status.Root>
-							<IconButton
-								aria-label={'Send message'}
-								disabled={working}
-								variant={'ghost'}
-								onClick={() => askQuestion()}
-							>
-								<LuSend />
-							</IconButton>
-						</Flex>
-					</Card.Body>
-				</Card.Root>
+				<Box mb={6}>
+					<ChatInput
+						disabled={working}
+						onChange={setQuestion}
+						onInvoke={askQuestion}
+						value={question}
+					/>
+				</Box>
 			</Flex>
 		</Box>
 	)

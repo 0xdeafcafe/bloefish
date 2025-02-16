@@ -1,12 +1,14 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { apiMiddleware, apiReducers } from './api';
 import { useDispatch, useSelector } from 'react-redux';
+import { conversationsReducer } from './features/conversations/store';
 
 export type RootState = ReturnType<typeof store.getState>;
 
 export const store = configureStore({
 	reducer: combineReducers({
 		...apiReducers,
+		conversationsReducer,
 	}),
 	devTools: true,
 	middleware: (getDefaultMiddleware) => 
