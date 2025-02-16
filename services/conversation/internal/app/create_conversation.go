@@ -33,7 +33,7 @@ func (a *App) CreateConversation(ctx context.Context, req *conversation.CreateCo
 	}
 
 	return &conversation.CreateConversationResponse{
-		ConversationID:  convo.ID,
-		StreamChannelID: convo.ID,
+		ConversationID:        convo.ID,
+		StreamChannelIDPrefix: convo.ID,
 	}, nil
 }

@@ -1,12 +1,16 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { CreateConversationMessageRequest, CreateConversationMessageResponse, CreateConversationRequest, CreateConversationResponse } from './conversation.types';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import type {
+	CreateConversationMessageRequest,
+	CreateConversationMessageResponse,
+	CreateConversationRequest,
+	CreateConversationResponse,
+
+} from './conversation.types';
+import { createBaseQueryWithSnake } from './base';
 
 export const conversationApi = createApi({
 	reducerPath: 'api.bloefish.conversation',
-	baseQuery: fetchBaseQuery({
-		baseUrl: 'http://svc_conversation.bloefish.local:4002/rpc/',
-		method: 'POST',
-	}),
+	baseQuery: createBaseQueryWithSnake('http://svc_conversation.bloefish.local:4002/rpc/'),
 
 	endpoints: (builder) => ({
 		createConversation: builder.mutation<CreateConversationResponse, CreateConversationRequest>({

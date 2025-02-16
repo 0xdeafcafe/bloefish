@@ -35,8 +35,8 @@ type CreateConversationRequest struct {
 }
 
 type CreateConversationResponse struct {
-	ConversationID  string `json:"conversation_id"`
-	StreamChannelID string `json:"stream_channel_id"`
+	ConversationID        string `json:"conversation_id"`
+	StreamChannelIDPrefix string `json:"stream_channel_id_prefix"`
 }
 
 type CreateConversationMessageRequest struct {
@@ -54,9 +54,10 @@ type CreateConversationMessageRequestOptions struct {
 }
 
 type CreateConversationMessageResponse struct {
-	ConversationID  string `json:"conversation_id"`
-	InteractionID   string `json:"interaction_id"`
-	StreamChannelID string `json:"stream_channel_id"`
+	ConversationID        string `json:"conversation_id"`
+	InteractionID         string `json:"interaction_id"`
+	ResponseInteractionID string `json:"response_interaction_id"`
+	StreamChannelID       string `json:"stream_channel_id"`
 }
 
 type GetInteractionRequest struct {

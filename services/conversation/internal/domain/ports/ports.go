@@ -13,6 +13,8 @@ type ConversationRepository interface {
 
 type InteractionRepository interface {
 	Create(ctx context.Context, cmd *models.CreateInteractionCommand) (*models.Interaction, error)
+	CreateActive(ctx context.Context, cmd *models.CreateActiveInteractionCommand) (*models.Interaction, error)
+	MarkActiveAsComplete(ctx context.Context, interactionID, messageContent string) error
 	GetByID(ctx context.Context, interactionID string) (*models.Interaction, error)
 	GetAllByConversationID(ctx context.Context, conversationID string) ([]*models.Interaction, error)
 }

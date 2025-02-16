@@ -16,8 +16,6 @@ func (a *App) InvokeStreamingConversationMessage(ctx context.Context, req *airel
 		return nil, fmt.Errorf("failed to prepare OpenAI chat completion messages: %w", err)
 	}
 
-	fmt.Println("a")
-
 	chatStream := a.OpenAI.Chat.Completions.NewStreaming(ctx, openai.ChatCompletionNewParams{
 		Messages: openai.F(chatCompletionMessages),
 		Seed:     openai.Int(1),
@@ -34,8 +32,6 @@ func (a *App) InvokeStreamingConversationMessage(ctx context.Context, req *airel
 	for chatStream.Next() {
 		chunk := chatStream.Current()
 		acc.AddChunk(chunk)
-
-		fmt.Println("b")
 
 		if content, ok := acc.JustFinishedContent(); ok {
 			if err := a.StreamService.SendMessageFull(ctx, &stream.SendMessageFullRequest{

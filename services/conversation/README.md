@@ -78,6 +78,8 @@ interface Response {
 	conversation_id: string;
 	interaction_id: string;
 
+	response_interaction_id: string;
+
 	// If streaming is used in the conversation at all, this is the channel the messages will be attached to.
 	stream_channel_id: string;
 }

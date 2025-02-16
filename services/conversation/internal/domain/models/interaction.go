@@ -12,9 +12,10 @@ type Interaction struct {
 	Owner          *Actor          `json:"owner"`
 	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
 
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   *time.Time `json:"updated_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
+	CompletedAt *time.Time `json:"completed_at"`
 }
 
 type CreateInteractionCommand struct {
@@ -32,6 +33,25 @@ type CreateInteractionCommandOwner struct {
 }
 
 type CreateInteractionCommandAIRelayOptions struct {
+	ProviderID string
+	ModelID    string
+}
+
+type CreateActiveInteractionCommand struct {
+	IdempotencyKey string
+	ConversationID string
+	FileIDs        []string
+	MessageContent string
+	Owner          *CreateActiveInteractionCommandOwner
+	AIRelayOptions *CreateActiveInteractionCommandAIRelayOptions
+}
+
+type CreateActiveInteractionCommandOwner struct {
+	Type       ActorType
+	Identifier string
+}
+
+type CreateActiveInteractionCommandAIRelayOptions struct {
 	ProviderID string
 	ModelID    string
 }

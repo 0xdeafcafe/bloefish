@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -57,23 +58,49 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 		return nil, fmt.Errorf("failed to create interaction: %w", err)
 	}
 
+	activeInteraction, err := a.InteractionRepository.CreateActive(ctx, &models.CreateActiveInteractionCommand{
+		IdempotencyKey: time.Now().Format(time.RFC3339Nano), // TODO(afr): Replace this
+		ConversationID: convo.ID,
+		FileIDs:        []string{},
+		MessageContent: "",
+		Owner: &models.CreateActiveInteractionCommandOwner{
+			Type:       models.ActorTypeBot,
+			Identifier: interactionAIRelayOptions.ProviderID,
+		},
+		AIRelayOptions: &models.CreateActiveInteractionCommandAIRelayOptions{
+			ProviderID: interactionAIRelayOptions.ProviderID,
+			ModelID:    interactionAIRelayOptions.ModelID,
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create active interaction: %w", err)
+	}
+
+	streamingChannelID := fmt.Sprintf("%s/%s", convo.ID, activeInteraction.ID)
+
 	forkedcontext.ForkContext(ctx, func(ctx context.Context) error {
 		conversationInteractions, err := a.InteractionRepository.GetAllByConversationID(ctx, convo.ID)
 		if err != nil {
 			return fmt.Errorf("failed to get full conversation: %w", err)
 		}
 
-		messages := make([]*airelay.InvokeConversationMessageRequestMessage, len(conversationInteractions))
+		messages := make([]*airelay.InvokeConversationMessageRequestMessage, 0, len(conversationInteractions))
 
-		for i, interaction := range conversationInteractions {
-			messages[i] = &airelay.InvokeConversationMessageRequestMessage{
+		for _, interaction := range conversationInteractions {
+			if interaction.CompletedAt == nil {
+				continue
+			}
+
+			fmt.Println(interaction.MessageContent)
+
+			messages = append(messages, &airelay.InvokeConversationMessageRequestMessage{
 				Owner: &airelay.Actor{
 					Type:       airelay.ActorType(interaction.Owner.Type),
 					Identifier: interaction.Owner.Identifier,
 				},
 				FileIDs: []string{},
 				Content: interaction.MessageContent,
-			}
+			})
 		}
 
 		var messageContent string
@@ -91,7 +118,7 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 
 		if req.Options.UseStreaming {
 			response, err := a.AIRelayService.InvokeStreamingConversationMessage(ctx, &airelay.InvokeStreamingConversationMessageRequest{
-				StreamingChannelID: convo.ID,
+				StreamingChannelID: streamingChannelID,
 				Owner: &airelay.Actor{
 					Type:       airelay.ActorType(req.Owner.Type),
 					Identifier: req.Owner.Identifier,
@@ -100,7 +127,8 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 				AIRelayOptions: aiRelayOptions,
 			})
 			if err != nil {
-				clog.Get(ctx).WithError(err).Error("failed to invoke streaming conversation message")
+				json, _ := json.Marshal(err)
+				clog.Get(ctx).WithError(err).WithField("json", string(json)).Error("failed to invoke streaming conversation message")
 
 				return fmt.Errorf("failed to invoke streaming conversation message: %w", err)
 			}
@@ -125,29 +153,17 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 			messageContent = response.MessageContent
 		}
 
-		if _, err = a.InteractionRepository.Create(ctx, &models.CreateInteractionCommand{
-			IdempotencyKey: time.Now().Format(time.RFC3339Nano), // TODO(afr): Replace this
-			ConversationID: convo.ID,
-			FileIDs:        []string{},
-			MessageContent: messageContent,
-			Owner: &models.CreateInteractionCommandOwner{
-				Type:       models.ActorTypeBot,
-				Identifier: "openai",
-			},
-			AIRelayOptions: &models.CreateInteractionCommandAIRelayOptions{
-				ProviderID: req.AIRelayOptions.ProviderID,
-				ModelID:    req.AIRelayOptions.ModelID,
-			},
-		}); err != nil {
-			return fmt.Errorf("failed to create response interaction: %w", err)
+		if err := a.InteractionRepository.MarkActiveAsComplete(ctx, activeInteraction.ID, messageContent); err != nil {
+			return fmt.Errorf("failed to confirm active interaction: %w", err)
 		}
 
 		return nil
 	})
 
 	return &conversation.CreateConversationMessageResponse{
-		ConversationID:  convo.ID,
-		InteractionID:   interaction.ID,
-		StreamChannelID: convo.ID,
+		ConversationID:        convo.ID,
+		InteractionID:         interaction.ID,
+		ResponseInteractionID: activeInteraction.ID,
+		StreamChannelID:       streamingChannelID,
 	}, nil
 }

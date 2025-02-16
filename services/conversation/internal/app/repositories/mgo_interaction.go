@@ -29,9 +29,10 @@ type persistedInteraction struct {
 		ModelID    string `bson:"model_id"`
 	} `bson:"ai_relay_options"`
 
-	CreatedAt time.Time  `bson:"created_at"`
-	UpdatedAt *time.Time `bson:"updated_at"`
-	DeletedAt *time.Time `bson:"deleted_at"`
+	CreatedAt   time.Time  `bson:"created_at"`
+	UpdatedAt   *time.Time `bson:"updated_at"`
+	DeletedAt   *time.Time `bson:"deleted_at"`
+	CompletedAt *time.Time `bson:"completed_at"`
 }
 
 type mgoInteraction struct {
@@ -68,8 +69,9 @@ func (r *mgoInteraction) Create(ctx context.Context, cmd *models.CreateInteracti
 				"model_id":    cmd.AIRelayOptions.ModelID,
 			},
 
-			"created_at": time.Now(),
-			"deleted_at": nil,
+			"created_at":   time.Now(),
+			"completed_at": time.Now(),
+			"deleted_at":   nil,
 		},
 	}, options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After))
 
@@ -79,6 +81,63 @@ func (r *mgoInteraction) Create(ctx context.Context, cmd *models.CreateInteracti
 	}
 
 	return interaction.ToDomainModel(), nil
+}
+
+func (r *mgoInteraction) CreateActive(ctx context.Context, cmd *models.CreateActiveInteractionCommand) (*models.Interaction, error) {
+	result := r.c.FindOneAndUpdate(ctx, bson.M{
+		"idempotency_key":  cmd.IdempotencyKey,
+		"conversation_id":  cmd.ConversationID,
+		"owner.type":       cmd.Owner.Type,
+		"owner.identifier": cmd.Owner.Identifier,
+	}, bson.M{
+		"$currentDate": bson.M{
+			"updated_at": true,
+		},
+		"$setOnInsert": bson.M{
+			"_id":             ksuid.Generate(ctx, "interaction").String(),
+			"idempotency_key": cmd.IdempotencyKey,
+			"conversation_id": cmd.ConversationID,
+			"message_content": cmd.MessageContent,
+			"file_ids":        cmd.FileIDs,
+
+			"owner": bson.M{
+				"type":       cmd.Owner.Type,
+				"identifier": cmd.Owner.Identifier,
+			},
+			"ai_relay_options": bson.M{
+				"provider_id": cmd.AIRelayOptions.ProviderID,
+				"model_id":    cmd.AIRelayOptions.ModelID,
+			},
+
+			"created_at":   time.Now(),
+			"deleted_at":   nil,
+			"completed_at": nil,
+		},
+	}, options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After))
+
+	var interaction *persistedInteraction
+	if err := result.Decode(&interaction); err != nil {
+		return nil, err
+	}
+
+	return interaction.ToDomainModel(), nil
+}
+
+func (r *mgoInteraction) MarkActiveAsComplete(ctx context.Context, interactionID, messageContent string) error {
+	_, err := r.c.UpdateOne(ctx, bson.M{
+		"_id":          interactionID,
+		"confirmed_at": nil,
+	}, bson.M{
+		"$currentDate": bson.M{
+			"updated_at":   true,
+			"completed_at": true,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *mgoInteraction) GetByID(ctx context.Context, interactionID string) (*models.Interaction, error) {
@@ -139,8 +198,9 @@ func (p *persistedInteraction) ToDomainModel() *models.Interaction {
 			ModelID:    p.AIRelayOptions.ModelID,
 		},
 
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
-		DeletedAt: p.DeletedAt,
+		CreatedAt:   p.CreatedAt,
+		UpdatedAt:   p.UpdatedAt,
+		DeletedAt:   p.DeletedAt,
+		CompletedAt: p.CompletedAt,
 	}
 }
