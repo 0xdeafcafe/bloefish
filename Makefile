@@ -20,6 +20,6 @@ start:
 	docker-compose up --build -d
 
 # Aliases for build&start, but only does what is necessary
-services: build-go docker-build start
-web: build-js docker-build start
-infra: docker-build start
+services: build-go build-docker start
+web: build-js build-docker start
+infra: build-docker start
