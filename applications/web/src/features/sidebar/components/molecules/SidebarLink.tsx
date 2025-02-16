@@ -22,7 +22,7 @@ export const SidebarLink: React.FC<SidebarButtonProps> = ({
 				background={active ? 'bg.emphasized' : 'transparent'}
 				paddingX={3}
 				paddingY={'5px'}
-				borderRadius={5}
+				borderRadius={'md'}
 				borderRightRadius={0}
 				onClick={onClick}
 				cursor={'pointer'}
@@ -31,7 +31,7 @@ export const SidebarLink: React.FC<SidebarButtonProps> = ({
 					<Icon color={active ? 'MenuText' : 'GrayText'}>
 						{icon}
 					</Icon>
-					<Text fontSize={"sm"} color={'MenuText'} fontWeight={'bold'}>{content}</Text>
+					<Text fontSize={"sm"} color={'MenuText'} fontWeight={'semibold'}>{content}</Text>
 				</HStack>
 			</Box>
 		</Link>

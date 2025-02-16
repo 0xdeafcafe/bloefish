@@ -7,7 +7,6 @@ import { motion } from 'motion/react';
 const sidebarStates = [
 	'new_conversation',
 	'conversations',
-	'files',
 	'workflows',
 	'preferences',
 ] as const;
@@ -43,7 +42,7 @@ export const Sidebar: React.FC = () => {
 						style={{
 							position: 'absolute',
 							left: 0,
-							width: '5px',
+							width: '6px',
 							height: '23px',
 							borderRadius: '0.125rem',
 							borderTopLeftRadius: 0,
@@ -63,7 +62,7 @@ export const Sidebar: React.FC = () => {
 						<SidebarLink
 							active={state === 'new_conversation'}
 							content={'New conversation'}
-							path={'/testing'}
+							path={'/'}
 							icon={<LuMessageCirclePlus />}
 						/>
 						<SidebarLink
@@ -71,12 +70,6 @@ export const Sidebar: React.FC = () => {
 							content={'Conversations'}
 							path={'/conversations'}
 							icon={<LuFolderOpen />}
-						/>
-						<SidebarLink
-							active={state === 'files'}
-							content={'Files'}
-							path={'/files'}
-							icon={<LuBox />}
 						/>
 						<SidebarLink
 							active={state === 'workflows'}
@@ -101,10 +94,9 @@ function useSidebarLocationState(): SidebarButtonState {
 	const loc = useLocation();
 
 	switch (true) {
+		case loc.pathname.startsWith('/testing'): // TODO(afr); Remove this
 		case loc.pathname.startsWith('/conversations'):
 			return 'conversations';
-		case loc.pathname.startsWith('/files'):
-			return 'files';
 		case loc.pathname.startsWith('/workflows'):
 			return 'workflows';
 		case loc.pathname.startsWith('/preferences'):

@@ -8,6 +8,9 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { store } from './store';
 import { EnsureReadiness } from './components/molecules/EnsureReadiness';
 import { NotFound } from './pages/NotFound';
+import { PanelRoot } from './components/molecules/PanelRoot';
+import { NewConversation } from './features/new-conversation/NewConversation';
+import { Theme } from '@chakra-ui/react';
 
 const root = createRoot(document.getElementById('root')!);
 
@@ -15,19 +18,29 @@ root.render(
 	<React.StrictMode>
 		<ChakraProvider>
 			<BrowserRouter>
-				<ReduxProvider store={store}>
-					<App>
-						<EnsureReadiness>
-							<Routes>
-								<Route path="/" element={<h1>home</h1>} />
-								<Route path="testing" element={<Welcome />} />
+				<Theme appearance={'dark'}>
+					<ReduxProvider store={store}>
+						<App>
+							<EnsureReadiness>
+								<Routes>
+									<Route path="/" element={wrap(NewConversation)} />
+									<Route path="testing" element={wrap(Welcome)} />
 
-								<Route path="*" element={<NotFound />} />
-							</Routes>
-						</EnsureReadiness>
-					</App>
-				</ReduxProvider>
+									<Route path="*" element={wrap(NotFound)} />
+								</Routes>
+							</EnsureReadiness>
+						</App>
+					</ReduxProvider>
+				</Theme>
 			</BrowserRouter>
 		</ChakraProvider>
 	</React.StrictMode>
 );
+
+function wrap(Component: React.FC) {
+	return (
+		<PanelRoot>
+			{<Component />}
+		</PanelRoot>
+	)
+}

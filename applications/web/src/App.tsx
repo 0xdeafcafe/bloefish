@@ -13,7 +13,11 @@ export const App: React.FC<React.PropsWithChildren> = ({ children }) => (
 				boxShadow={'md'}
 				marginBottom={3}
 			>
-				<Card.Body gap="2">
+				<Card.Body
+					p={0}
+					maxH={'calc(100vh - 3.5rem)'}
+					overflow={'hidden'}
+				>
 					{children}
 				</Card.Body>
 			</Card.Root>
