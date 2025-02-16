@@ -156,7 +156,7 @@ export const NewConversation: React.FC = () => {
 						maxW={'lg'}
 					>
 						{'You can pick a starter prompt from the list below, or you can '}
-						{'ask type a question for me below.'}
+						{'ask me question below.'}
 					</Text>
 					
 					<Flex
