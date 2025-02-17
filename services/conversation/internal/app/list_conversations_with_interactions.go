@@ -33,11 +33,11 @@ func (a *App) ListConversationsWithInteractions(ctx context.Context, req *conver
 			}
 
 			for _, interaction := range interactions {
+				mu.Lock()
 				if relics[convo.ID] == nil {
-					mu.Lock()
 					relics[convo.ID] = make([]*models.Interaction, 0)
-					mu.Unlock()
 				}
+				mu.Unlock()
 
 				mu.Lock()
 				relics[convo.ID] = append(relics[convo.ID], interaction)
