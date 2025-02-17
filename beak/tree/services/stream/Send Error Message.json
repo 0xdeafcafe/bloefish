@@ -9,7 +9,7 @@
 				"itemId": "item_000000D1m0lOjiNAiKiSWBahdLC56"
 			}
 		},
-		"/rpc/2025-02-12/send_message_fragment"
+		"/rpc/2025-02-12/send_error_message"
 	],
 	"query": {},
 	"body": {
@@ -40,11 +40,42 @@
 			"jsonentry_000000D1m0qUPmSLSxSCD9zxNo9yy": {
 				"id": "jsonentry_000000D1m0qUPmSLSxSCD9zxNo9yy",
 				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "object",
+				"name": "error",
+				"enabled": true
+			},
+			"jsonentry_000000D1xqENU88s8XEElqh3CRlxE": {
+				"id": "jsonentry_000000D1xqENU88s8XEElqh3CRlxE",
+				"parentId": "jsonentry_000000D1m0qUPmSLSxSCD9zxNo9yy",
 				"type": "string",
-				"name": "message_content",
+				"name": "code",
 				"enabled": true,
 				"value": [
-					"Blah blah blah"
+					"blah"
+				]
+			},
+			"jsonentry_000000D1xqENU88s8XEElqh3CRlyA": {
+				"id": "jsonentry_000000D1xqENU88s8XEElqh3CRlyA",
+				"parentId": "jsonentry_000000D1m0qUPmSLSxSCD9zxNo9yy",
+				"type": "object",
+				"name": "meta",
+				"enabled": true
+			},
+			"jsonentry_000000D1xqENU88s8XEElqh3CRlz6": {
+				"id": "jsonentry_000000D1xqENU88s8XEElqh3CRlz6",
+				"parentId": "jsonentry_000000D1m0qUPmSLSxSCD9zxNo9yy",
+				"type": "array",
+				"name": "reasons",
+				"enabled": true
+			},
+			"jsonentry_000000D1xqG9HOQ1PPqgXLvt40ZKT": {
+				"id": "jsonentry_000000D1xqG9HOQ1PPqgXLvt40ZKT",
+				"parentId": "jsonentry_000000D1xqENU88s8XEElqh3CRlyA",
+				"type": "string",
+				"name": "foo",
+				"enabled": true,
+				"value": [
+					"bar"
 				]
 			}
 		}

@@ -1,5 +1,5 @@
 {
-	"id": "request_000000D1xqh2mgzjMAdrUC0LFLPPk",
+	"id": "request_000000D1xqqLD3sWjVw8PyF5dq1gK",
 	"verb": "post",
 	"url": [
 		{
@@ -8,7 +8,7 @@
 				"itemId": "item_000000D1jJedxq0crIujqEZ8f0RMB"
 			}
 		},
-		"/rpc/2025-02-12/get_interaction"
+		"/rpc/2025-02-12/list_conversations_with_interactions"
 	],
 	"query": {},
 	"headers": {
@@ -33,10 +33,34 @@
 			"jsonentry_000000D1jaBQhZS6jU9H2Uyy95s8F": {
 				"id": "jsonentry_000000D1jaBQhZS6jU9H2Uyy95s8F",
 				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
+				"type": "object",
+				"name": "owner",
+				"enabled": true
+			},
+			"jsonentry_000000D1xqrmPxjD8r47jC01HTvJd": {
+				"id": "jsonentry_000000D1xqrmPxjD8r47jC01HTvJd",
+				"parentId": "jsonentry_000000D1jaBQhZS6jU9H2Uyy95s8F",
 				"type": "string",
-				"name": "interaction_id",
+				"name": "type",
 				"enabled": true,
-				"value": []
+				"value": [
+					"user"
+				]
+			},
+			"jsonentry_000000D1xqrmPxjD8r47jC01HTvKh": {
+				"id": "jsonentry_000000D1xqrmPxjD8r47jC01HTvKh",
+				"parentId": "jsonentry_000000D1jaBQhZS6jU9H2Uyy95s8F",
+				"type": "string",
+				"name": "identifier",
+				"enabled": true,
+				"value": [
+					{
+						"type": "variable_group_item",
+						"payload": {
+							"itemId": "item_000000D1jaU8PHV02up84Np3SSWwN"
+						}
+					}
+				]
 			}
 		}
 	},

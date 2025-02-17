@@ -1,5 +1,5 @@
 {
-	"id": "request_000000D1xqh2mgzjMAdrUC0LFLPPk",
+	"id": "request_000000D1jnRL6I58ycDNWTfiTRqtj",
 	"verb": "post",
 	"url": [
 		{
@@ -8,7 +8,7 @@
 				"itemId": "item_000000D1jJedxq0crIujqEZ8f0RMB"
 			}
 		},
-		"/rpc/2025-02-12/get_interaction"
+		"/rpc/2025-02-12/get_conversation_with_interactions"
 	],
 	"query": {},
 	"headers": {
@@ -34,9 +34,11 @@
 				"id": "jsonentry_000000D1jaBQhZS6jU9H2Uyy95s8F",
 				"parentId": "jsonentry_000000D1jaAlWqbB0PAM7w19hG4bJ",
 				"type": "string",
-				"name": "interaction_id",
+				"name": "conversation_id",
 				"enabled": true,
-				"value": []
+				"value": [
+					"conversation_000000D1wgnjbTlhKLuHDAsmMHMor"
+				]
 			}
 		}
 	},
