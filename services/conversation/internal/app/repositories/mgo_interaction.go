@@ -132,6 +132,9 @@ func (r *mgoInteraction) MarkActiveAsComplete(ctx context.Context, interactionID
 			"updated_at":   true,
 			"completed_at": true,
 		},
+		"$set": bson.M{
+			"message_content": messageContent,
+		},
 	})
 	if err != nil {
 		return err

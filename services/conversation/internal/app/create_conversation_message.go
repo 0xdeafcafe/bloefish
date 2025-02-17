@@ -91,8 +91,6 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 				continue
 			}
 
-			fmt.Println(interaction.MessageContent)
-
 			messages = append(messages, &airelay.InvokeConversationMessageRequestMessage{
 				Owner: &airelay.Actor{
 					Type:       airelay.ActorType(interaction.Owner.Type),
