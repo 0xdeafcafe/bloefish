@@ -12,32 +12,34 @@ import { PanelRoot } from './components/molecules/PanelRoot';
 import { NewConversation } from './features/new-conversation/NewConversation';
 import { Theme } from '@chakra-ui/react';
 import { Conversation } from './features/conversations/Conversation';
-import './utils/monaco-setup';
+import { HelmetProvider } from 'react-helmet-async';
 
 const root = createRoot(document.getElementById('root')!);
 
 
 root.render(
 	<React.StrictMode>
-		<ChakraProvider>
-			<BrowserRouter>
-				<Theme appearance={'dark'}>
-					<ReduxProvider store={store}>
-						<App>
-							<EnsureReadiness>
-								<Routes>
-									<Route path="/" element={wrap(NewConversation)} />
-									<Route path="/conversations/:conversationId" element={wrap(Conversation)} />
-									<Route path="testing" element={wrap(Welcome)} />
+		<HelmetProvider>
+			<ChakraProvider>
+				<BrowserRouter>
+					<Theme appearance={'dark'}>
+						<ReduxProvider store={store}>
+							<App>
+								<EnsureReadiness>
+									<Routes>
+										<Route path="/" element={wrap(NewConversation)} />
+										<Route path="/conversations/:conversationId" element={wrap(Conversation)} />
+										<Route path="testing" element={wrap(Welcome)} />
 
-									<Route path="*" element={wrap(NotFound)} />
-								</Routes>
-							</EnsureReadiness>
-						</App>
-					</ReduxProvider>
-				</Theme>
-			</BrowserRouter>
-		</ChakraProvider>
+										<Route path="*" element={wrap(NotFound)} />
+									</Routes>
+								</EnsureReadiness>
+							</App>
+						</ReduxProvider>
+					</Theme>
+				</BrowserRouter>
+			</ChakraProvider>
+		</HelmetProvider>
 	</React.StrictMode>
 );
 

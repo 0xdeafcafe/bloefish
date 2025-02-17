@@ -7,13 +7,16 @@ import { useAppDispatch } from '~/store';
 import { startConversationChain } from '~/api/flows/start-conversation';
 import { useNavigate } from 'react-router';
 import { ChatInput } from '../chat-input/ChatInput';
+import { Helmet } from 'react-helmet-async';
 
 const starterPrompts: string[] = [
 	'What is the meaning of life?',
+	'Magnets, how do they work?',
 	'Explain the concept of a monad',
 	'Write a React counter component',
 	'How do I use the Go Mongo Driver?',
 	'Why does Hill yap so much?',
+	'If the universe is so big, why won\'t it fight me?',
 ];
 
 export const NewConversation: React.FC = () => {
@@ -23,14 +26,15 @@ export const NewConversation: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const [working, setWorking] = useState(false);
 
-	async function askQuestion() {
+	async function askQuestion(questionOverride?: string) {
 		if (working) return;
 
 		setWorking(true);
+
 		try {
 			await dispatch(startConversationChain({
-				idempotencyKey: question,
-				messageContent: question,
+				idempotencyKey: questionOverride ?? question,
+				messageContent: questionOverride ?? question,
 				navigate,
 			})).unwrap();
 		} finally {
@@ -44,6 +48,9 @@ export const NewConversation: React.FC = () => {
 			width={'full'}
 			height={'full'}
 		>
+			<Helmet>
+				<title>{'Welcome | Bloefish'}</title>
+			</Helmet>
 			<HStack
 				position={'absolute'}
 				bottom={0} left={0} right={0}
@@ -134,8 +141,8 @@ export const NewConversation: React.FC = () => {
 						textAlign={'center'}
 						maxW={'lg'}
 					>
-						{'You can pick a starter prompt from the list below, or you can '}
-						{'ask me question below.'}
+						{'Pick a starter prompt from the list, or you can ask me '}
+						{'question below.'}
 					</Text>
 					
 					<Flex
@@ -146,12 +153,12 @@ export const NewConversation: React.FC = () => {
 					>
 						{starterPrompts.map((prompt) => (
 							<TagButton
-								size={'lg'}
+								size={'md'}
 								key={prompt}
 								borderRadius={'full'}
 								onClicked={prompt => {
 									setQuestion(prompt);
-									setTimeout(() => askQuestion(), 0);
+									askQuestion(prompt);
 								}}
 							>
 								{prompt}

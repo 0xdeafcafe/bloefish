@@ -82,7 +82,7 @@ export const startConversationChain = createAsyncThunk<
 				aiRelayOptions,
 			}));
 
-			params.navigate(`/conversations/${conversation.conversationId}`, { replace: true });
+			params.navigate(`/conversations/${conversation.conversationId}`, { replace: false });
 
 			return {
 				conversationId: conversation.conversationId,

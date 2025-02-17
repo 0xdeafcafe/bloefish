@@ -17,7 +17,7 @@ export const TagButton = React.forwardRef<HTMLSpanElement, TagButtonProps>(
       <ChakraTag.Root
         tabIndex={0}
         ref={ref}
-        px={4}
+        px={3}
         py={2}
         cursor={'pointer'}
         onClick={() => onClicked(children as string)}

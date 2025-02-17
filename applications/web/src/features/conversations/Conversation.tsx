@@ -13,6 +13,7 @@ import Markdown from 'react-markdown';
 import { useTheme } from 'next-themes';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { twilight, coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Helmet } from 'react-helmet-async';
 
 export const Conversation: React.FC = () => {
 	const theme = useTheme();
@@ -27,6 +28,7 @@ export const Conversation: React.FC = () => {
 		return (
 			<NotFound
 				title={'Conversation not found'}
+				pageTitle={'Conversation not found'}
 				description={'The conversation you are looking for does not exist, or this part of the app just hasn\'t been built yet. Your guess is as good as mine.'}
 				Icon={LuMailQuestion}
 			/>
@@ -57,6 +59,10 @@ export const Conversation: React.FC = () => {
 			width={'full'}
 			height={'full'}
 		>
+			<Helmet>
+				<title>{'Conversation title | Bloefish'}</title>
+			</Helmet>
+
 			<Grid
 				h="full"
 				templateRows="max-content 1fr max-content"
