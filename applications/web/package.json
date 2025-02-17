@@ -26,6 +26,7 @@
     "react-redux": "^9.2.0",
     "react-router": "^7.1.5",
     "react-syntax-highlighter": "^15.6.1",
+    "remark-gfm": "^4.0.1",
     "snakecase-keys": "^8.0.1",
     "styled-components": "^6.1.15"
   },
