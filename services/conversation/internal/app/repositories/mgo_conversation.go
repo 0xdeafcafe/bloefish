@@ -89,7 +89,7 @@ func (p *persistedConversation) ToDomainModel() *models.Conversation {
 			Type:       models.ActorType(p.Owner.Type),
 			Identifier: p.Owner.Identifier,
 		},
-		AIRelayOptions: &models.ConversationAIRelayOptions{
+		AIRelayOptions: &models.AIRelayOptions{
 			ProviderID: p.AIRelayOptions.ProviderID,
 			ModelID:    p.AIRelayOptions.ModelID,
 		},

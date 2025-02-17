@@ -10,6 +10,7 @@ import (
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/forkedcontext"
 	"github.com/0xdeafcafe/bloefish/services/airelay"
+	"github.com/0xdeafcafe/bloefish/services/stream"
 
 	"github.com/0xdeafcafe/bloefish/services/conversation"
 	"github.com/0xdeafcafe/bloefish/services/conversation/internal/domain/models"
@@ -77,82 +78,26 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 	}
 
 	streamingChannelID := fmt.Sprintf("%s/%s", convo.ID, activeInteraction.ID)
-
 	forkedcontext.ForkContext(ctx, func(ctx context.Context) error {
-		conversationInteractions, err := a.InteractionRepository.GetAllByConversationID(ctx, convo.ID)
-		if err != nil {
-			return fmt.Errorf("failed to get full conversation: %w", err)
-		}
-
-		messages := make([]*airelay.InvokeConversationMessageRequestMessage, 0, len(conversationInteractions))
-
-		for _, interaction := range conversationInteractions {
-			if interaction.CompletedAt == nil {
-				continue
+		if err := a.createConversationMessageReply(ctx, &createConversationMessageReplyCommand{
+			Conversation: convo,
+			Owner: &airelay.Actor{
+				Type:       airelay.ActorType(interaction.Owner.Type),
+				Identifier: interaction.Owner.Identifier,
+			},
+			Interaction:        interaction,
+			ActiveInteraction:  activeInteraction,
+			StreamingChannelID: streamingChannelID,
+			UseStreaming:       req.Options.UseStreaming,
+		}); err != nil {
+			if sendErrorErr := a.StreamService.SendErrorMessage(ctx, &stream.SendErrorMessageRequest{
+				ChannelID: streamingChannelID,
+				Error:     cher.Coerce(err),
+			}); sendErrorErr != nil {
+				clog.Get(ctx).WithError(sendErrorErr).Error("failed to send error message to stream service")
 			}
 
-			messages = append(messages, &airelay.InvokeConversationMessageRequestMessage{
-				Owner: &airelay.Actor{
-					Type:       airelay.ActorType(interaction.Owner.Type),
-					Identifier: interaction.Owner.Identifier,
-				},
-				FileIDs: []string{},
-				Content: interaction.MessageContent,
-			})
-		}
-
-		var messageContent string
-
-		aiRelayOptions := &airelay.InvokeConversationMessageRequestAIRelayOptions{
-			ProviderID: convo.AIRelayOptions.ProviderID,
-			ModelID:    convo.AIRelayOptions.ModelID,
-		}
-		if interaction.AIRelayOptions != nil {
-			aiRelayOptions = &airelay.InvokeConversationMessageRequestAIRelayOptions{
-				ProviderID: interaction.AIRelayOptions.ProviderID,
-				ModelID:    interaction.AIRelayOptions.ModelID,
-			}
-		}
-
-		if req.Options.UseStreaming {
-			response, err := a.AIRelayService.InvokeStreamingConversationMessage(ctx, &airelay.InvokeStreamingConversationMessageRequest{
-				StreamingChannelID: streamingChannelID,
-				Owner: &airelay.Actor{
-					Type:       airelay.ActorType(req.Owner.Type),
-					Identifier: req.Owner.Identifier,
-				},
-				Messages:       messages,
-				AIRelayOptions: aiRelayOptions,
-			})
-			if err != nil {
-				json, _ := json.Marshal(err)
-				clog.Get(ctx).WithError(err).WithField("json", string(json)).Error("failed to invoke streaming conversation message")
-
-				return fmt.Errorf("failed to invoke streaming conversation message: %w", err)
-			}
-
-			messageContent = response.MessageContent
-		} else {
-			response, err := a.AIRelayService.InvokeConversationMessage(ctx, &airelay.InvokeConversationMessageRequest{
-				Owner: &airelay.Actor{
-					Type:       airelay.ActorType(req.Owner.Type),
-					Identifier: req.Owner.Identifier,
-				},
-				Messages: messages,
-				AIRelayOptions: &airelay.InvokeConversationMessageRequestAIRelayOptions{
-					ProviderID: req.AIRelayOptions.ProviderID,
-					ModelID:    req.AIRelayOptions.ModelID,
-				},
-			})
-			if err != nil {
-				return fmt.Errorf("failed to invoke conversation message: %w", err)
-			}
-
-			messageContent = response.MessageContent
-		}
-
-		if err := a.InteractionRepository.MarkActiveAsComplete(ctx, activeInteraction.ID, messageContent); err != nil {
-			return fmt.Errorf("failed to confirm active interaction: %w", err)
+			clog.Get(ctx).WithError(err).Error("failed to create conversation message reply")
 		}
 
 		return nil
@@ -164,4 +109,98 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 		ResponseInteractionID: activeInteraction.ID,
 		StreamChannelID:       streamingChannelID,
 	}, nil
+}
+
+type createConversationMessageReplyCommand struct {
+	Conversation *models.Conversation
+	Owner        *airelay.Actor
+
+	Interaction       *models.Interaction
+	ActiveInteraction *models.Interaction
+
+	StreamingChannelID string
+	UseStreaming       bool
+}
+
+func (a *App) createConversationMessageReply(
+	ctx context.Context,
+	cmd *createConversationMessageReplyCommand,
+) error {
+	conversationInteractions, err := a.InteractionRepository.GetAllByConversationID(ctx, cmd.Conversation.ID)
+	if err != nil {
+		return err
+	}
+
+	messages := make([]*airelay.InvokeConversationMessageRequestMessage, 0, len(conversationInteractions))
+
+	for _, interaction := range conversationInteractions {
+		if interaction.CompletedAt == nil {
+			continue
+		}
+
+		messages = append(messages, &airelay.InvokeConversationMessageRequestMessage{
+			Owner: &airelay.Actor{
+				Type:       airelay.ActorType(interaction.Owner.Type),
+				Identifier: interaction.Owner.Identifier,
+			},
+			FileIDs: []string{}, // TODO(afr): Handle files
+			Content: interaction.MessageContent,
+		})
+	}
+
+	var messageContent string
+
+	aiRelayOptions := &models.AIRelayOptions{
+		ProviderID: cmd.Conversation.AIRelayOptions.ProviderID,
+		ModelID:    cmd.Conversation.AIRelayOptions.ModelID,
+	}
+	if cmd.Interaction.AIRelayOptions != nil {
+		aiRelayOptions = &models.AIRelayOptions{
+			ProviderID: cmd.Interaction.AIRelayOptions.ProviderID,
+			ModelID:    cmd.Interaction.AIRelayOptions.ModelID,
+		}
+	}
+
+	if cmd.UseStreaming {
+		response, err := a.AIRelayService.InvokeStreamingConversationMessage(ctx, &airelay.InvokeStreamingConversationMessageRequest{
+			StreamingChannelID: cmd.StreamingChannelID,
+			Owner:              cmd.Owner,
+			Messages:           messages,
+			AIRelayOptions: &airelay.InvokeConversationMessageRequestAIRelayOptions{
+				ProviderID: aiRelayOptions.ProviderID,
+				ModelID:    aiRelayOptions.ModelID,
+			},
+		})
+		if err != nil {
+			json, _ := json.Marshal(err)
+			clog.Get(ctx).WithError(err).WithField("json", string(json)).Error("failed to invoke streaming conversation message")
+
+			return err
+		}
+
+		messageContent = response.MessageContent
+	} else {
+		response, err := a.AIRelayService.InvokeConversationMessage(ctx, &airelay.InvokeConversationMessageRequest{
+			Owner:    cmd.Owner,
+			Messages: messages,
+			AIRelayOptions: &airelay.InvokeConversationMessageRequestAIRelayOptions{
+				ProviderID: aiRelayOptions.ProviderID,
+				ModelID:    aiRelayOptions.ModelID,
+			},
+		})
+		if err != nil {
+			json, _ := json.Marshal(err)
+			clog.Get(ctx).WithError(err).WithField("json", string(json)).Error("failed to invoke conversation message")
+
+			return err
+		}
+
+		messageContent = response.MessageContent
+	}
+
+	if err := a.InteractionRepository.MarkActiveAsComplete(ctx, cmd.ActiveInteraction.ID, messageContent); err != nil {
+		return err
+	}
+
+	return nil
 }

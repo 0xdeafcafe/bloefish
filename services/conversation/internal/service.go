@@ -9,6 +9,7 @@ import (
 	"github.com/0xdeafcafe/bloefish/services/conversation/internal/app"
 	"github.com/0xdeafcafe/bloefish/services/conversation/internal/app/repositories"
 	"github.com/0xdeafcafe/bloefish/services/conversation/internal/transport/rpc"
+	"github.com/0xdeafcafe/bloefish/services/stream"
 	"github.com/0xdeafcafe/bloefish/services/user"
 )
 
@@ -18,6 +19,7 @@ type Config struct {
 	Mongo   config.MongoDB `env:"MONGO"`
 
 	AIRelayService config.UnauthenticatedService `env:"AI_RELAY_SERVICE"`
+	StreamService  config.UnauthenticatedService `env:"STREAM_SERVICE"`
 	UserService    config.UnauthenticatedService `env:"USER_SERVICE"`
 }
 
@@ -40,6 +42,9 @@ func defaultConfig() Config {
 		AIRelayService: config.UnauthenticatedService{
 			BaseURL: "http://localhost:4003/rpc",
 		},
+		StreamService: config.UnauthenticatedService{
+			BaseURL: "http://localhost:4004/rpc",
+		},
 		UserService: config.UnauthenticatedService{
 			BaseURL: "http://localhost:4001/rpc",
 		},
@@ -58,6 +63,7 @@ func Run(ctx context.Context) error {
 		InteractionRepository:  repositories.NewMgoInteraction(mongoDatabase),
 
 		AIRelayService: airelay.NewRPCClient(ctx, cfg.AIRelayService),
+		StreamService:  stream.NewRPCClient(ctx, cfg.StreamService),
 		UserService:    user.NewRPCClient(ctx, cfg.UserService),
 	}
 
