@@ -12,7 +12,9 @@ import { PanelRoot } from './components/molecules/PanelRoot';
 import { NewConversation } from './features/new-conversation/NewConversation';
 import { Theme } from '@chakra-ui/react';
 import { Conversation } from './features/conversations/Conversation';
+import { Ready } from './components/molecules/Ready';
 import { HelmetProvider } from 'react-helmet-async';
+import { ConversationsList } from './features/conversations/ConversationsList';
 
 const root = createRoot(document.getElementById('root')!);
 
@@ -26,13 +28,16 @@ root.render(
 						<ReduxProvider store={store}>
 							<App>
 								<EnsureReadiness>
-									<Routes>
-										<Route path="/" element={wrap(NewConversation)} />
-										<Route path="/conversations/:conversationId" element={wrap(Conversation)} />
-										<Route path="testing" element={wrap(Welcome)} />
+									<Ready>
+										<Routes>
+											<Route path="/" element={wrap(NewConversation)} />
+											<Route path="/conversations/:conversationId" element={wrap(Conversation)} />
+											<Route path="/conversations" element={wrap(ConversationsList)} />
+											<Route path="testing" element={wrap(Welcome)} />
 
-										<Route path="*" element={wrap(NotFound)} />
-									</Routes>
+											<Route path="*" element={wrap(NotFound)} />
+										</Routes>
+									</Ready>
 								</EnsureReadiness>
 							</App>
 						</ReduxProvider>

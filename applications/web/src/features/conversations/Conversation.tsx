@@ -14,17 +14,34 @@ import { useTheme } from 'next-themes';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { twilight, coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Helmet } from 'react-helmet-async';
+import { conversationApi } from '~/api/bloefish/conversation';
+import { userApi } from '~/api/bloefish/user';
 
 export const Conversation: React.FC = () => {
 	const theme = useTheme();
 	const { conversationId } = useParams();
 	const conversation = useAppSelector(s => s.conversationsReducer[conversationId ?? 'kut']);
 	const dispatch = useAppDispatch();
+	const { data: userData } = userApi.useGetOrCreateDefaultUserQuery();
+	const { isFetching: convoFetching, isLoading: convoLoading } = conversationApi.useListConversationsWithInteractionsQuery({
+		owner: {
+			type: 'user',
+			identifier: userData!.user.id,
+		},
+	}, { skip: true });
 
 	const [question, setQuestion] = useState('');
 	const [working, setWorking] = useState(false);
 
 	if (!conversation) {
+		if (convoFetching || convoLoading) {
+			return (
+				<Flex w={'full'} h={'full'} justify={'center'} align={'center'}>
+					<Spinner />
+				</Flex>
+			);
+		}
+
 		return (
 			<NotFound
 				title={'Conversation not found'}
@@ -71,7 +88,10 @@ export const Conversation: React.FC = () => {
 				<GridItem px={4} py={3} borderBottom={'1px solid'} borderColor={'border'}>
 					{'Some example header about things'}
 				</GridItem>
-				<GridItem overflowX={'scroll'}>
+				<GridItem
+					position={'relative'}
+					overflowX={'scroll'}
+				>
 					<Container maxW={'5xl'} minW={'5xl'} py={10}>
 						<Stack gap={6} pb={20}>
 							{conversation.interactions.map((i) => (

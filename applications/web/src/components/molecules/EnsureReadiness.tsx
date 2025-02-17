@@ -1,5 +1,5 @@
-import { Flex, Spinner } from "@chakra-ui/react";
-import { userApi } from "~/api/bloefish/user";
+import { Flex, Spinner } from '@chakra-ui/react';
+import { userApi } from '~/api/bloefish/user';
 
 export const EnsureReadiness: React.FC<React.PropsWithChildren> = ({ children }) => {
 	const {

@@ -7,6 +7,15 @@ export const conversationsSlice = createSlice({
 	name: 'conversations',
 	initialState: initialState,
 	reducers: {
+		injectConversations: (state, { payload }: PayloadAction<Conversation[]>) => {
+			for (const conversation of payload) {
+				if (state[conversation.conversationId]) {
+					continue;
+				}
+
+				state[conversation.conversationId] = conversation;
+			}
+		},
 		startConversation: (state, { payload }: PayloadAction<CreateConversationPayload>) => {
 			state[payload.conversationId] = {
 				conversationId: payload.conversationId,
@@ -65,5 +74,11 @@ export const conversationsSlice = createSlice({
 	},
 });
 
-export const { startConversation, addInteraction, addActiveInteraction, addInteractionFragment } = conversationsSlice.actions;
+export const {
+	injectConversations,
+	startConversation,
+	addInteraction,
+	addActiveInteraction,
+	addInteractionFragment,
+} = conversationsSlice.actions;
 export const conversationsReducer = conversationsSlice.reducer;
