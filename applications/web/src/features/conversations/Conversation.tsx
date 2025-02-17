@@ -1,4 +1,4 @@
-import { Avatar, Box, Card, Center, Circle, Container, Flex, Float, Grid, GridItem, HStack, Spinner, Stack, Text } from '@chakra-ui/react';
+import { Avatar, Blockquote, Box, Card, Center, Circle, Container, Flex, Float, Grid, GridItem, HStack, List, Spinner, Stack, Table, Text } from '@chakra-ui/react';
 import { LuBot, LuMailQuestion } from 'react-icons/lu';
 import { useAppDispatch, useAppSelector } from '~/store';
 import { styled } from 'styled-components';
@@ -8,6 +8,7 @@ import { ChatInput } from '../chat-input/ChatInput';
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { continueConversationChain } from '~/api/flows/continue-conversation';
+import remarkGfm from 'remark-gfm';
 import Markdown from 'react-markdown';
 import { useTheme } from 'next-themes';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -58,9 +59,12 @@ export const Conversation: React.FC = () => {
 		>
 			<Grid
 				h="full"
-				templateRows="1fr max-content"
+				templateRows="max-content 1fr max-content"
 				templateColumns="1fr"
 			>
+				<GridItem px={4} py={3} borderBottom={'1px solid'} borderColor={'border'}>
+					{'Some example header about things'}
+				</GridItem>
 				<GridItem overflowX={'scroll'}>
 					<Container maxW={'5xl'} minW={'5xl'} py={10}>
 						<Stack gap={6} pb={20}>
@@ -97,6 +101,7 @@ export const Conversation: React.FC = () => {
 													<MarkdownWrapper>
 														<Markdown
 															disallowedElements={[]}
+															remarkPlugins={[remarkGfm]}
 															components={{
 																code(props) {
 																	const { children, className, node, ...rest } = props
@@ -116,12 +121,49 @@ export const Conversation: React.FC = () => {
 																		</code>
 																	)
 																},
+
 																h1: (props) => <Text as="h1" fontSize="2xl" fontWeight="bold" {...props} />,
 																h2: (props) => <Text as="h2" fontSize="xl" fontWeight="bold" {...props} />,
 																h3: (props) => <Text as="h3" fontSize="lg" fontWeight="bold" {...props} />,
 																h4: (props) => <Text as="h4" fontSize="md" fontWeight="bold" {...props} />,
 																h5: (props) => <Text as="h5" fontSize="sm" fontWeight="bold" {...props} />,
 																h6: (props) => <Text as="h6" fontSize="xs" fontWeight="bold" {...props} />,
+
+																blockquote: (props) => (
+																	<Blockquote.Root>
+																		<Blockquote.Content>
+																			{props.children}
+																		</Blockquote.Content>
+																	</Blockquote.Root>
+																),
+
+																ul: (props) => (
+																	<List.Root as={'ul'} ml={4} mt={-3}>
+																		{props.children}
+																	</List.Root>
+																),
+																ol: (props) => (
+																	<List.Root as={'ol'} ml={4} mt={-3}>
+																		{props.children}
+																	</List.Root>
+																),
+																li: (props) => (<List.Item>{props.children}</List.Item>),
+
+																table: (props) => (
+																	<Card.Root overflow={'hidden'}>
+																		<Table.ScrollArea>
+																			<Table.Root size={'sm'} variant={'outline'} striped stickyHeader interactive>
+																				{props.children}
+																			</Table.Root>
+																		</Table.ScrollArea>
+																	</Card.Root>
+																),
+																tr: (props) => <Table.Row>{props.children}</Table.Row>,
+																th: (props) => <Table.ColumnHeader>{props.children}</Table.ColumnHeader>,
+																td: (props) => <Table.Cell>{props.children}</Table.Cell>,
+																tbody: (props) => <Table.Body>{props.children}</Table.Body>,
+																thead: (props) => <Table.Header>{props.children}</Table.Header>,
+																tfoot: (props) => <Table.Footer>{props.children}</Table.Footer>,
 															}}
 														>
 															{i.messageContent}
