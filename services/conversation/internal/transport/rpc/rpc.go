@@ -48,6 +48,8 @@ func New(ctx context.Context, app *app.App) *RPC {
 	svr.Register("create_conversation", "2025-02-12", schema("create_conversation"), rpc.CreateConversation)
 	svr.Register("create_conversation_message", "2025-02-12", schema("create_conversation_message"), rpc.CreateConversationMessage)
 	svr.Register("get_interaction", "2025-02-12", schema("get_interaction"), rpc.GetInteraction)
+	svr.Register("get_conversation_with_interactions", "2025-02-12", schema("get_conversation_with_interactions"), rpc.GetConversationWithInteractions)
+	svr.Register("list_conversations_with_interactions", "2025-02-12", schema("list_conversations_with_interactions"), rpc.ListConversationsWithInteractions)
 
 	mux := chi.NewRouter()
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))

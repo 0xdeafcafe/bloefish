@@ -29,3 +29,11 @@ func (r *RPCClient) CreateConversationMessage(ctx context.Context, req *CreateCo
 func (r *RPCClient) GetInteraction(ctx context.Context, req *GetInteractionRequest) (resp *GetInteractionResponse, err error) {
 	return resp, r.client.Do(ctx, "get_interaction", "2025-02-12", req, &resp)
 }
+
+func (r *RPCClient) GetConversationWithInteractions(ctx context.Context, req *GetConversationWithInteractionsRequest) (resp *GetConversationWithInteractionsResponse, err error) {
+	return resp, r.client.Do(ctx, "get_conversation_with_interactions", "2025-02-12", req, &resp)
+}
+
+func (r *RPCClient) ListConversationsWithInteractions(ctx context.Context, req *ListConversationsWithInteractionsRequest) (resp *ListConversationsWithInteractionsResponse, err error) {
+	return resp, r.client.Do(ctx, "list_conversations_with_interactions", "2025-02-12", req, &resp)
+}

@@ -9,6 +9,8 @@ type Service interface {
 	CreateConversation(ctx context.Context, req *CreateConversationRequest) (*CreateConversationResponse, error)
 	CreateConversationMessage(ctx context.Context, req *CreateConversationMessageRequest) (*CreateConversationMessageResponse, error)
 	GetInteraction(ctx context.Context, req *GetInteractionRequest) (*GetInteractionResponse, error)
+	GetConversationWithInteractions(ctx context.Context, req *GetConversationWithInteractionsRequest) (*GetConversationWithInteractionsResponse, error)
+	ListConversationsWithInteractions(ctx context.Context, req *ListConversationsWithInteractionsRequest) (*ListConversationsWithInteractionsResponse, error)
 }
 
 type ActorType string
@@ -73,4 +75,60 @@ type GetInteractionResponse struct {
 	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
 	CreatedAt      time.Time       `json:"created_at"`
 	UpdatedAt      *time.Time      `json:"updated_at"`
+}
+
+type GetConversationWithInteractionsRequest struct {
+	ConversationID string `json:"conversation_id"`
+}
+
+type GetConversationWithInteractionsResponse struct {
+	ConversationID string          `json:"conversation_id"`
+	Owner          *Actor          `json:"owner"`
+	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
+
+	Interactions []*GetConversationWithInteractionsResponseInteraction `json:"interactions"`
+
+	CreatedAt time.Time  `json:"created_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
+}
+
+type GetConversationWithInteractionsResponseInteraction struct {
+	ID             string          `json:"id"`
+	Owner          *Actor          `json:"owner"`
+	MessageContent string          `json:"message_content"`
+	FileIDs        []string        `json:"file_ids"`
+	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
+	CreatedAt      time.Time       `json:"created_at"`
+	UpdatedAt      *time.Time      `json:"updated_at"`
+	CompletedAt    *time.Time      `json:"completed_at"`
+	DeletedAt      *time.Time      `json:"deleted_at"`
+}
+
+type ListConversationsWithInteractionsRequest struct {
+	Owner *Actor `json:"owner"`
+}
+
+type ListConversationsWithInteractionsResponse struct {
+	Conversations []*ListConversationsWithInteractionsResponseConversation `json:"conversations"`
+}
+
+type ListConversationsWithInteractionsResponseConversation struct {
+	ID             string                                                              `json:"id"`
+	Owner          *Actor                                                              `json:"owner"`
+	AIRelayOptions *AIRelayOptions                                                     `json:"ai_relay_options"`
+	Interactions   []*ListConversationsWithInteractionsResponseConversationInteraction `json:"interactions"`
+	CreatedAt      time.Time                                                           `json:"created_at"`
+	DeletedAt      *time.Time                                                          `json:"deleted_at"`
+}
+
+type ListConversationsWithInteractionsResponseConversationInteraction struct {
+	ID             string          `json:"id"`
+	Owner          *Actor          `json:"owner"`
+	MessageContent string          `json:"message_content"`
+	FileIDs        []string        `json:"file_ids"`
+	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
+	CreatedAt      time.Time       `json:"created_at"`
+	UpdatedAt      *time.Time      `json:"updated_at"`
+	CompletedAt    *time.Time      `json:"completed_at"`
+	DeletedAt      *time.Time      `json:"deleted_at"`
 }

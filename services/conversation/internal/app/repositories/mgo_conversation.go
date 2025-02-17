@@ -81,6 +81,30 @@ func (r *mgoConversation) GetByID(ctx context.Context, conversationID string) (*
 	return conversation.ToDomainModel(), nil
 }
 
+func (r *mgoConversation) ListByOwner(ctx context.Context, actor models.Actor) ([]*models.Conversation, error) {
+	cursor, err := r.c.Find(ctx, bson.M{
+		"owner.type":       actor.Type,
+		"owner.identifier": actor.Identifier,
+		"deleted_at":       nil,
+	}, options.Find().SetSort(bson.M{"created_at": -1}))
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var persistedConversations []*persistedConversation
+	if err := cursor.All(ctx, &persistedConversations); err != nil {
+		return nil, err
+	}
+
+	conversations := make([]*models.Conversation, len(persistedConversations))
+	for i, persistedConversation := range persistedConversations {
+		conversations[i] = persistedConversation.ToDomainModel()
+	}
+
+	return conversations, nil
+}
+
 func (p *persistedConversation) ToDomainModel() *models.Conversation {
 	return &models.Conversation{
 		ID:             p.ID,

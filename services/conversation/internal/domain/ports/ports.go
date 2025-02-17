@@ -9,6 +9,7 @@ import (
 type ConversationRepository interface {
 	Create(ctx context.Context, cmd *models.CreateConversationCommand) (*models.Conversation, error)
 	GetByID(ctx context.Context, conversationID string) (*models.Conversation, error)
+	ListByOwner(ctx context.Context, actor models.Actor) ([]*models.Conversation, error)
 }
 
 type InteractionRepository interface {

@@ -1,0 +1,15 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+
+	"required": [
+		"conversation_id"
+	],
+
+	"properties": {
+		"conversation_id": {
+			"type": "string",
+			"minLength": 1
+		}
+	}
+}
