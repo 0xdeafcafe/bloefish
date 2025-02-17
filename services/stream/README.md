@@ -50,6 +50,25 @@ interface Request {
 type Response = null;
 ```
 
+#### `send_error`
+
+Sends an error message.
+
+**Contract**
+
+```typescript
+interface Request {
+	channel_id: string;
+	error: {
+		code: number;
+		meta: Record<string, unknown>;
+		reasons: { code: string, meta: Record<string, unknown>, reasons: unknown[] }[];
+	};
+}
+
+type Response = null;
+```
+
 ## WebSocket transport
 
 ### Base URL
@@ -62,8 +81,13 @@ type Response = null;
 interface Message {
 	channel_id: string;
 	message_id: string;
-	type: 'message_full' | 'message_fragment';
+	type: 'message_full' | 'message_fragment' | 'error_message';
 	message_full: string | null; // Only set if type is 'message_full'
 	message_fragment: string | null; // Only set if type is 'message_fragment'
+	error: {
+		code: number;
+		meta: Record<string, unknown>;
+		reasons: { code: string, meta: Record<string, unknown>, reasons: unknown[] }[];
+	} | null; // Only set if type is 'error'
 }
 ```

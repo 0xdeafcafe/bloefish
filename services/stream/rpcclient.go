@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/0xdeafcafe/bloefish/libraries/cher"
 	"github.com/0xdeafcafe/bloefish/libraries/config"
 	"github.com/0xdeafcafe/bloefish/libraries/crpc"
 )
@@ -27,6 +26,6 @@ func (r *RPCClient) SendMessageFull(ctx context.Context, req *SendMessageFullReq
 	return r.client.Do(ctx, "send_message_full", "2025-02-12", req, nil)
 }
 
-func (r *RPCClient) SendStreamedMessage(context.Context, *StreamedMessage) error {
-	return cher.New("not_implemented", cher.M{"method": "SendStreamedMessage"})
+func (r *RPCClient) SendErrorMessage(ctx context.Context, req *SendErrorMessageRequest) error {
+	return r.client.Do(ctx, "send_error_message", "2025-02-12", req, nil)
 }

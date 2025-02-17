@@ -18,3 +18,7 @@ func (a *App) SendMessageFull(ctx context.Context, req *stream.SendMessageFullRe
 func (a *App) SendMessageFragment(ctx context.Context, req *stream.SendMessageFragmentRequest) error {
 	return a.MessageBroker.SendMessageFragment(ctx, req.ChannelID, req.MessageContent)
 }
+
+func (a *App) SendErrorMessage(ctx context.Context, req *stream.SendErrorMessageRequest) error {
+	return a.MessageBroker.SendErrorMessage(ctx, req.ChannelID, req.Error)
+}

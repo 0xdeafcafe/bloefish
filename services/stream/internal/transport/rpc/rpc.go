@@ -41,6 +41,7 @@ func New(ctx context.Context, app *app.App, mux *chi.Mux) *RPC {
 
 	svr.Register("send_message_full", "2025-02-12", schema("send_message_full"), rpc.SendMessageFull)
 	svr.Register("send_message_fragment", "2025-02-12", schema("send_message_fragment"), rpc.SendMessageFragment)
+	svr.Register("send_error_message", "2025-02-12", schema("send_error_message"), rpc.SendErrorMessage)
 
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))
 	mux.Get("/system/health", middlewares.HealthCheck)

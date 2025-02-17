@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"runtime"
 	"sync"
 
+	"github.com/0xdeafcafe/bloefish/libraries/cher"
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/ksuid"
 	"github.com/0xdeafcafe/bloefish/libraries/merr"
-	"github.com/0xdeafcafe/bloefish/libraries/ptr"
 	"github.com/0xdeafcafe/bloefish/services/stream/internal/domain/models"
 	"github.com/0xdeafcafe/bloefish/services/stream/internal/domain/ports"
 	"github.com/gorilla/websocket"
@@ -39,14 +40,18 @@ func (w *websocketMessageBroker) RegisterConnection(ctx context.Context, conn *w
 }
 
 func (w *websocketMessageBroker) SendMessageFragment(ctx context.Context, channelID string, messageContent string) error {
-	return w.sendMessage(ctx, channelID, messageContent, models.StreamMessageTypeMessageFragment)
+	return w.sendMessage(ctx, channelID, &messageContent, nil, models.StreamMessageTypeMessageFragment)
 }
 
 func (w *websocketMessageBroker) SendMessageFull(ctx context.Context, channelID string, messageContent string) error {
-	return w.sendMessage(ctx, channelID, messageContent, models.StreamMessageTypeMessageFull)
+	return w.sendMessage(ctx, channelID, &messageContent, nil, models.StreamMessageTypeMessageFull)
 }
 
-func (w *websocketMessageBroker) sendMessage(ctx context.Context, channelID, messageContent string, messageType models.StreamMessageType) error {
+func (w *websocketMessageBroker) SendErrorMessage(ctx context.Context, channelID string, errorMessage cher.E) error {
+	return w.sendMessage(ctx, channelID, nil, &errorMessage, models.StreamMessageTypeError)
+}
+
+func (w *websocketMessageBroker) sendMessage(ctx context.Context, channelID string, messageContent *string, errorMessage *cher.E, messageType models.StreamMessageType) error {
 	msg := &models.StreamMessage{
 		ChannelID: channelID,
 		Type:      messageType,
@@ -54,9 +59,11 @@ func (w *websocketMessageBroker) sendMessage(ctx context.Context, channelID, mes
 
 	switch msg.Type {
 	case models.StreamMessageTypeMessageFragment:
-		msg.MessageFragment = ptr.P(messageContent)
+		msg.MessageFragment = messageContent
 	case models.StreamMessageTypeMessageFull:
-		msg.MessageFull = ptr.P(messageContent)
+		msg.MessageFull = messageContent
+	case models.StreamMessageTypeError:
+		msg.Error = errorMessage
 	default:
 		return merr.New(ctx, "invalid message type", merr.M{
 			"message_type": messageType,
@@ -69,7 +76,7 @@ func (w *websocketMessageBroker) sendMessage(ctx context.Context, channelID, mes
 	}
 
 	errGroup, egCtx := errgroup.WithContext(ctx)
-	errGroup.SetLimit(100)
+	errGroup.SetLimit(runtime.NumCPU())
 
 	for connID, conn := range w.connections {
 		errGroup.Go(func() error {
