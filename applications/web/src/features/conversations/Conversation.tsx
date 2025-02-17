@@ -1,6 +1,7 @@
-import { Avatar, Box, Card, Center, Circle, Container, Flex, Float, Grid, GridItem, HStack, Spinner, Stack } from '@chakra-ui/react';
+import { Avatar, Box, Card, Center, Circle, Container, Flex, Float, Grid, GridItem, HStack, Spinner, Stack, Text } from '@chakra-ui/react';
 import { LuBot, LuMailQuestion } from 'react-icons/lu';
 import { useAppDispatch, useAppSelector } from '~/store';
+import { styled } from 'styled-components';
 import { useParams } from 'react-router';
 import { NotFound } from '~/pages/NotFound';
 import { ChatInput } from '../chat-input/ChatInput';
@@ -8,8 +9,12 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { continueConversationChain } from '~/api/flows/continue-conversation';
 import Markdown from 'react-markdown';
+import { useTheme } from 'next-themes';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { twilight, coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 export const Conversation: React.FC = () => {
+	const theme = useTheme();
 	const { conversationId } = useParams();
 	const conversation = useAppSelector(s => s.conversationsReducer[conversationId ?? 'kut']);
 	const dispatch = useAppDispatch();
@@ -58,47 +63,79 @@ export const Conversation: React.FC = () => {
 			>
 				<GridItem overflowX={'scroll'}>
 					<Container maxW={'5xl'} minW={'5xl'} py={10}>
-						<Center>
-							<Stack gap={6}>
-								{conversation.interactions.map((i) => (
-									<Flex
-										flex={i.interactionId}
-										gap={5}
-										direction={i.owner.type === 'user' ? 'row-reverse' : 'row'}
-									>
-										{i.owner.type === 'bot' ? (
-											<Avatar.Root colorPalette="pink" variant="subtle">
-												<LuBot />
-												<Float placement="bottom-end" offsetX="1" offsetY="1">
-													<Circle
-														bg="green.500"
-														size="8px"
-														outline="0.2em solid"
-														outlineColor="bg"
-													/>
-												</Float>
-											</Avatar.Root>
-										) : (
-											<Avatar.Root colorPalette="blue" variant="subtle">
-												<Avatar.Fallback name="Alexander Forbes-Reed" />
-											</Avatar.Root>
-										)}
+						<Stack gap={6} pb={20}>
+							{conversation.interactions.map((i) => (
+								<Flex
+									key={i.interactionId}
+									gap={5}
+									direction={i.owner.type === 'user' ? 'row-reverse' : 'row'}
+								>
+									{i.owner.type === 'bot' ? (
+										<Avatar.Root colorPalette="pink" variant="subtle">
+											<LuBot />
+											<Float placement="bottom-end" offsetX="1" offsetY="1">
+												<Circle
+													bg="green.500"
+													size="8px"
+													outline="0.2em solid"
+													outlineColor="bg"
+												/>
+											</Float>
+										</Avatar.Root>
+									) : (
+										<Avatar.Root colorPalette="blue" variant="subtle">
+											<Avatar.Fallback name="Alexander Forbes-Reed" />
+										</Avatar.Root>
+									)}
 
-										<Card.Root borderRadius={"lg"}>
-											<Card.Body p={3} px={5}>
-												{i.messageContent === '' ? (
-													<Spinner />
-												) : (
-													<Markdown>
-														{i.messageContent}
-													</Markdown>
-												)}
-											</Card.Body>
-										</Card.Root>
-									</Flex>
-								))}
-							</Stack>
-						</Center>
+									<Card.Root borderRadius={"lg"}>
+										<Card.Body p={3} px={5}>
+											{i.messageContent === '' ? (
+												<Spinner />
+											) : (
+												<Text fontSize={'sm'} as={'div'}>
+													<MarkdownWrapper>
+														<Markdown
+															disallowedElements={[]}
+															components={{
+																code(props) {
+																	const { children, className, node, ...rest } = props
+																	const match = /language-(\w+)/.exec(className || '')
+																	return match ? (
+																		// @ts-expect-error too lazy to fix this
+																		<SyntaxHighlighter
+																			{...rest}
+																			PreTag={'div'}
+																			children={String(children).replace(/\n$/, '')}
+																			language={match[1]}
+																			style={theme.resolvedTheme === 'dark' ? twilight : coy}
+																		/>
+																	) : (
+																		<code {...rest} className={className}>
+																			{children}
+																		</code>
+																	)
+																},
+																h1: (props) => <Text as="h1" fontSize="2xl" fontWeight="bold" {...props} />,
+																h2: (props) => <Text as="h2" fontSize="xl" fontWeight="bold" {...props} />,
+																h3: (props) => <Text as="h3" fontSize="lg" fontWeight="bold" {...props} />,
+																h4: (props) => <Text as="h4" fontSize="md" fontWeight="bold" {...props} />,
+																h5: (props) => <Text as="h5" fontSize="sm" fontWeight="bold" {...props} />,
+																h6: (props) => <Text as="h6" fontSize="xs" fontWeight="bold" {...props} />,
+															}}
+														>
+															{i.messageContent}
+														</Markdown>
+													</MarkdownWrapper>
+												</Text>
+											)}
+										</Card.Body>
+									</Card.Root>
+
+									<Box maxW={'100px'} minW={'100px'} />
+								</Flex>
+							))}
+						</Stack>
 					</Container>
 				</GridItem>
 				<GridItem>
@@ -154,3 +191,13 @@ export const Conversation: React.FC = () => {
 };
 
 const MotionBox = motion(Box);
+
+const MarkdownWrapper = styled.div`
+	& > * {
+		margin-bottom: 16px;
+	}
+
+	& > *:last-child {
+		margin-bottom: 0;
+	}
+`;

@@ -12,8 +12,10 @@ import { PanelRoot } from './components/molecules/PanelRoot';
 import { NewConversation } from './features/new-conversation/NewConversation';
 import { Theme } from '@chakra-ui/react';
 import { Conversation } from './features/conversations/Conversation';
+import './utils/monaco-setup';
 
 const root = createRoot(document.getElementById('root')!);
+
 
 root.render(
 	<React.StrictMode>

@@ -151,7 +151,7 @@ export const NewConversation: React.FC = () => {
 								borderRadius={'full'}
 								onClicked={prompt => {
 									setQuestion(prompt);
-									askQuestion();
+									setTimeout(() => askQuestion(), 0);
 								}}
 							>
 								{prompt}

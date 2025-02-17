@@ -1,6 +1,6 @@
-import { Card, Flex, HStack, Icon, IconButton, Status, Textarea } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
-import { LuBot, LuSend } from "react-icons/lu";
+import { Card, Flex, HStack, Icon, IconButton, Status, Textarea } from '@chakra-ui/react';
+import { useEffect, useRef, useState } from 'react';
+import { LuBot, LuSend } from 'react-icons/lu';
 
 const maxPromptLength = 5000;
 
@@ -82,7 +82,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 					/>
 				</HStack>
 				<Flex justify={'flex-end'} align={'center'} gap={2}>
-					<Status.Root colorPalette={lengthStatusColor} userSelect={'none'}>
+					<Status.Root colorPalette={lengthStatusColor} userSelect={'none'} fontSize={'xs'} color={'GrayText'}>
 						{questionLength === 5000 ? '😱 ' : <Status.Indicator />}
 						{`${questionLength}/5000`}
 					</Status.Root>
@@ -90,6 +90,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 						aria-label={'Send message'}
 						disabled={disabled}
 						variant={'ghost'}
+						size={'sm'}
 						onClick={() => onInvoke()}
 					>
 						<LuSend />
