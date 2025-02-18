@@ -94,7 +94,6 @@ function useSidebarLocationState(): SidebarButtonState {
 	const loc = useLocation();
 
 	switch (true) {
-		case loc.pathname.startsWith('/testing'): // TODO(afr); Remove this
 		case loc.pathname.startsWith('/conversations'):
 			return 'conversations';
 		case loc.pathname.startsWith('/workflows'):
@@ -110,5 +109,5 @@ function useSidebarLocationState(): SidebarButtonState {
 function calculateIndicatorTop(state: SidebarButtonState): number {
 	const index = sidebarStates.indexOf(state);
 
-	return ((index * 31) + (index * 8)) + 4;
+	return ((index * 31) + (index * 10)) + 4;
 }

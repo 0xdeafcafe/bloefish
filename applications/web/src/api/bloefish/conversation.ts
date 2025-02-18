@@ -36,6 +36,28 @@ export const conversationApi = createApi({
 				url: '2025-02-12/get_conversation_with_interactions',
 				body,
 			}),
+			async onQueryStarted(_, { dispatch, queryFulfilled }) {
+				try {
+					const { data } = await queryFulfilled;
+
+					dispatch(injectConversations([{
+						conversationId: data.conversationId,
+						owner: data.owner,
+						aiRelayOptions: data.aiRelayOptions,
+						interactions: data.interactions.map((interaction) => ({
+							conversationId: data.conversationId,
+							interactionId: interaction.id,
+							messageContent: interaction.messageContent,
+							aiRelayOptions: interaction.aiRelayOptions,
+							owner: interaction.owner,
+							streamChannelId: `${data.conversationId}/${interaction.id}`, // TODO(afr): Fetch from backend
+						})),
+						streamChannelId: data.conversationId,
+					}]));
+				} catch (error) {
+					console.error(error);
+				}
+			},
 		}),
 
 		listConversationsWithInteractions: builder.query<ListConversationsWithInteractionsResponse, ListConversationsWithInteractionsRequest>({

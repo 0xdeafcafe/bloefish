@@ -2,7 +2,6 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { App } from './App';
-import { Welcome } from './welcome/welcome';
 import { Provider as ChakraProvider } from './components/ui/provider';
 import { Provider as ReduxProvider } from 'react-redux';
 import { store } from './store';
@@ -33,7 +32,6 @@ root.render(
 											<Route path="/" element={wrap(NewConversation)} />
 											<Route path="/conversations/:conversationId" element={wrap(Conversation)} />
 											<Route path="/conversations" element={wrap(ConversationsList)} />
-											<Route path="testing" element={wrap(Welcome)} />
 
 											<Route path="*" element={wrap(NotFound)} />
 										</Routes>

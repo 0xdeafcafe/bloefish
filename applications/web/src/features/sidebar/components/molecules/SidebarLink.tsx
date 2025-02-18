@@ -22,10 +22,14 @@ export const SidebarLink: React.FC<SidebarButtonProps> = ({
 				background={active ? 'bg.emphasized' : 'transparent'}
 				paddingX={3}
 				paddingY={'5px'}
+				borderWidth={'1px'}
+				borderEndWidth={0}
+				borderColor={active ? 'border.emphasized' : 'transparent'}
 				borderRadius={'md'}
 				borderRightRadius={0}
 				onClick={onClick}
 				cursor={'pointer'}
+				zIndex={10000}
 			>
 				<HStack>
 					<Icon color={active ? 'MenuText' : 'GrayText'}>
