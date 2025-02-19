@@ -7,7 +7,7 @@ import (
 )
 
 func (a *App) DeleteInteractions(ctx context.Context, req *conversation.DeleteInteractionsRequest) error {
-	if err := a.ConversationRepository.DeleteMany(ctx, req.InteractionIDs); err != nil {
+	if err := a.InteractionRepository.DeleteMany(ctx, req.InteractionIDs); err != nil {
 		return err
 	}
 
