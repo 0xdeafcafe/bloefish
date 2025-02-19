@@ -1,17 +1,7 @@
-import { Avatar, Blockquote, Box, Button, ButtonGroup, Card, Center, Circle, Code, Container, Flex, Float, Grid, GridItem, HStack, List, Spinner, Stack, Table, TableScrollArea, Text } from '@chakra-ui/react';
-import { useAppDispatch, useAppSelector } from '~/store';
+import { Box, Button, ButtonGroup, Code, Flex, Spinner, Table, Text } from '@chakra-ui/react';
+import { useAppSelector } from '~/store';
 import { styled } from 'styled-components';
-import { useParams } from 'react-router';
-import { NotFound } from '~/pages/NotFound';
-import { ChatInput } from '../chat-input/ChatInput';
-import { useState } from 'react';
 import { motion } from 'motion/react';
-import { continueConversationChain } from '~/api/flows/continue-conversation';
-import remarkGfm from 'remark-gfm';
-import Markdown from 'react-markdown';
-import { useTheme } from 'next-themes';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { twilight, coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Helmet } from 'react-helmet-async';
 import { conversationApi } from '~/api/bloefish/conversation';
 import { userApi } from '~/api/bloefish/user';
@@ -20,9 +10,8 @@ import type { Conversation } from './store/types';
 import { ClipboardId, ClipboardRoot } from '~/components/ui/clipboard';
 
 export const ConversationsList: React.FC = () => {
-	const dispatch = useAppDispatch();
 	const { data: userData } = userApi.useGetOrCreateDefaultUserQuery();
-	const conversations = useAppSelector(s => s.conversationsReducer);
+	const conversations = useAppSelector(s => s.conversations);
 	const { isFetching: convoFetching, isLoading: convoLoading } = conversationApi.useListConversationsWithInteractionsQuery({
 		owner: {
 			type: 'user',
@@ -65,7 +54,7 @@ export const ConversationsList: React.FC = () => {
 								{'ID'}
 							</Table.ColumnHeader>
 							<Table.ColumnHeader>
-								{'Preview'}
+								{'First message preview'}
 							</Table.ColumnHeader>
 							<Table.ColumnHeader>
 								{'Author'}
@@ -77,17 +66,17 @@ export const ConversationsList: React.FC = () => {
 					</Table.Header>
 					<Table.Body>
 						{truthyConversations.map(conversation => (
-							<Table.Row>
+							<Table.Row key={conversation.id}>
 								<Table.Cell>
 									<Code>
-										<ClipboardRoot value={conversation.conversationId}>
+										<ClipboardRoot value={conversation.id}>
 											<ClipboardId color="orange.fg" textStyle="xs" />
 										</ClipboardRoot>
 									</Code>
 								</Table.Cell>
 								<Table.Cell>
 									<Text truncate fontSize={'sm'}>
-										{conversation.interactions.at(0)?.messageContent.substring(0, 200)}
+										{conversation.interactions.at(0)?.messageContent.substring(0, 100)}
 									</Text>
 								</Table.Cell>
 								<Table.Cell>
