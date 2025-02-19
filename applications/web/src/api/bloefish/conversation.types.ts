@@ -2,11 +2,16 @@ import type { Actor, AiRelayOptions } from './shared.types';
 
 export interface Interaction {
 	id: string;
-	owner: Actor;
 	messageContent: string;
 	fileIds: string[];
-	aiRelayOptions: AiRelayOptions;
+	includedInAiContext: boolean;
 	streamChannelId: string;
+
+	markedAsExcludedAt: string | null;
+
+	aiRelayOptions: AiRelayOptions;
+	owner: Actor;
+
 	createdAt: string;
 	updatedAt: string;
 	completedAt: string | null;
@@ -79,4 +84,13 @@ export interface ListConversationsWithInteractionsResponse {
 
 export interface DeleteConversationsRequest {
 	conversationIds: string[];
+}
+
+export interface DeleteInteractionsRequest {
+	interactionIds: string[];
+}
+
+export interface UpdateInteractionExcludedStateRequest {
+	interactionId: string;
+	excluded: boolean;
 }

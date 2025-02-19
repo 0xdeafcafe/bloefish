@@ -9,9 +9,11 @@ import type {
 	ListConversationsWithInteractionsRequest,
 	ListConversationsWithInteractionsResponse,
 	DeleteConversationsRequest,
+	DeleteInteractionsRequest,
+	UpdateInteractionExcludedStateRequest,
 } from './conversation.types';
 import { createBaseQueryWithSnake } from './base';
-import { deleteConversations, injectConversations } from '~/features/conversations/store';
+import { deleteConversations, deleteInteractions, injectConversations, updateInteractionIncludedState } from '~/features/conversations/store';
 
 export const conversationApi = createApi({
 	reducerPath: 'api.bloefish.conversation',
@@ -53,9 +55,13 @@ export const conversationApi = createApi({
 							conversationId: data.id,
 							id: interaction.id,
 							messageContent: interaction.messageContent,
-							aiRelayOptions: interaction.aiRelayOptions,
-							owner: interaction.owner,
 							streamChannelId: interaction.streamChannelId,
+
+							markedAsExcludedAt: interaction.markedAsExcludedAt,
+
+							owner: interaction.owner,
+							aiRelayOptions: interaction.aiRelayOptions,
+
 							createdAt: interaction.createdAt,
 							updatedAt: interaction.updatedAt,
 							deletedAt: interaction.deletedAt,
@@ -93,8 +99,11 @@ export const conversationApi = createApi({
 							conversationId: conversation.id,
 							id: interaction.id,
 							messageContent: interaction.messageContent,
-							aiRelayOptions: interaction.aiRelayOptions,
 							streamChannelId: `${conversation.id}/${interaction.id}`, // TODO(afr): Fetch from backend
+
+							markedAsExcludedAt: interaction.markedAsExcludedAt,
+
+							aiRelayOptions: interaction.aiRelayOptions,
 							owner: interaction.owner,
 
 							createdAt: interaction.createdAt,
@@ -124,6 +133,41 @@ export const conversationApi = createApi({
 
 					dispatch(deleteConversations({
 						conversationIds: req.conversationIds,
+					}));
+				} catch (error) {
+					console.error(error);
+				}
+			},
+		}),
+
+		deleteInteractions: builder.mutation<void, DeleteInteractionsRequest>({
+			query: (body) => ({
+				url: '2025-02-12/delete_interactions',
+				body,
+			}),
+			async onQueryStarted(req, { dispatch, queryFulfilled }) {
+				try {
+					await queryFulfilled;
+
+					dispatch(deleteInteractions({ interactionIds: req.interactionIds }));
+				} catch (error) {
+					console.error(error);
+				}
+			},
+		}),
+
+		updateInteractionExcludedState: builder.mutation<void, UpdateInteractionExcludedStateRequest>({
+			query: (body) => ({
+				url: '2025-02-12/update_interaction_excluded_state',
+				body,
+			}),
+			async onQueryStarted(req, { dispatch, queryFulfilled }) {
+				try {
+					await queryFulfilled;
+
+					dispatch(updateInteractionIncludedState({
+						interactionId: req.interactionId,
+						excluded: req.excluded,
 					}));
 				} catch (error) {
 					console.error(error);

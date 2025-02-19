@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { AddActiveInteractionPayload, AddInteractionFragmentPayload, AddInteractionPayload, Conversation, CreateConversationPayload, DeleteConversationPayload as DeleteConversationsPayload, UpdateConversationTitlePayload, UpdateInteractionMessageContentPayload } from './types';
+import type { AddActiveInteractionPayload, AddInteractionFragmentPayload, AddInteractionPayload, Conversation, CreateConversationPayload, DeleteConversationsPayload as DeleteConversationsPayload, DeleteInteractionsPayload, UpdateConversationTitlePayload, UpdateInteractionExcludedStatePayload, UpdateInteractionMessageContentPayload } from './types';
 
 const initialState: Record<string, Conversation | undefined> = {};
 
@@ -42,9 +42,13 @@ export const conversationsSlice = createSlice({
 				conversationId: payload.conversationId,
 				id: payload.interactionId,
 				messageContent: payload.messageContent,
-				aiRelayOptions: payload.aiRelayOptions,
-				owner: payload.owner,
 				streamChannelId: conversation.streamChannelId,
+
+				markedAsExcludedAt: payload.markedAsExcludedAt,
+
+				owner: payload.owner,
+				aiRelayOptions: payload.aiRelayOptions,
+
 				createdAt: payload.createdAt,
 				updatedAt: payload.updatedAt,
 				completedAt: payload.completedAt,
@@ -60,13 +64,17 @@ export const conversationsSlice = createSlice({
 			conversation.interactions.push({
 				id: payload.interactionId,
 				conversationId: payload.conversationId,
+				messageContent: payload.messageContent,
+				streamChannelId: conversation.streamChannelId,
+
+				markedAsExcludedAt: payload.markedAsExcludedAt,
+
 				owner: {
 					type: 'bot',
 					identifier: 'open_ai',
 				},
-				messageContent: payload.messageContent,
 				aiRelayOptions: payload.aiRelayOptions,
-				streamChannelId: conversation.streamChannelId,
+				
 				createdAt: payload.createdAt,
 				updatedAt: payload.updatedAt,
 				completedAt: payload.completedAt,
@@ -120,6 +128,33 @@ export const conversationsSlice = createSlice({
 				conversation.title = payload.title;
 			}
 		},
+		deleteInteractions: (state, { payload }: PayloadAction<DeleteInteractionsPayload>) => {
+			for (const conversation of Object.values(state)) {
+				if (!conversation) {
+					continue;
+				}
+
+				conversation.interactions = conversation.interactions.filter(i => !payload.interactionIds.includes(i.id));
+			}
+		},
+		updateInteractionIncludedState: (state, { payload }: PayloadAction<UpdateInteractionExcludedStatePayload>) => {
+			for (const conversation of Object.values(state)) {
+				if (!conversation) {
+					continue;
+				}
+
+				const interaction = conversation.interactions.find(i => i.id === payload.interactionId);
+				if (!interaction) {
+					continue;
+				}
+
+				if (payload.excluded) {
+					interaction.markedAsExcludedAt = new Date().toISOString();
+				} else {
+					interaction.markedAsExcludedAt = null;
+				}
+			}
+		},
 	},
 });
 
@@ -132,5 +167,7 @@ export const {
 	updateInteractionMessageContent,
 	deleteConversations,
 	updateConversationTitle,
+	deleteInteractions,
+	updateInteractionIncludedState,
 } = conversationsSlice.actions;
 export const conversationsReducer = conversationsSlice.reducer;

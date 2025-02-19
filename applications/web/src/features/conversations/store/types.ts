@@ -25,6 +25,7 @@ export interface AddInteractionPayload extends ConversationPlugin, InteractionPl
 	owner: Actor;
 	messageContent: string;
 	aiRelayOptions: AiRelayOptions;
+	markedAsExcludedAt: string | null;
 
 	createdAt: string;
 	updatedAt: string;
@@ -35,6 +36,7 @@ export interface AddActiveInteractionPayload extends ConversationPlugin, Interac
 	messageContent: string;
 	streamChannelId: string;
 	aiRelayOptions: AiRelayOptions; // TODO(afr): this should come from the backend
+	markedAsExcludedAt: string | null;
 
 	createdAt: string;
 	updatedAt: string;
@@ -54,8 +56,16 @@ export interface UpdateConversationTitlePayload extends ConversationPlugin {
 	treatAsFragment: boolean;
 }
 
-export interface DeleteConversationPayload {
+export interface DeleteConversationsPayload {
 	conversationIds: string[];
+}
+
+export interface DeleteInteractionsPayload {
+	interactionIds: string[];
+}
+
+export interface UpdateInteractionExcludedStatePayload extends InteractionPlugin {
+	excluded: boolean;
 }
 
 export interface Conversation {
@@ -77,8 +87,11 @@ export interface Interaction {
 	id: string;
 	conversationId: string;
 	streamChannelId: string | null;
-	owner: Actor;
 	messageContent: string;
+
+	markedAsExcludedAt: string | null;
+
+	owner: Actor;
 	aiRelayOptions: AiRelayOptions;
 
 	createdAt: string;
