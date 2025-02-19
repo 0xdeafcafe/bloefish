@@ -41,12 +41,12 @@ export const conversationApi = createApi({
 					const { data } = await queryFulfilled;
 
 					dispatch(injectConversations([{
-						conversationId: data.conversationId,
+						id: data.conversationId,
 						owner: data.owner,
 						aiRelayOptions: data.aiRelayOptions,
 						interactions: data.interactions.map((interaction) => ({
 							conversationId: data.conversationId,
-							interactionId: interaction.id,
+							id: interaction.id,
 							messageContent: interaction.messageContent,
 							aiRelayOptions: interaction.aiRelayOptions,
 							owner: interaction.owner,
@@ -70,12 +70,12 @@ export const conversationApi = createApi({
 					const { data } = await queryFulfilled;
 
 					dispatch(injectConversations(data.conversations.map((conversation) => ({
-						conversationId: conversation.id,
+						id: conversation.id,
 						owner: conversation.owner,
 						aiRelayOptions: conversation.aiRelayOptions,
 						interactions: conversation.interactions.map((interaction) => ({
 							conversationId: conversation.id,
-							interactionId: interaction.id,
+							id: interaction.id,
 							messageContent: interaction.messageContent,
 							aiRelayOptions: interaction.aiRelayOptions,
 							owner: interaction.owner,
