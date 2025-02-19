@@ -1,5 +1,5 @@
-import { Stack, Text } from '@chakra-ui/react';
-import { format, formatDistanceToNow, formatISO }from'date-fns';
+import { Text } from '@chakra-ui/react';
+import { format, formatDistanceToNow }from'date-fns';
 import { Tooltip } from '../ui/tooltip';
 
 interface FormatDurationProps {

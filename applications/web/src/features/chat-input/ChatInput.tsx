@@ -1,7 +1,8 @@
-import { ButtonGroup, Card, Flex, HStack, Icon, IconButton, Status, Textarea } from '@chakra-ui/react';
+import { ButtonGroup, Card, Flex, HStack, Icon, IconButton, Kbd, Status, Textarea } from '@chakra-ui/react';
 import { useTheme } from 'next-themes';
 import { useEffect, useRef, useState } from 'react';
 import { LuBot, LuSend, LuChevronUp } from 'react-icons/lu';
+import type { AiRelayOptions } from '~/api/bloefish/shared.types';
 import { Button } from '~/components/ui/button';
 import { MenuContent, MenuItem, MenuItemCommand, MenuRoot, MenuTrigger } from '~/components/ui/menu';
 
@@ -25,6 +26,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 	const theme = useTheme();
 	const [focused, setFocused] = useState(false);
 	const inputRef = useRef<HTMLTextAreaElement>(null);
+	const [selectedModel, setSelectedModel] = useState<AiRelayOptions>({ providerId: 'open_ai', modelId: 'gpt-4o' });
 
 	const [questionLength, setQuestionLength] = useState(0);
 	const [lengthStatusColor, setLengthStatusColor] = useState<LengthStatus>('green');

@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Icon, Input, Kbd, Text, VStack } from '@chakra-ui/react';
+import { Button, Icon, Input, Text, VStack } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import { DialogActionTrigger, DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle, DialogTrigger } from '~/components/ui/dialog';
 import { conversationApi } from '~/api/bloefish/conversation';
@@ -6,10 +6,18 @@ import { LuTrash2 } from 'react-icons/lu';
 
 interface DeleteConversationsDialogProps {
 	conversationIds: string[];
+	onDeleteSuccess: () => void;
+	deleteButtonSize: '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'; // ButtonVariant -> styled-system
+	deleteButtonIconSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'; // IconVariant -> styled-system
+	deleteButtonText: string;
 }
 
 export const DeleteConversationsDialog: React.FC<DeleteConversationsDialogProps> = ({
 	conversationIds,
+	onDeleteSuccess,
+	deleteButtonSize,
+	deleteButtonIconSize,
+	deleteButtonText,
 }) => {
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [confirmText, setConfirmText] = useState('');
@@ -31,6 +39,7 @@ export const DeleteConversationsDialog: React.FC<DeleteConversationsDialogProps>
 			}).unwrap();
 
 			dialogCloseRef.current?.click();
+			onDeleteSuccess();
 		} catch (e) {
 			console.error(e);
 		} finally {
@@ -49,12 +58,12 @@ export const DeleteConversationsDialog: React.FC<DeleteConversationsDialogProps>
 				<Button
 					variant={'outline'}
 					colorPalette={'red'}
-					size={'xs'}
+					size={deleteButtonSize}
 				>
-					<Icon size={'xs'}>
+					<Icon size={deleteButtonIconSize}>
 						<LuTrash2 />
 					</Icon>
-					Delete conversation{conversationIds.length > 1 ? 's' : ''}
+					{deleteButtonText}
 				</Button>
 			</DialogTrigger>
 			<DialogContent onKeyDown={(e) => e.key === 'Enter' && deleteAllowed && handleDelete()}>

@@ -130,7 +130,10 @@ export const OmniBar: React.FC = () => {
 
 						<OmniGroup title={'Commands'}>
 							{commands.map(c => (
-								<OmniButton iconElement={c.icon} onClick={c.onInvoke}>
+								<OmniButton iconElement={c.icon} onClick={() => {
+									dispatch(closeOmni());
+									c.onInvoke();
+								}}>
 									{c.name}
 								</OmniButton>
 							))}

@@ -1,6 +1,6 @@
 import { Avatar, Box, HStack, Separator, Stack, Text } from '@chakra-ui/react';
 import { SidebarLink } from './components/molecules/SidebarLink';
-import { LuFolderOpen, LuMessageCirclePlus, LuSettings2, LuWorkflow } from 'react-icons/lu';
+import { LuFolderOpen, LuFolderRoot, LuGraduationCap, LuMessageCirclePlus, LuSettings2, LuWorkflow } from 'react-icons/lu';
 import { useLocation } from 'react-router';
 import { motion } from 'motion/react';
 import { SearchButton } from '~/components/ui/search-button';
@@ -10,6 +10,8 @@ import { openOmni } from '../omnibar/store';
 const sidebarStates = [
 	'new_conversation',
 	'conversations',
+	'still_sets',
+	'projects',
 	'workflows',
 	'preferences',
 ] as const;
@@ -59,7 +61,7 @@ export const Sidebar: React.FC = () => {
 							borderRadius: '0.125rem',
 							borderTopLeftRadius: 0,
 							borderBottomLeftRadius: 0,
-							background: 'var(--chakra-colors-bg-emphasized)',
+							background: 'var(--chakra-colors-gray-emphasized)',
 						}}
 						animate={{
 							top: `${indicatorTop}px`
@@ -82,6 +84,18 @@ export const Sidebar: React.FC = () => {
 							content={'Conversations'}
 							path={'/conversations'}
 							icon={<LuFolderOpen />}
+						/>
+						<SidebarLink
+							active={state === 'still_sets'}
+							content={'Skill sets'}
+							path={'/skill-sets'}
+							icon={<LuGraduationCap />}
+						/>
+						<SidebarLink
+							active={state === 'projects'}
+							content={'Projects'}
+							path={'/projects'}
+							icon={<LuFolderRoot />}
 						/>
 						<SidebarLink
 							active={state === 'workflows'}
@@ -121,5 +135,5 @@ function useSidebarLocationState(): SidebarButtonState {
 function calculateIndicatorTop(state: SidebarButtonState): number {
 	const index = sidebarStates.indexOf(state);
 
-	return ((index * 31) + (index * 10)) + 4;
+	return ((index * 31) + (index * 10)) + 5;
 }
