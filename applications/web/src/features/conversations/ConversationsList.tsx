@@ -1,10 +1,10 @@
-import { Box, Breadcrumb, Button, ButtonGroup, Center, EmptyState, Spinner, Table, Text, VStack } from '@chakra-ui/react';
+import { Box, Breadcrumb, Button, ButtonGroup, Center, EmptyState, Icon, Spinner, Table, Text, VStack } from '@chakra-ui/react';
 import { useAppSelector } from '~/store';
 import { Helmet } from 'react-helmet-async';
 import { conversationApi } from '~/api/bloefish/conversation';
 import { userApi } from '~/api/bloefish/user';
 import type { Conversation } from './store/types';
-import { LuFishSymbol }  from 'react-icons/lu';
+import { LuFishSymbol, LuSquareStack, LuX }  from 'react-icons/lu';
 
 import { Panel } from '~/components/atoms/Panel';
 import { Checkbox } from '~/components/ui/checkbox';
@@ -12,6 +12,8 @@ import { useState } from 'react';
 import { ActionBarContent, ActionBarRoot, ActionBarSelectionTrigger, ActionBarSeparator } from '~/components/ui/action-bar';
 import { useNavigate } from 'react-router';
 import { DeleteConversationsDialog } from './components/organisms/DeleteConversationsDialog';
+import { Skeleton } from '~/components/ui/skeleton';
+import { FormatDuration } from '~/components/atoms/FormatDuration';
 
 export const ConversationsList: React.FC = () => {
 	const navigate = useNavigate();
@@ -81,7 +83,16 @@ export const ConversationsList: React.FC = () => {
 								/>
 							</Table.ColumnHeader>
 							<Table.ColumnHeader>
+								{'Title'}
+							</Table.ColumnHeader>
+							<Table.ColumnHeader>
 								{'First message preview'}
+							</Table.ColumnHeader>
+							<Table.ColumnHeader>
+								{'Created at'}
+							</Table.ColumnHeader>
+							<Table.ColumnHeader>
+								{'Last updated at'}
 							</Table.ColumnHeader>
 							<Table.ColumnHeader w={52}>
 								{'Actions'}
@@ -105,9 +116,20 @@ export const ConversationsList: React.FC = () => {
 									/>
 								</Table.Cell>
 								<Table.Cell>
+									{conversation.title ?? (
+										<Skeleton variant={'shine'} w={32} height={4} />
+									)}
+								</Table.Cell>
+								<Table.Cell>
 									<Text truncate>
 										{conversation.interactions.at(0)?.messageContent.substring(0, 100)}
 									</Text>
+								</Table.Cell>
+								<Table.Cell>
+									<FormatDuration pointInTime={conversation.createdAt} />
+								</Table.Cell>
+								<Table.Cell>
+									<FormatDuration pointInTime={conversation.interactions.at(0)?.updatedAt ?? conversation.updatedAt} />
 								</Table.Cell>
 								<Table.Cell>
 									<ButtonGroup size={'2xs'} variant={'outline'}>
@@ -132,6 +154,14 @@ export const ConversationsList: React.FC = () => {
 					</ActionBarSelectionTrigger>
 					<ActionBarSeparator />
 					<Button variant={'outline'} colorPalette={'gray'} size={'xs'} onClick={() => {
+						setSelection([]);
+					}}>
+						<Icon size={'xs'}>
+							<LuX />
+						</Icon>
+						Clear selection
+					</Button>
+					<Button variant={'outline'} colorPalette={'gray'} size={'xs'} onClick={() => {
 						if (selection.length === 1) {
 							navigate(`/conversations/${selection[0]}`);
 							setSelection([]);
@@ -142,6 +172,9 @@ export const ConversationsList: React.FC = () => {
 							window.open(`/conversations/${convoId}`, '_blank');
 						}
 					}}>
+						<Icon size={'xs'}>
+							<LuSquareStack />
+						</Icon>
 						Open {selection.length > 1 ? 'all' : ''}
 					</Button>
 					<DeleteConversationsDialog

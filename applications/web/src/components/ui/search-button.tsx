@@ -5,7 +5,7 @@ import { LuSearch } from "react-icons/lu"
 export const SearchButton = forwardRef<HTMLButtonElement, ButtonProps>(
   function SearchButton(props, ref) {
     return (
-      <Button variant="subtle" color="fg.muted!" ref={ref} {...props}>
+      <Button variant="subtle" color="fg.muted!" borderWidth={1} borderStyle={'solid'} borderColor={'border.emphasized'} ref={ref} {...props}>
         <LuSearch />
         <Span
           ms="1"
