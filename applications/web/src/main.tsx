@@ -15,6 +15,7 @@ import { Ready } from './components/molecules/Ready';
 import { HelmetProvider } from 'react-helmet-async';
 import { ConversationsList } from './features/conversations/ConversationsList';
 import { OmniBar } from './features/omnibar/OmniBar';
+import { Toaster } from './components/ui/toaster';
 
 const root = createRoot(document.getElementById('root')!);
 
@@ -39,6 +40,7 @@ root.render(
 									</Ready>
 								</EnsureReadiness>
 							</App>
+							<Toaster />
 							<OmniBar />
 						</ReduxProvider>
 					</Theme>
