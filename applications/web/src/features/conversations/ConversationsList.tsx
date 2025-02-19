@@ -1,17 +1,28 @@
-import { Box, Button, ButtonGroup, Code, Flex, Spinner, Table, Text } from '@chakra-ui/react';
+import { Box, Breadcrumb, Button, ButtonGroup, Center, EmptyState, Spinner, Table, Text, VStack } from '@chakra-ui/react';
 import { useAppSelector } from '~/store';
-import { styled } from 'styled-components';
-import { motion } from 'motion/react';
 import { Helmet } from 'react-helmet-async';
 import { conversationApi } from '~/api/bloefish/conversation';
 import { userApi } from '~/api/bloefish/user';
 import type { Conversation } from './store/types';
+import { LuFishSymbol }  from 'react-icons/lu';
 
-import { ClipboardId, ClipboardRoot } from '~/components/ui/clipboard';
+import { Panel } from '~/components/atoms/Panel';
+import { Checkbox } from '~/components/ui/checkbox';
+import { useState } from 'react';
+import { ActionBarContent, ActionBarRoot, ActionBarSelectionTrigger, ActionBarSeparator } from '~/components/ui/action-bar';
+import { useNavigate } from 'react-router';
+import { DeleteConversationsDialog } from './components/organisms/DeleteConversationsDialog';
 
 export const ConversationsList: React.FC = () => {
+	const navigate = useNavigate();
 	const { data: userData } = userApi.useGetOrCreateDefaultUserQuery();
 	const conversations = useAppSelector(s => s.conversations);
+	const truthyConversations = Object.values(conversations).filter(Boolean) as Conversation[];
+
+	const [selection, setSelection] = useState<string[]>([]);
+	const hasSelection = selection.length > 0;
+	const indeterminate = hasSelection && selection.length < truthyConversations.length;
+
 	const { isFetching: convoFetching, isLoading: convoLoading } = conversationApi.useListConversationsWithInteractionsQuery({
 		owner: {
 			type: 'user',
@@ -19,47 +30,60 @@ export const ConversationsList: React.FC = () => {
 		},
 	}, { skip: true });
 
-	// const sortedConversations = Object.values(conversations).sort((a, b) => {
-	// 	const aDate = new Date(a.updatedAt);
-	// 	const bDate = new Date(b.updatedAt);
-
-	// 	return aDate < bDate ? 1 : -1;
-	// });
-
 	if (convoFetching || convoLoading) {
 		return (
-			<Flex w={'full'} h={'full'} justify={'center'} align={'center'}>
+			<Container>
 				<Spinner />
-			</Flex>
+			</Container>
 		);
 	}
 
-	const truthyConversations = Object.values(conversations).filter(Boolean) as Conversation[];
+	if (truthyConversations.length === 0) {
+		return (
+			<Container>
+				<Center h={'full'}>
+					<EmptyState.Root size={'lg'}>
+						<EmptyState.Content>
+							<EmptyState.Indicator>
+								<LuFishSymbol />
+							</EmptyState.Indicator>
+							<VStack textAlign={'center'}>
+								<EmptyState.Title>
+									{'Something on your mind?'}
+								</EmptyState.Title>
+								<EmptyState.Description>
+									{'Once you start asking conversations, they\'ll appear here.'}
+								</EmptyState.Description>
+							</VStack>
+						</EmptyState.Content>
+					</EmptyState.Root>
+				</Center>
+			</Container>
+		);
+	}
 
 	return (
-		<Box
-			position={'relative'}
-			width={'full'}
-			height={'full'}
-		>
-			<Helmet>
-				<title>{'Conversations | Bloefish'}</title>
-			</Helmet>
-
+		<Container>
 			<Table.ScrollArea>
-				<Table.Root striped interactive stickyHeader>
+				<Table.Root striped interactive stickyHeader size={'md'}>
 					<Table.Header>
 						<Table.Row>
-							<Table.ColumnHeader>
-								{'ID'}
+							<Table.ColumnHeader w={6}>
+								<Checkbox
+									top="1"
+									aria-label="Select all conversations"
+									size={'sm'}
+									checked={indeterminate ? 'indeterminate' : selection.length > 0}
+									onCheckedChange={(changes) => setSelection(changes.checked
+										? truthyConversations.map((conversation) => conversation.id)
+										: [],
+									)}
+								/>
 							</Table.ColumnHeader>
 							<Table.ColumnHeader>
 								{'First message preview'}
 							</Table.ColumnHeader>
-							<Table.ColumnHeader>
-								{'Author'}
-							</Table.ColumnHeader>
-							<Table.ColumnHeader>
+							<Table.ColumnHeader w={52}>
 								{'Actions'}
 							</Table.ColumnHeader>
 						</Table.Row>
@@ -68,24 +92,25 @@ export const ConversationsList: React.FC = () => {
 						{truthyConversations.map(conversation => (
 							<Table.Row key={conversation.id}>
 								<Table.Cell>
-									<Code>
-										<ClipboardRoot value={conversation.id}>
-											<ClipboardId color="orange.fg" textStyle="xs" />
-										</ClipboardRoot>
-									</Code>
+									<Checkbox
+										top="1"
+										aria-label="Select conversation"
+										checked={selection.includes(conversation.id)}
+										size={'sm'}
+										onCheckedChange={(changes) => setSelection((prev) =>
+											changes.checked
+												? [...prev, conversation.id]
+												: selection.filter((name) => name !== conversation.id),
+										)}
+									/>
 								</Table.Cell>
 								<Table.Cell>
-									<Text truncate fontSize={'sm'}>
+									<Text truncate>
 										{conversation.interactions.at(0)?.messageContent.substring(0, 100)}
 									</Text>
 								</Table.Cell>
 								<Table.Cell>
-									<Text truncate fontSize={'sm'}>
-										{'You'}
-									</Text>
-								</Table.Cell>
-								<Table.Cell>
-									<ButtonGroup size={'xs'} variant={'outline'}>
+									<ButtonGroup size={'2xs'} variant={'outline'}>
 										<Button colorPalette="gray">
 											{'View'}
 										</Button>
@@ -99,18 +124,57 @@ export const ConversationsList: React.FC = () => {
 					</Table.Body>
 				</Table.Root>
 			</Table.ScrollArea>
-		</Box>
-	)
+
+			<ActionBarRoot open={hasSelection}>
+				<ActionBarContent>
+					<ActionBarSelectionTrigger>
+						{selection.length} selected
+					</ActionBarSelectionTrigger>
+					<ActionBarSeparator />
+					<Button variant={'outline'} colorPalette={'gray'} size={'xs'} onClick={() => {
+						if (selection.length === 1) {
+							navigate(`/conversations/${selection[0]}`);
+							setSelection([]);
+							return;
+						}
+
+						for (const convoId of selection) {
+							window.open(`/conversations/${convoId}`, '_blank');
+						}
+					}}>
+						Open {selection.length > 1 ? 'all' : ''}
+					</Button>
+					<DeleteConversationsDialog
+						conversationIds={selection}
+					/>
+				</ActionBarContent>
+			</ActionBarRoot>
+		</Container>
+	);
 };
 
-const MotionBox = motion(Box);
+const Container: React.FC<React.PropsWithChildren> = ({ children }) => (
+	<Box
+		position={'relative'}
+		width={'full'}
+		height={'full'}
+	>
+		<Helmet>
+			<title>{'Conversations | Bloefish'}</title>
+		</Helmet>
 
-const MarkdownWrapper = styled.div`
-	& > * {
-		margin-bottom: 16px;
-	}
+		<Panel.Header>
+			<Breadcrumb.Root>
+				<Breadcrumb.List>
+					<Breadcrumb.Item>
+						<Breadcrumb.CurrentLink>
+							{'Conversations'}
+						</Breadcrumb.CurrentLink>
+					</Breadcrumb.Item>
+				</Breadcrumb.List>
+			</Breadcrumb.Root>
+		</Panel.Header>
 
-	& > *:last-child {
-		margin-bottom: 0;
-	}
-`;
+		{children}
+	</Box>
+);

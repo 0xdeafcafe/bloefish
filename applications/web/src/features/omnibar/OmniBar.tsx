@@ -14,7 +14,7 @@ import { useCommands } from './hooks/use-commands';
 import Fuse from 'fuse.js'
 import type { Conversation } from '../conversations/store/types';
 import { OmniGroup } from './components/molecules/OmniGroup';
-import type { SearchContextItem } from './types';
+import type { CommandSearchContext, InteractionSearchContext, SearchContextItem } from './types';
 import { SearchItem } from './components/molecules/SearchItem';
 import { OmniButton } from './components/molecules/OmniButton';
 
@@ -29,9 +29,9 @@ export const OmniBar: React.FC = () => {
 	const foundConversations = Object.values(conversations).filter(Boolean) as Conversation[];
 
 	const searchContextItems: SearchContextItem[] = [
-		...commands.map(command => ({ ...command, searchContextType: 'command' })),
+		...commands.map<CommandSearchContext>(command => ({ ...command, searchContextType: 'command' })),
 		...Object.values(foundConversations).flatMap(conversation => 
-			conversation.interactions.map(interaction => ({ 
+			conversation.interactions.map<InteractionSearchContext>(interaction => ({ 
 				...interaction,
 				searchContextType: 'interaction',
 			})),

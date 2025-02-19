@@ -3,6 +3,7 @@ import { Sidebar } from './features/sidebar/Sidebar';
 import { LuExternalLink } from 'react-icons/lu';
 import { useStreamListener } from './api/bloefish/stream';
 import { PlatformStatus } from './components/molecules/PlatformStatus';
+import { Panel } from './components/atoms/Panel';
 
 export const App: React.FC<React.PropsWithChildren> = ({ children }) => {
 	useStreamListener();
@@ -18,14 +19,9 @@ export const App: React.FC<React.PropsWithChildren> = ({ children }) => {
 					boxShadow={'md'}
 					marginBottom={3}
 				>
-					<Card.Body
-						p={0}
-						maxH={'calc(100vh - 3.5rem)'}
-						minH={'700px'}
-						overflow={'hidden'}
-					>
+					<Panel.Body>
 						{children}
-					</Card.Body>
+					</Panel.Body>
 				</Card.Root>
 				<Box marginRight={1}>
 					<HStack justify={'end'} gap={2}>

@@ -1,8 +1,8 @@
-import { Text, Box, Card, Center, Container, Flex, Grid, GridItem, HStack, Spinner, Stack, ButtonGroup, IconButton, Badge } from '@chakra-ui/react';
-import { LuMailQuestion, LuTrash2 } from 'react-icons/lu';
+import { Box, Center, Container, Flex, Grid, GridItem, HStack, Spinner, Stack, ButtonGroup, IconButton, Badge, Breadcrumb } from '@chakra-ui/react';
+import { LuMailQuestion, LuSlash, LuTrash2 } from 'react-icons/lu';
 import { useAppDispatch, useAppSelector } from '~/store';
 import { styled } from 'styled-components';
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import { NotFound } from '~/pages/NotFound';
 import { ChatInput } from '../chat-input/ChatInput';
 import { useState } from 'react';
@@ -14,6 +14,7 @@ import { userApi } from '~/api/bloefish/user';
 import { ConversationInteraction } from './components/organisms/ConversationInteraction';
 import { Tooltip } from '~/components/ui/tooltip';
 import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
+import { Panel } from '~/components/atoms/Panel';
 
 export const Conversation: React.FC = () => {
 	const { conversationId } = useParams();
@@ -119,40 +120,43 @@ export const Conversation: React.FC = () => {
 				templateColumns="1fr"
 			>
 				<GridItem>
-					<Card.Header
-						py={0}
-						px={4}
-						height={'60px'}
-						borderBottomWidth={'1px'}
-						borderBottomStyle={'solid'}
-						borderBottomColor={'border.emphasized'}
-					>
-						<Flex
-							justify={'space-between'}
-							align={'center'}
-							height={'full'}
-						>
-							<Flex gap={2} align={'center'}>
-								<Text>
-									Generated conversation title
-								</Text>
-								<Badge colorPalette={'pink'} size={'sm'}>
-									{`${conversation.aiRelayOptions.providerId} (${conversation.aiRelayOptions.modelId})`}
-								</Badge>
-							</Flex>
-							<ButtonGroup variant={'outline'} size={'xs'}>
-								<Tooltip content={'Delete conversation'}>
-									<IconButton
-										aria-label={'Delete conversation'}
-										colorPalette={'red'}
-										disabled
-									>
-										<LuTrash2 />
-									</IconButton>
-								</Tooltip>
-							</ButtonGroup>
+					<Panel.Header>
+						<Flex gap={2} align={'center'}>
+							<Breadcrumb.Root>
+								<Breadcrumb.List>
+									<Breadcrumb.Item>
+										<Breadcrumb.Link asChild>
+											<Link to={'/conversations'}>
+												{'Conversations'}
+											</Link>
+										</Breadcrumb.Link>
+									</Breadcrumb.Item>
+									<Breadcrumb.Separator>
+										<LuSlash />
+									</Breadcrumb.Separator>
+									<Breadcrumb.Item>
+										<Breadcrumb.CurrentLink>
+											{'Generated conversation title'}
+										</Breadcrumb.CurrentLink>
+									</Breadcrumb.Item>
+								</Breadcrumb.List>
+							</Breadcrumb.Root>
+							<Badge colorPalette={'pink'} size={'sm'}>
+								{`${conversation.aiRelayOptions.providerId} (${conversation.aiRelayOptions.modelId})`}
+							</Badge>
 						</Flex>
-					</Card.Header>
+						<ButtonGroup variant={'outline'} size={'xs'}>
+							<Tooltip content={'Delete conversation'}>
+								<IconButton
+									aria-label={'Delete conversation'}
+									colorPalette={'red'}
+									disabled
+								>
+									<LuTrash2 />
+								</IconButton>
+							</Tooltip>
+						</ButtonGroup>
+					</Panel.Header>
 				</GridItem>
 				<GridItem
 					position={'relative'}
