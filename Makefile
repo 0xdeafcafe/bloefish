@@ -23,3 +23,5 @@ start:
 services: build-go build-docker start
 web: build-js build-docker start
 infra: build-docker start
+
+all: build start
