@@ -7,6 +7,9 @@
     "build": "vite build",
     "dev": "vite",
     "start": "vite preview",
+    "lint": "eslint",
+    "lint-fix": "eslint --fix",
+    "lint-dry": "eslint --fix-dry-run",
     "typecheck": "tsc --noEmit",
     "fi": "yarn react-icons"
   },
@@ -36,14 +39,22 @@
   },
   "devDependencies": {
     "@chakra-ui/cli": "^3.8.0",
+    "@eslint/js": "^9.20.0",
     "@react-router/dev": "^7.1.5",
     "@types/node": "^20",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.3",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@vitejs/plugin-react": "^4.3.4",
+    "babel-plugin-react-compiler": "^19.0.0-beta-21e868a-20250216",
+    "eslint": "^9.20.1",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-compiler": "^19.0.0-beta-21e868a-20250216",
+    "globals": "^15.15.0",
+    "react-compiler-runtime": "^19.0.0-beta-21e868a-20250216",
     "serve": "^14.2.4",
     "typescript": "^5.7.2",
+    "typescript-eslint": "^8.24.1",
     "vite": "^5.4.11",
     "vite-tsconfig-paths": "^5.1.4"
   }
