@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from 'react';
 import { EmptyState, Input, Stack, VStack } from '@chakra-ui/react';
 import { InputGroup } from '~/components/ui/input-group';
 import { useCommands } from './hooks/use-commands';
-import Fuse, { type FuseResult } from 'fuse.js'
+import Fuse from 'fuse.js'
 import type { Conversation } from '../conversations/store/types';
 import { OmniGroup } from './components/molecules/OmniGroup';
 import type { SearchContextItem } from './types';
