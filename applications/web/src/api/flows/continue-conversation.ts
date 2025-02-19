@@ -54,23 +54,31 @@ export const continueConversationChain = createAsyncThunk<
 
 			dispatch(addInteraction({
 				conversationId: params.conversationId,
-				interactionId: interaction.interactionId,
-				messageContent: params.messageContent,
-				streamChannelId: interaction.streamChannelId,
+				interactionId: interaction.inputInteraction.id,
 				aiRelayOptions,
 				owner,
+				messageContent: params.messageContent,
+				streamChannelId: interaction.streamChannelId,
+
+				createdAt: interaction.inputInteraction.createdAt,
+				updatedAt: interaction.inputInteraction.updatedAt,
+				completedAt: interaction.inputInteraction.completedAt,
 			}));
 			dispatch(addActiveInteraction({
 				conversationId: params.conversationId,
-				interactionId: interaction.responseInteractionId,
+				interactionId: interaction.responseInteraction.id,
+				aiRelayOptions,
 				messageContent: '',
 				streamChannelId: interaction.streamChannelId,
-				aiRelayOptions,
+
+				createdAt: interaction.responseInteraction.createdAt,
+				updatedAt: interaction.responseInteraction.updatedAt,
+				completedAt: interaction.responseInteraction.completedAt,
 			}));
 
 			return {
 				conversationId: params.conversationId,
-				interactionId: interaction.interactionId,
+				interactionId: interaction.inputInteraction.id,
 				streamChannelId: interaction.streamChannelId,
 			};
 		} catch (err) {

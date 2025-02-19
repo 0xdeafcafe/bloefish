@@ -10,9 +10,14 @@ export interface InteractionPlugin {
 
 export interface CreateConversationPayload {
 	conversationId: string;
-	streamChannelIdPrefix: string;
 	owner: Actor;
 	aiRelayOptions: AiRelayOptions;
+
+	streamChannelId: string;
+	title: string | null;
+
+	createdAt: string;
+	updatedAt: string | null;
 }
 
 export interface AddInteractionPayload extends ConversationPlugin, InteractionPlugin {
@@ -20,12 +25,20 @@ export interface AddInteractionPayload extends ConversationPlugin, InteractionPl
 	owner: Actor;
 	messageContent: string;
 	aiRelayOptions: AiRelayOptions;
+
+	createdAt: string;
+	updatedAt: string | null;
+	completedAt: string | null;
 }
 
 export interface AddActiveInteractionPayload extends ConversationPlugin, InteractionPlugin {
 	messageContent: string;
 	streamChannelId: string;
 	aiRelayOptions: AiRelayOptions; // TODO(afr): this should come from the backend
+
+	createdAt: string;
+	updatedAt: string | null;
+	completedAt: string | null;
 }
 
 export interface AddInteractionFragmentPayload extends ConversationPlugin, InteractionPlugin {
@@ -36,13 +49,23 @@ export interface UpdateInteractionMessageContentPayload extends ConversationPlug
 	content: string;
 }
 
+export interface DeleteConversationPayload {
+	conversationIds: string[];
+}
+
 export interface Conversation {
 	id: string;
-	streamChannelId: string;
 	owner: Actor;
 	aiRelayOptions: AiRelayOptions;
+	
+	title: string | null;
+	streamChannelId: string;
 
 	interactions: Interaction[];
+
+	createdAt: string;
+	updatedAt: string;
+	deletedAt: string | null;
 }
 
 export interface Interaction {
@@ -52,4 +75,9 @@ export interface Interaction {
 	owner: Actor;
 	messageContent: string;
 	aiRelayOptions: AiRelayOptions;
+
+	createdAt: string;
+	updatedAt: string;
+	completedAt: string | null;
+	deletedAt: string | null;
 }

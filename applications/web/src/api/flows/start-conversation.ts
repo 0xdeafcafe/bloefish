@@ -48,15 +48,20 @@ export const startConversationChain = createAsyncThunk<
 			})).unwrap();
 
 			dispatch(startConversation({
-				conversationId: conversation.conversationId,
+				conversationId: conversation.id,
 				owner,
 				aiRelayOptions,
-				streamChannelIdPrefix: conversation.streamChannelIdPrefix,
+
+				streamChannelId: conversation.streamChannelId,
+				title: conversation.title,
+
+				createdAt: conversation.createdAt,
+				updatedAt: conversation.updatedAt,
 			}));
 
 			const interaction = await dispatch(conversationApi.endpoints.createConversationMessage.initiate({
 				idempotencyKey: params.idempotencyKey,
-				conversationId: conversation.conversationId,
+				conversationId: conversation.id,
 				messageContent: params.messageContent,
 				fileIds: [],
 				owner,
@@ -67,26 +72,32 @@ export const startConversationChain = createAsyncThunk<
 			})).unwrap();
 
 			dispatch(addInteraction({
-				conversationId: conversation.conversationId,
-				interactionId: interaction.interactionId,
-				messageContent: params.messageContent,
-				streamChannelId: interaction.streamChannelId,
-				aiRelayOptions,
+				conversationId: conversation.id,
 				owner,
+				aiRelayOptions,
+				interactionId: interaction.inputInteraction.id,
+				streamChannelId: interaction.streamChannelId,
+				messageContent: params.messageContent,
+				createdAt: interaction.inputInteraction.createdAt,
+				updatedAt: interaction.inputInteraction.updatedAt,
+				completedAt: interaction.inputInteraction.completedAt,
 			}));
 			dispatch(addActiveInteraction({
-				conversationId: conversation.conversationId,
-				interactionId: interaction.responseInteractionId,
-				messageContent: '',
-				streamChannelId: interaction.streamChannelId,
+				conversationId: conversation.id,
 				aiRelayOptions,
+				interactionId: interaction.responseInteraction.id,
+				streamChannelId: interaction.streamChannelId,
+				messageContent: '',
+				createdAt: interaction.responseInteraction.createdAt,
+				updatedAt: interaction.responseInteraction.updatedAt,
+				completedAt: interaction.responseInteraction.completedAt,
 			}));
 
-			params.navigate(`/conversations/${conversation.conversationId}`, { replace: false });
+			params.navigate(`/conversations/${conversation.id}`, { replace: false });
 
 			return {
-				conversationId: conversation.conversationId,
-				interactionId: interaction.interactionId,
+				conversationId: conversation.id,
+				interactionId: interaction.inputInteraction.id,
 				streamChannelId: interaction.streamChannelId,
 			};
 		} catch (err) {

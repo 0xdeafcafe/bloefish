@@ -8,9 +8,10 @@ import type {
 	GetConversationWithInteractionsRequest,
 	ListConversationsWithInteractionsRequest,
 	ListConversationsWithInteractionsResponse,
+	DeleteConversationsRequest,
 } from './conversation.types';
 import { createBaseQueryWithSnake } from './base';
-import { injectConversations } from '~/features/conversations/store';
+import { deleteConversations, injectConversations } from '~/features/conversations/store';
 
 export const conversationApi = createApi({
 	reducerPath: 'api.bloefish.conversation',
@@ -41,18 +42,29 @@ export const conversationApi = createApi({
 					const { data } = await queryFulfilled;
 
 					dispatch(injectConversations([{
-						id: data.conversationId,
+						id: data.id,
 						owner: data.owner,
 						aiRelayOptions: data.aiRelayOptions,
+
+						title: data.title,
+						streamChannelId: data.streamChannelId,
+
 						interactions: data.interactions.map((interaction) => ({
-							conversationId: data.conversationId,
+							conversationId: data.id,
 							id: interaction.id,
 							messageContent: interaction.messageContent,
 							aiRelayOptions: interaction.aiRelayOptions,
 							owner: interaction.owner,
-							streamChannelId: `${data.conversationId}/${interaction.id}`, // TODO(afr): Fetch from backend
+							streamChannelId: interaction.streamChannelId,
+							createdAt: interaction.createdAt,
+							updatedAt: interaction.updatedAt,
+							deletedAt: interaction.deletedAt,
+							completedAt: interaction.completedAt,
 						})),
-						streamChannelId: data.conversationId,
+
+						createdAt: data.createdAt,
+						updatedAt: data.updatedAt,
+						deletedAt: data.deletedAt,
 					}]));
 				} catch (error) {
 					console.error(error);
@@ -73,16 +85,46 @@ export const conversationApi = createApi({
 						id: conversation.id,
 						owner: conversation.owner,
 						aiRelayOptions: conversation.aiRelayOptions,
+
+						title: conversation.title,
+						streamChannelId: conversation.streamChannelId,
+
 						interactions: conversation.interactions.map((interaction) => ({
 							conversationId: conversation.id,
 							id: interaction.id,
 							messageContent: interaction.messageContent,
 							aiRelayOptions: interaction.aiRelayOptions,
-							owner: interaction.owner,
 							streamChannelId: `${conversation.id}/${interaction.id}`, // TODO(afr): Fetch from backend
+							owner: interaction.owner,
+
+							createdAt: interaction.createdAt,
+							updatedAt: interaction.updatedAt,
+							completedAt: interaction.completedAt,
+							deletedAt: interaction.deletedAt,
 						})),
-						streamChannelId: conversation.id,
+
+						createdAt: conversation.createdAt,
+						updatedAt: conversation.updatedAt,
+						deletedAt: conversation.deletedAt,
 					}))));
+				} catch (error) {
+					console.error(error);
+				}
+			},
+		}),
+
+		deleteConversations: builder.mutation<void, DeleteConversationsRequest>({
+			query: (body) => ({
+				url: '2025-02-12/delete_conversations',
+				body,
+			}),
+			async onQueryStarted(req, { dispatch, queryFulfilled }) {
+				try {
+					await queryFulfilled;
+
+					dispatch(deleteConversations({
+						conversationIds: req.conversationIds,
+					}));
 				} catch (error) {
 					console.error(error);
 				}

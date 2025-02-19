@@ -6,9 +6,22 @@ export interface Interaction {
 	messageContent: string;
 	fileIds: string[];
 	aiRelayOptions: AiRelayOptions;
+	streamChannelId: string;
 	createdAt: string;
-	updatedAt: string | null;
-	confirmedAt: string | null;
+	updatedAt: string;
+	completedAt: string | null;
+	deletedAt: string | null;
+}
+
+export interface Conversation {
+	id: string;
+	owner: Actor;
+	aiRelayOptions: AiRelayOptions;
+	title: string | null;
+	streamChannelId: string;
+	interactions: Interaction[];
+	createdAt: string;
+	updatedAt: string;
 	deletedAt: string | null;
 }
 
@@ -19,8 +32,14 @@ export interface CreateConversationRequest {
 }
 
 export interface CreateConversationResponse {
-	conversationId: string;
-	streamChannelIdPrefix: string;
+	id: string;
+	owner: Actor;
+	aiRelayOptions: AiRelayOptions;
+	title: string | null;
+	streamChannelId: string;
+	createdAt: string;
+	updatedAt: string;
+	deletedAt: string | null;
 }
 
 export interface CreateConversationMessageRequest {
@@ -39,8 +58,8 @@ export interface CreateConversationMessageRequestOptions {
 
 export interface CreateConversationMessageResponse {
 	conversationId: string;
-	interactionId: string;
-	responseInteractionId: string;
+	inputInteraction: Interaction;
+	responseInteraction: Interaction;
 	streamChannelId: string;
 }
 
@@ -48,28 +67,16 @@ export interface GetConversationWithInteractionsRequest {
 	conversationId: string;
 }
 
-export interface GetConversationWithInteractionsResponse {
-	conversationId: string;
-	owner: Actor;
-	aiRelayOptions: AiRelayOptions;
-	interactions: Interaction[];
-	createdAt: string;
-	deletedAt: string | null;
-}
+export interface GetConversationWithInteractionsResponse extends Conversation {}
 
 export interface ListConversationsWithInteractionsRequest {
 	owner: Actor;
 }
 
 export interface ListConversationsWithInteractionsResponse {
-	conversations: ListConversationsWithInteractionsResponseConversation[];
+	conversations: Conversation[];
 }
 
-export interface ListConversationsWithInteractionsResponseConversation {
-	id: string;
-	owner: Actor;
-	aiRelayOptions: AiRelayOptions;
-	interactions: Interaction[];
-	createdAt: string;
-	deletedAt: string | null;
+export interface DeleteConversationsRequest {
+	conversationIds: string[];
 }
