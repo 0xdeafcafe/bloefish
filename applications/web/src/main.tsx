@@ -24,7 +24,7 @@ root.render(
 		<HelmetProvider>
 			<ChakraProvider>
 				<BrowserRouter>
-					<Theme appearance={'dark'}>
+					<Theme>
 						<ReduxProvider store={store}>
 							<App>
 								<EnsureReadiness>
