@@ -36,7 +36,7 @@ export function useStreamListener() {
 					break;
 				}
 
-				case 'message_full':
+				case 'message_full': {
 					const [conversationId, interactionId] = data.channelId.split('/');
 					if (!conversationId || !interactionId) return;
 
@@ -55,6 +55,7 @@ export function useStreamListener() {
 						content: data.messageFull,
 					}));
 					break;
+				}
 
 				default:
 					break;

@@ -73,21 +73,27 @@ export const startConversationChain = createAsyncThunk<
 
 			dispatch(addInteraction({
 				conversationId: conversation.id,
-				owner,
-				aiRelayOptions,
 				interactionId: interaction.inputInteraction.id,
 				streamChannelId: interaction.streamChannelId,
 				messageContent: params.messageContent,
+				markedAsExcludedAt: null,
+
+				owner,
+				aiRelayOptions,
+
 				createdAt: interaction.inputInteraction.createdAt,
 				updatedAt: interaction.inputInteraction.updatedAt,
 				completedAt: interaction.inputInteraction.completedAt,
 			}));
 			dispatch(addActiveInteraction({
 				conversationId: conversation.id,
-				aiRelayOptions,
 				interactionId: interaction.responseInteraction.id,
 				streamChannelId: interaction.streamChannelId,
 				messageContent: '',
+				markedAsExcludedAt: null,
+
+				aiRelayOptions,
+
 				createdAt: interaction.responseInteraction.createdAt,
 				updatedAt: interaction.responseInteraction.updatedAt,
 				completedAt: interaction.responseInteraction.completedAt,

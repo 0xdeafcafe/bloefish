@@ -8,7 +8,6 @@ import { startConversationChain } from '~/api/flows/start-conversation';
 import { useNavigate } from 'react-router';
 import { ChatInput } from '../chat-input/ChatInput';
 import { Helmet } from 'react-helmet-async';
-import { generateRandomString } from '~/utils/random';
 import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
 
 const starterPrompts: string[] = [
@@ -198,4 +197,4 @@ function generateTimeOfDayText(): [string, string, string] {
 	}
 }
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);

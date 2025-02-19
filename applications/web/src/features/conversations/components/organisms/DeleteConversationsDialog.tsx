@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { DialogActionTrigger, DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle, DialogTrigger } from '~/components/ui/dialog';
 import { conversationApi } from '~/api/bloefish/conversation';
 import { LuTrash2 } from 'react-icons/lu';
+import React from 'react';
 
 interface DeleteConversationsDialogProps {
 	conversationIds: string[];
@@ -24,6 +25,9 @@ export const DeleteConversationsDialog: React.FC<DeleteConversationsDialogProps>
 	const initialFocusRef = useRef<HTMLInputElement>(null);
 	const dialogCloseRef = useRef<HTMLButtonElement>(null);
 	const [deleteConversations] = conversationApi.useDeleteConversationsMutation();
+
+	const count = conversationIds.length;
+	const single = count === 1;
 
 	const deleteAllowed = confirmText.toLowerCase() === 'delete';
 
@@ -53,7 +57,7 @@ export const DeleteConversationsDialog: React.FC<DeleteConversationsDialogProps>
 	}, []);
 
 	return (
-		<DialogRoot role="alertdialog">
+		<DialogRoot role={'alertdialog'}>
 			<DialogTrigger asChild>
 				<Button
 					variant={'outline'}
@@ -73,10 +77,25 @@ export const DeleteConversationsDialog: React.FC<DeleteConversationsDialogProps>
 					</DialogTitle>
 				</DialogHeader>
 				<DialogBody>
-					<VStack align="stretch" gap={6}>
+					<Text mb={6}>
+						{single ? (
+							<React.Fragment>
+								{'You\'re about to delete a conversation. This '}
+								{'action cannot be undone and will permanently '}
+								{'remove the selected conversation from the '}
+								{'platform.'}
+							</React.Fragment>
+						) : (
+							<React.Fragment>
+								{`You're about to delete ${count} conversations. `}
+								{'This action cannot be undone and will permanently '}
+								{'remove selected conversations from the platform.'}
+							</React.Fragment>
+						)}
+					</Text>
+					<VStack align={'stretch'} gap={2}>
 						<Text>
-							You're about to delete {conversationIds.length} conversation{conversationIds.length === 1 ? '' : 's'}.
-							This action cannot be undone and will permanently remove all selected conversations from your account.
+							{'Are you sure you with to proceed?'}
 						</Text>
 						<Input
 							ref={initialFocusRef}
@@ -85,16 +104,18 @@ export const DeleteConversationsDialog: React.FC<DeleteConversationsDialogProps>
 							placeholder={'Type \'delete\' to confirm'}
 							value={confirmText}
 							onChange={(e) => setConfirmText(e.target.value)}
-							autoComplete="off"
+							autoComplete={'off'}
 						/>
 					</VStack>
 				</DialogBody>
 				<DialogFooter>
 					<DialogActionTrigger asChild>
-						<Button variant="outline">Cancel</Button>
+						<Button size={'md'} variant={'outline'}>Cancel</Button>
 					</DialogActionTrigger>
 					<Button
-						colorPalette="red"
+						size={'md'}
+						variant={'solid'}
+						colorPalette={'red'}
 						disabled={!deleteAllowed || isDeleting}
 						loading={isDeleting}
 						onClick={handleDelete}

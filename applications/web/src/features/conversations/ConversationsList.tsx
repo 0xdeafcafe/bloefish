@@ -1,4 +1,4 @@
-import { Box, Breadcrumb, Button, ButtonGroup, Center, EmptyState, Icon, Link as ChakraLink, LinkOverlay, Spinner, Table, Text, VStack } from '@chakra-ui/react';
+import { Box, Breadcrumb, Button, ButtonGroup, Center, EmptyState, Icon, Link as ChakraLink, Spinner, Table, VStack } from '@chakra-ui/react';
 import { useAppSelector } from '~/store';
 import { Helmet } from 'react-helmet-async';
 import { conversationApi } from '~/api/bloefish/conversation';
@@ -14,12 +14,16 @@ import { Link, useNavigate } from 'react-router';
 import { DeleteConversationsDialog } from './components/organisms/DeleteConversationsDialog';
 import { Skeleton } from '~/components/ui/skeleton';
 import { FormatDuration } from '~/components/atoms/FormatDuration';
+import { toaster } from '~/components/ui/toaster';
 
 export const ConversationsList: React.FC = () => {
 	const navigate = useNavigate();
 	const { data: userData } = userApi.useGetOrCreateDefaultUserQuery();
 	const conversations = useAppSelector(s => s.conversations);
 	const truthyConversations = Object.values(conversations).filter(Boolean) as Conversation[];
+	const sortedConversations = truthyConversations.sort((a, b) => {
+		return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+	});
 
 	const [selection, setSelection] = useState<string[]>([]);
 	const hasSelection = selection.length > 0;
@@ -82,11 +86,8 @@ export const ConversationsList: React.FC = () => {
 									)}
 								/>
 							</Table.ColumnHeader>
-							<Table.ColumnHeader>
+							<Table.ColumnHeader w={'full'}>
 								{'Title'}
-							</Table.ColumnHeader>
-							<Table.ColumnHeader>
-								{'First message preview'}
 							</Table.ColumnHeader>
 							<Table.ColumnHeader>
 								{'Created at'}
@@ -100,7 +101,7 @@ export const ConversationsList: React.FC = () => {
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{truthyConversations.map(conversation => (
+						{sortedConversations.map(conversation => (
 							<Table.Row key={conversation.id}>
 								<Table.Cell>
 									<Checkbox
@@ -123,15 +124,10 @@ export const ConversationsList: React.FC = () => {
 											)}
 										</Table.Cell>
 										<Table.Cell>
-											<Text truncate>
-												{conversation.interactions.at(0)?.messageContent.substring(0, 70)}
-											</Text>
-										</Table.Cell>
-										<Table.Cell>
 											<FormatDuration pointInTime={conversation.createdAt} />
 										</Table.Cell>
 										<Table.Cell>
-											<FormatDuration pointInTime={conversation.interactions.at(0)?.updatedAt ?? conversation.updatedAt} />
+											<FormatDuration pointInTime={Object.values(conversation.interactions).at(0)?.updatedAt ?? conversation.updatedAt} />
 										</Table.Cell>
 									</Link>
 								</ChakraLink>
@@ -147,7 +143,13 @@ export const ConversationsList: React.FC = () => {
 										</Button>
 										<DeleteConversationsDialog
 											conversationIds={[conversation.id]}
-											onDeleteSuccess={() => setSelection([])}
+											onDeleteSuccess={() => {
+												toaster.create({
+													type: 'error',
+													title: 'Conversation deleted',
+													description: 'The conversation has been deleted successfully.',
+												});
+											}}
 											deleteButtonSize={'2xs'}
 											deleteButtonIconSize={'xs'}
 											deleteButtonText={'Delete'}
@@ -192,7 +194,14 @@ export const ConversationsList: React.FC = () => {
 					</Button>
 					<DeleteConversationsDialog
 						conversationIds={selection}
-						onDeleteSuccess={() => setSelection([])}
+						onDeleteSuccess={() => {
+							setSelection([]);
+							toaster.create({
+								type: 'error',
+								title: 'Conversation deleted',
+								description: 'The conversation has been deleted successfully.',
+							});
+						}}
 						deleteButtonSize={'xs'}
 						deleteButtonIconSize={'xs'}
 						deleteButtonText={`Delete conversation${selection.length > 1 ? 's' : ''}`}

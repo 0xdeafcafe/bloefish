@@ -24,6 +24,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 					remarkPlugins={[remarkGfm]}
 					components={{
 						code(props) {
+							// eslint-disable-next-line @typescript-eslint/no-unused-vars
 							const { children, className, node, ...rest } = props
 							const match = /language-(\w+)/.exec(className || '')
 							return match ? (
@@ -31,6 +32,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 								<SyntaxHighlighter
 									{...rest}
 									PreTag={'div'}
+									// eslint-disable-next-line react/no-children-prop
 									children={String(children).replace(/\n$/, '')}
 									language={match[1]}
 									style={theme.resolvedTheme === 'dark' ? twilight : coy}
@@ -66,12 +68,12 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 						),
 
 						ul: (props) => (
-							<List.Root as={'ul'} ml={4} mt={-3}>
+							<List.Root as={'ul'} ml={4}>
 								{props.children}
 							</List.Root>
 						),
 						ol: (props) => (
-							<List.Root as={'ol'} ml={4} mt={-3}>
+							<List.Root as={'ol'} ml={4}>
 								{props.children}
 							</List.Root>
 						),

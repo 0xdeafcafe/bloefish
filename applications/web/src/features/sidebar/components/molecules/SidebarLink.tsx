@@ -18,10 +18,10 @@ export const SidebarLink: React.FC<SidebarButtonProps> = ({
 	onClick,
 }) => {
 	return (
-		<MotionLink 
+		<MotionLink
 			to={path}
-			initial={{ scale: 1 }}
-			whileTap={{ scale: 0.95 }}
+			// initial={{ scale: 1 }}
+			// whileTap={{ scale: 0.8 }}
 		>
 			<Box
 				background={active ? 'bg.emphasized' : 'transparent'}
@@ -50,4 +50,4 @@ export const SidebarLink: React.FC<SidebarButtonProps> = ({
 	);
 };
 
-const MotionLink = motion(Link);
+const MotionLink = motion.create(Link);

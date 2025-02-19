@@ -1,4 +1,4 @@
-import { Center, EmptyState, Icon, VStack } from "@chakra-ui/react";
+import { Center, EmptyState, VStack } from "@chakra-ui/react";
 import { Helmet } from "react-helmet-async";
 import { LuFishOff } from "react-icons/lu";
 

@@ -1,4 +1,4 @@
-import { IconButton, Status } from "@chakra-ui/react";
+import { Status } from "@chakra-ui/react";
 import { motion } from "motion/react";
 import React from "react";
 import { useEffect, useState } from "react";
@@ -91,4 +91,4 @@ export const PlatformStatus: React.FC = () => {
 	}
 }
 
-const MotionIndicator = motion(Status.Indicator);
+const MotionIndicator = motion.create(Status.Indicator);

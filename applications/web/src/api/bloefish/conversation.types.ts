@@ -72,7 +72,7 @@ export interface GetConversationWithInteractionsRequest {
 	conversationId: string;
 }
 
-export interface GetConversationWithInteractionsResponse extends Conversation {}
+export type GetConversationWithInteractionsResponse = Conversation;
 
 export interface ListConversationsWithInteractionsRequest {
 	owner: Actor;

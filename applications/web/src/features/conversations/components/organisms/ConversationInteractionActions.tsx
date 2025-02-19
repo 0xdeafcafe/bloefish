@@ -5,6 +5,7 @@ import { InteractionActionButton } from '../atoms/InteractionActionButton';
 import React from 'react';
 import { conversationApi } from '~/api/bloefish/conversation';
 import { DeleteInteractionDialog } from './DeleteInteractionDialog';
+import { toaster } from '~/components/ui/toaster';
 
 interface ConversationInteractionActionsProps {
 	conversation: Conversation;
@@ -12,24 +13,40 @@ interface ConversationInteractionActionsProps {
 }
 
 export const ConversationInteractionActions: React.FC<ConversationInteractionActionsProps> = ({
-	conversation,
 	interaction,
 }) => {
 	const [updateExcludedState, excludedMutationState] = conversationApi.useUpdateInteractionExcludedStateMutation();
+	const active = interaction.owner.type === 'bot' && interaction.completedAt === null;
 
-	async function setExcludedState(excluded: boolean) {
+	async function setExcludedState(excluded: boolean, undoable: boolean = true) {
 		if (excludedMutationState.isLoading) return;
 
 		await updateExcludedState({
 			excluded,
 			interactionId: interaction.id,
+		}).unwrap();
+
+		toaster.create({
+			type: excluded ? 'info' : 'success',
+			title: excluded ? 'Message excluded' : 'Message included',
+			description: excluded ? 'The message has been excluded from the AI context' : 'The message has been included in the AI context',
+			action: undoable ? {
+				label: 'Undo',
+				onClick: () => setExcludedState(!excluded, false),
+			} : void 0,
 		});
 	}
 
 	return (
 		<HStack gap={2}>
 			<InteractionActionButton
-				onClick={() => navigator.clipboard.writeText(interaction.messageContent)}
+				onClick={() => {
+					navigator.clipboard.writeText(interaction.messageContent);
+					toaster.create({
+						title: 'Message copied',
+						description: 'The message has been copied to your clipboard',
+					});
+				}}
 				tooltip={'Copy message'}
 			>
 				<LuClipboardCopy />
@@ -48,7 +65,7 @@ export const ConversationInteractionActions: React.FC<ConversationInteractionAct
 
 			{interaction.markedAsExcludedAt === null ? (
 				<InteractionActionButton
-					disabled={excludedMutationState.isLoading}
+					disabled={excludedMutationState.isLoading || active}
 					loading={excludedMutationState.isLoading}
 					tooltip={'Exclude message from AI context'}
 					onClick={() => setExcludedState(true)}
@@ -57,7 +74,7 @@ export const ConversationInteractionActions: React.FC<ConversationInteractionAct
 				</InteractionActionButton>
 			) : (
 				<InteractionActionButton
-					disabled={excludedMutationState.isLoading}
+					disabled={excludedMutationState.isLoading || active}
 					loading={excludedMutationState.isLoading}
 					tooltip={'Include message from AI context'}
 					onClick={() => setExcludedState(false)}
@@ -66,7 +83,17 @@ export const ConversationInteractionActions: React.FC<ConversationInteractionAct
 				</InteractionActionButton>
 			)}
 
-			<DeleteInteractionDialog interactionId={interaction.id}/>
+			<DeleteInteractionDialog
+				disabled={active}
+				interactionId={interaction.id}
+				onDeleteSuccess={() => {
+					toaster.create({
+						type: 'error',
+						title: 'Message deleted',
+						description: 'The message has been deleted from the conversation',
+					});
+				}}
+			/>
 		</HStack>
 	);
 };

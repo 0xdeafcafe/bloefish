@@ -4,7 +4,6 @@ import { OmniButton, OmniLink } from './OmniButton';
 import { LuMessageCircle } from 'react-icons/lu';
 import type { FuseResultMatch } from 'fuse.js';
 import React from 'react';
-import { useNavigate } from 'react-router';
 
 interface SearchItemProps {
 	result: SearchContextItem;
@@ -15,8 +14,6 @@ export const SearchItem: React.FC<SearchItemProps> = ({
 	result,
 	matches,
 }) => {
-	const navigate = useNavigate();
-
 	switch (result.searchContextType) {
 		case 'command': {
 			return (

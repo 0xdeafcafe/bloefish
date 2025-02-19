@@ -1,4 +1,4 @@
-import { Button, Icon, Input, Text, VStack } from '@chakra-ui/react';
+import { Button, Input, Text, VStack } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import { DialogActionTrigger, DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle, DialogTrigger } from '~/components/ui/dialog';
 import { conversationApi } from '~/api/bloefish/conversation';
@@ -6,11 +6,13 @@ import { LuTrash2 } from 'react-icons/lu';
 import { InteractionActionButton } from '../atoms/InteractionActionButton';
 
 interface DeleteInteractionDialogProps {
+	disabled?: boolean,
 	interactionId: string;
 	onDeleteSuccess?: () => void;
 }
 
 export const DeleteInteractionDialog: React.FC<DeleteInteractionDialogProps> = ({
+	disabled,
 	interactionId,
 	onDeleteSuccess,
 }) => {
@@ -48,39 +50,47 @@ export const DeleteInteractionDialog: React.FC<DeleteInteractionDialogProps> = (
 	}, []);
 
 	return (
-		<DialogRoot role="alertdialog">
+		<DialogRoot role={'alertdialog'}>
 			<DialogTrigger asChild>
-				<InteractionActionButton danger tooltip="Delete message">
+				<InteractionActionButton
+					disabled={disabled}
+					danger
+					tooltip={'Delete message'}
+				>
 					<LuTrash2 />
 				</InteractionActionButton>
 			</DialogTrigger>
 			<DialogContent onKeyDown={(e) => e.key === 'Enter' && deleteAllowed && handleDelete()}>
 				<DialogHeader>
-					<DialogTitle>Delete message</DialogTitle>
+					<DialogTitle>{'Delete message'}</DialogTitle>
 				</DialogHeader>
 				<DialogBody>
-					<VStack align="stretch" gap={6}>
+					<Text mb={6}>
+						{'You\'re about to delete a message. This action cannot be '}
+						{'undone and will permanently remove the selected message from '}
+						{'from the platform.'}
+					</Text>
+					<VStack align={'stretch'} gap={2}>
 						<Text>
-							You're about to delete this message.
-							This action cannot be undone and will permanently remove it from the conversation.
+							{'Are you sure you with to proceed?'}
 						</Text>
 						<Input
 							ref={initialFocusRef}
 							disabled={isDeleting}
 							autoFocus
-							placeholder="Type 'delete' to confirm"
+							placeholder={'Type \'delete\' to confirm'}
 							value={confirmText}
 							onChange={(e) => setConfirmText(e.target.value)}
-							autoComplete="off"
+							autoComplete={'off'}
 						/>
 					</VStack>
 				</DialogBody>
 				<DialogFooter>
 					<DialogActionTrigger asChild>
-						<Button variant="outline">Cancel</Button>
+						<Button variant={'outline'}>Cancel</Button>
 					</DialogActionTrigger>
 					<Button
-						colorPalette="red"
+						colorPalette={'red'}
 						disabled={!deleteAllowed || isDeleting}
 						loading={isDeleting}
 						onClick={handleDelete}

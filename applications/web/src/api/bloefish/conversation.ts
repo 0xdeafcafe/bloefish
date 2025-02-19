@@ -51,22 +51,25 @@ export const conversationApi = createApi({
 						title: data.title,
 						streamChannelId: data.streamChannelId,
 
-						interactions: data.interactions.map((interaction) => ({
-							conversationId: data.id,
-							id: interaction.id,
-							messageContent: interaction.messageContent,
-							streamChannelId: interaction.streamChannelId,
+						interactions: Object.fromEntries(data.interactions.map((interaction) => [
+							interaction.id,
+							{
+								conversationId: data.id,
+								id: interaction.id,
+								messageContent: interaction.messageContent,
+								streamChannelId: interaction.streamChannelId,
 
-							markedAsExcludedAt: interaction.markedAsExcludedAt,
+								markedAsExcludedAt: interaction.markedAsExcludedAt,
 
-							owner: interaction.owner,
-							aiRelayOptions: interaction.aiRelayOptions,
+								owner: interaction.owner,
+								aiRelayOptions: interaction.aiRelayOptions,
 
-							createdAt: interaction.createdAt,
-							updatedAt: interaction.updatedAt,
-							deletedAt: interaction.deletedAt,
-							completedAt: interaction.completedAt,
-						})),
+								createdAt: interaction.createdAt,
+								updatedAt: interaction.updatedAt,
+								deletedAt: interaction.deletedAt,
+								completedAt: interaction.completedAt,
+							}
+						])),
 
 						createdAt: data.createdAt,
 						updatedAt: data.updatedAt,
@@ -95,22 +98,24 @@ export const conversationApi = createApi({
 						title: conversation.title,
 						streamChannelId: conversation.streamChannelId,
 
-						interactions: conversation.interactions.map((interaction) => ({
-							conversationId: conversation.id,
-							id: interaction.id,
-							messageContent: interaction.messageContent,
-							streamChannelId: `${conversation.id}/${interaction.id}`, // TODO(afr): Fetch from backend
+						interactions: Object.fromEntries(conversation.interactions.map((interaction) => [
+							interaction.id,
+							{
+								conversationId: conversation.id,
+								id: interaction.id,
+								messageContent: interaction.messageContent,
+								streamChannelId: interaction.streamChannelId,
+								markedAsExcludedAt: interaction.markedAsExcludedAt,
 
-							markedAsExcludedAt: interaction.markedAsExcludedAt,
+								aiRelayOptions: interaction.aiRelayOptions,
+								owner: interaction.owner,
 
-							aiRelayOptions: interaction.aiRelayOptions,
-							owner: interaction.owner,
-
-							createdAt: interaction.createdAt,
-							updatedAt: interaction.updatedAt,
-							completedAt: interaction.completedAt,
-							deletedAt: interaction.deletedAt,
-						})),
+								createdAt: interaction.createdAt,
+								updatedAt: interaction.updatedAt,
+								completedAt: interaction.completedAt,
+								deletedAt: interaction.deletedAt,
+							}
+						])),
 
 						createdAt: conversation.createdAt,
 						updatedAt: conversation.updatedAt,

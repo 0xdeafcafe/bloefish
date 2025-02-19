@@ -1,11 +1,10 @@
-import { Box, Center, Container, Flex, Grid, GridItem, HStack, Spinner, Stack, ButtonGroup, IconButton, Badge, Breadcrumb, Skeleton } from '@chakra-ui/react';
+import { Box, Center, Container, Flex, Grid, GridItem, HStack, Spinner, Stack, ButtonGroup, IconButton, Breadcrumb, Skeleton } from '@chakra-ui/react';
 import { LuMailQuestion, LuSlash, LuTrash2 } from 'react-icons/lu';
 import { useAppDispatch, useAppSelector } from '~/store';
-import { styled } from 'styled-components';
 import { Link, useParams } from 'react-router';
 import { NotFound } from '~/pages/NotFound';
 import { ChatInput } from '../chat-input/ChatInput';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import { continueConversationChain } from '~/api/flows/continue-conversation';
 import { Helmet } from 'react-helmet-async';
@@ -31,6 +30,16 @@ export const Conversation: React.FC = () => {
 	const [idempotencyKey, generateNewIdempotencyKey] = useIdempotencyKey();
 	const [question, setQuestion] = useState('');
 	const [working, setWorking] = useState(false);
+
+	const sortedInteractions = useMemo(() => {
+		if (!conversation) {
+			return [];
+		}
+
+		return Object.values(conversation.interactions).sort((a, b) => {
+			return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+		});
+	}, [conversation?.interactions]);
 
 	if (!conversation) {
 		if (convoFetching || convoLoading) {
@@ -160,8 +169,11 @@ export const Conversation: React.FC = () => {
 					overflowX={'scroll'}
 				>
 					<Container maxW={'5xl'} minW={'5xl'} py={10}>
-						<Stack gap={6} pb={20}>
-							{conversation.interactions.map(i => (
+						<Stack
+							gap={6}
+							pb={20}
+						>
+							{sortedInteractions.map(i => (
 								<ConversationInteraction
 									key={i.id}
 									conversation={conversation}
@@ -186,14 +198,4 @@ export const Conversation: React.FC = () => {
 	)
 };
 
-const MotionBox = motion(Box);
-
-const MarkdownWrapper = styled.div`
-	& > * {
-		margin-bottom: 16px;
-	}
-
-	& > *:last-child {
-		margin-bottom: 0;
-	}
-`;
+const MotionBox = motion.create(Box);

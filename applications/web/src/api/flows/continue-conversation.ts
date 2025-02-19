@@ -2,7 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { conversationApi } from "../bloefish/conversation";
 import type { RootState } from "~/store";
 import { userApi } from "../bloefish/user";
-import { addActiveInteraction, addInteraction, startConversation } from "~/features/conversations/store";
+import { addActiveInteraction, addInteraction } from "~/features/conversations/store";
 import type { Actor, AiRelayOptions } from "../bloefish/shared.types";
 
 interface ContinueConversation {
@@ -55,10 +55,13 @@ export const continueConversationChain = createAsyncThunk<
 			dispatch(addInteraction({
 				conversationId: params.conversationId,
 				interactionId: interaction.inputInteraction.id,
-				aiRelayOptions,
-				owner,
 				messageContent: params.messageContent,
 				streamChannelId: interaction.streamChannelId,
+
+				markedAsExcludedAt: null,
+
+				aiRelayOptions,
+				owner,
 
 				createdAt: interaction.inputInteraction.createdAt,
 				updatedAt: interaction.inputInteraction.updatedAt,
@@ -67,9 +70,11 @@ export const continueConversationChain = createAsyncThunk<
 			dispatch(addActiveInteraction({
 				conversationId: params.conversationId,
 				interactionId: interaction.responseInteraction.id,
-				aiRelayOptions,
 				messageContent: '',
 				streamChannelId: interaction.streamChannelId,
+				markedAsExcludedAt: null,
+
+				aiRelayOptions,
 
 				createdAt: interaction.responseInteraction.createdAt,
 				updatedAt: interaction.responseInteraction.updatedAt,

@@ -76,7 +76,7 @@ export interface Conversation {
 	title: string | null;
 	streamChannelId: string;
 
-	interactions: Interaction[];
+	interactions: Record<string, Interaction>;
 
 	createdAt: string;
 	updatedAt: string;

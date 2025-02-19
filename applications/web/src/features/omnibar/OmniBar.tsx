@@ -17,6 +17,7 @@ import { OmniGroup } from './components/molecules/OmniGroup';
 import type { CommandSearchContext, InteractionSearchContext, SearchContextItem } from './types';
 import { SearchItem } from './components/molecules/SearchItem';
 import { OmniButton } from './components/molecules/OmniButton';
+import { generateRandomString } from '~/utils/random';
 
 export const OmniBar: React.FC = () => {
 	const { open, query } = useAppSelector(s => s.omniBar);
@@ -31,7 +32,7 @@ export const OmniBar: React.FC = () => {
 	const searchContextItems: SearchContextItem[] = [
 		...commands.map<CommandSearchContext>(command => ({ ...command, searchContextType: 'command' })),
 		...Object.values(foundConversations).flatMap(conversation => 
-			conversation.interactions.map<InteractionSearchContext>(interaction => ({ 
+			Object.values(conversation.interactions).map<InteractionSearchContext>(interaction => ({ 
 				...interaction,
 				searchContextType: 'interaction',
 			})),
@@ -46,7 +47,11 @@ export const OmniBar: React.FC = () => {
 		threshold: 0,
 		ignoreLocation: true,
 	});
-	const searchResults = fuse.search(query);
+	const searchResults = fuse.search(query, {
+		limit: 10,
+	});
+
+	console.log(searchResults);
 
 	useEffect(() => {
 		function onKeyDown(event: KeyboardEvent) {
@@ -106,7 +111,11 @@ export const OmniBar: React.FC = () => {
 						{query && (
 							<OmniGroup title={'Search results'}>
 								{searchResults.map(r => (
-									<SearchItem result={r.item} matches={r.matches} />
+									<SearchItem
+										key={generateRandomString(10)}
+										result={r.item}
+										matches={r.matches}
+									/>
 								))}
 								{searchResults.length === 0 && (
 									<EmptyState.Root size={'sm'}>
@@ -128,16 +137,22 @@ export const OmniBar: React.FC = () => {
 							</OmniGroup>
 						)}
 
-						<OmniGroup title={'Commands'}>
-							{commands.map(c => (
-								<OmniButton iconElement={c.icon} onClick={() => {
-									dispatch(closeOmni());
-									c.onInvoke();
-								}}>
-									{c.name}
-								</OmniButton>
-							))}
-						</OmniGroup>
+						{searchResults.length === 0 && (
+							<OmniGroup title={'Commands'}>
+								{commands.map(c => (
+									<OmniButton
+										key={generateRandomString(10)}
+										iconElement={c.icon}
+										onClick={() => {
+											dispatch(closeOmni());
+											c.onInvoke();
+										}}
+									>
+										{c.name}
+									</OmniButton>
+								))}
+							</OmniGroup>
+						)}
 					</Stack>
 				</DialogBody>
 			</DialogContent>

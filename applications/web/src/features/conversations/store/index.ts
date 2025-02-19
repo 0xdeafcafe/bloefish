@@ -10,7 +10,8 @@ export const conversationsSlice = createSlice({
 		injectConversations: (state, { payload }: PayloadAction<Conversation[]>) => {
 			for (const conversation of payload) {
 				if (state[conversation.id]) {
-					// TODO(afr): Attempt to inject interactions
+					// TODO(afr): Handle injecting missing interactions
+
 					continue;
 				}
 
@@ -26,7 +27,7 @@ export const conversationsSlice = createSlice({
 				streamChannelId: payload.streamChannelId,
 				title: payload.title,
 
-				interactions: [],
+				interactions: {},
 				createdAt: payload.createdAt,
 				updatedAt: payload.updatedAt,
 				deletedAt: null,
@@ -38,7 +39,7 @@ export const conversationsSlice = createSlice({
 				return;
 			}
 
-			conversation.interactions.push({
+			conversation.interactions[payload.interactionId] = {
 				conversationId: payload.conversationId,
 				id: payload.interactionId,
 				messageContent: payload.messageContent,
@@ -53,7 +54,7 @@ export const conversationsSlice = createSlice({
 				updatedAt: payload.updatedAt,
 				completedAt: payload.completedAt,
 				deletedAt: null,
-			});
+			};
 		},
 		addActiveInteraction: (state, { payload }: PayloadAction<AddActiveInteractionPayload>) => {
 			const conversation = state[payload.conversationId];
@@ -61,7 +62,7 @@ export const conversationsSlice = createSlice({
 				return;
 			}
 
-			conversation.interactions.push({
+			conversation.interactions[payload.interactionId] = {
 				id: payload.interactionId,
 				conversationId: payload.conversationId,
 				messageContent: payload.messageContent,
@@ -79,7 +80,7 @@ export const conversationsSlice = createSlice({
 				updatedAt: payload.updatedAt,
 				completedAt: payload.completedAt,
 				deletedAt: null,
-			});
+			};
 		},
 		addInteractionFragment: (state, { payload }: PayloadAction<AddInteractionFragmentPayload>) => {
 			const conversation = state[payload.conversationId];
@@ -87,7 +88,7 @@ export const conversationsSlice = createSlice({
 				return;
 			}
 
-			const interaction = conversation.interactions.find(i => i.id === payload.interactionId);
+			const interaction = conversation.interactions[payload.interactionId];
 			if (!interaction) {
 				return;
 			}
@@ -100,12 +101,13 @@ export const conversationsSlice = createSlice({
 				return;
 			}
 
-			const interaction = conversation.interactions.find(i => i.id === payload.interactionId);
+			const interaction = conversation.interactions[payload.interactionId];
 			if (!interaction) {
 				return;
 			}
 
 			interaction.messageContent = payload.content;
+			interaction.completedAt = new Date().toISOString();
 		},
 		deleteConversations: (state, { payload }: PayloadAction<DeleteConversationsPayload>) => {
 			for (const conversationId of payload.conversationIds) {
@@ -134,7 +136,9 @@ export const conversationsSlice = createSlice({
 					continue;
 				}
 
-				conversation.interactions = conversation.interactions.filter(i => !payload.interactionIds.includes(i.id));
+				for (const interactionId of payload.interactionIds) {
+					delete conversation.interactions[interactionId];
+				}
 			}
 		},
 		updateInteractionIncludedState: (state, { payload }: PayloadAction<UpdateInteractionExcludedStatePayload>) => {
@@ -143,7 +147,7 @@ export const conversationsSlice = createSlice({
 					continue;
 				}
 
-				const interaction = conversation.interactions.find(i => i.id === payload.interactionId);
+				const interaction = conversation.interactions[payload.interactionId];
 				if (!interaction) {
 					continue;
 				}
