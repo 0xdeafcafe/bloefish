@@ -14,6 +14,7 @@ import { Conversation } from './features/conversations/Conversation';
 import { Ready } from './components/molecules/Ready';
 import { HelmetProvider } from 'react-helmet-async';
 import { ConversationsList } from './features/conversations/ConversationsList';
+import { OmniBar } from './features/omnibar/OmniBar';
 
 const root = createRoot(document.getElementById('root')!);
 
@@ -38,6 +39,7 @@ root.render(
 									</Ready>
 								</EnsureReadiness>
 							</App>
+							<OmniBar />
 						</ReduxProvider>
 					</Theme>
 				</BrowserRouter>
