@@ -16,6 +16,7 @@ import { twilight, coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Helmet } from 'react-helmet-async';
 import { conversationApi } from '~/api/bloefish/conversation';
 import { userApi } from '~/api/bloefish/user';
+import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
 
 export const Conversation: React.FC = () => {
 	const theme = useTheme();
@@ -30,6 +31,7 @@ export const Conversation: React.FC = () => {
 		},
 	}, { skip: true });
 
+	const [idempotencyKey, generateNewIdempotencyKey] = useIdempotencyKey();
 	const [question, setQuestion] = useState('');
 	const [working, setWorking] = useState(false);
 

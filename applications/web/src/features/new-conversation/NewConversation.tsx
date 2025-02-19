@@ -8,6 +8,8 @@ import { startConversationChain } from '~/api/flows/start-conversation';
 import { useNavigate } from 'react-router';
 import { ChatInput } from '../chat-input/ChatInput';
 import { Helmet } from 'react-helmet-async';
+import { generateRandomString } from '~/utils/random';
+import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
 
 const starterPrompts: string[] = [
 	'What is the meaning of life?',
@@ -22,6 +24,7 @@ const starterPrompts: string[] = [
 export const NewConversation: React.FC = () => {
 	const [timeOfDay, timeOfDayEmphasis, timeOfDayEmoji] = generateTimeOfDayText();
 	const [question, setQuestion] = useState('');
+	const [idempotencyKey, generateNewIdempotencyKey] = useIdempotencyKey();
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
 	const [working, setWorking] = useState(false);
@@ -33,10 +36,11 @@ export const NewConversation: React.FC = () => {
 
 		try {
 			await dispatch(startConversationChain({
-				idempotencyKey: questionOverride ?? question,
+				idempotencyKey: idempotencyKey,
 				messageContent: questionOverride ?? question,
 				navigate,
 			})).unwrap();
+			generateNewIdempotencyKey();
 		} finally {
 			setWorking(false);
 		}
