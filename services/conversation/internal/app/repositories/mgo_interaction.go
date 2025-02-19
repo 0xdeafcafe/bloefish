@@ -201,6 +201,18 @@ func (r *mgoInteraction) DeleteManyByConversationID(ctx context.Context, convers
 	return nil
 }
 
+func (r *mgoInteraction) ConversationHasInteractions(ctx context.Context, conversationID string) (bool, error) {
+	count, err := r.c.CountDocuments(ctx, bson.M{
+		"conversation_id": conversationID,
+		"deleted_at":      nil,
+	}, options.Count().SetLimit(1))
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
 func (p *persistedInteraction) ToDomainModel() *models.Interaction {
 	return &models.Interaction{
 		ID:             p.ID,

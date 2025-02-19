@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/0xdeafcafe/bloefish/libraries/cher"
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
@@ -59,8 +58,37 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 		return nil, fmt.Errorf("failed to create interaction: %w", err)
 	}
 
+	if newConversation, err := a.InteractionRepository.ConversationHasInteractions(ctx, convo.ID); err != nil {
+		return nil, err
+	} else if newConversation {
+		titleStreamingChannelID := fmt.Sprintf("%s/title", convo.ID)
+		forkedcontext.ForkContext(ctx, func(ctx context.Context) error {
+			if err := a.generateConversationTitle(ctx, &generateConversationTitleCommand{
+				Conversation: convo,
+				Owner: &airelay.Actor{
+					Type:       airelay.ActorType(req.Owner.Type),
+					Identifier: req.Owner.Identifier,
+				},
+				Interaction:        interaction,
+				StreamingChannelID: titleStreamingChannelID,
+				UseStreaming:       req.Options.UseStreaming,
+			}); err != nil {
+				if sendErrorErr := a.StreamService.SendErrorMessage(ctx, &stream.SendErrorMessageRequest{
+					ChannelID: titleStreamingChannelID,
+					Error:     cher.Coerce(err),
+				}); sendErrorErr != nil {
+					clog.Get(ctx).WithError(sendErrorErr).Error("failed to send title error message to stream service")
+				}
+
+				clog.Get(ctx).WithError(err).Error("failed to generate conversation title")
+			}
+
+			return nil
+		})
+	}
+
 	activeInteraction, err := a.InteractionRepository.CreateActive(ctx, &models.CreateActiveInteractionCommand{
-		IdempotencyKey: time.Now().Format(time.RFC3339Nano), // TODO(afr): Replace this
+		IdempotencyKey: fmt.Sprintf("%s-response", req.IdempotencyKey),
 		ConversationID: convo.ID,
 		FileIDs:        []string{},
 		MessageContent: "",

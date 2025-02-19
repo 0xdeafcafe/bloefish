@@ -11,6 +11,7 @@ type ConversationRepository interface {
 	GetByID(ctx context.Context, conversationID string) (*models.Conversation, error)
 	ListByOwner(ctx context.Context, actor models.Actor) ([]*models.Conversation, error)
 	DeleteMany(ctx context.Context, conversationIDs []string) error
+	UpdateTitle(ctx context.Context, conversationID, title string) error
 }
 
 type InteractionRepository interface {
@@ -20,4 +21,5 @@ type InteractionRepository interface {
 	GetByID(ctx context.Context, interactionID string) (*models.Interaction, error)
 	GetAllByConversationID(ctx context.Context, conversationID string) ([]*models.Interaction, error)
 	DeleteManyByConversationID(ctx context.Context, conversationID string) error
+	ConversationHasInteractions(ctx context.Context, conversationID string) (bool, error)
 }

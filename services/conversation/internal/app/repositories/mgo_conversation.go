@@ -25,6 +25,8 @@ type persistedConversation struct {
 		ModelID    string `bson:"model_id"`
 	} `bson:"ai_relay_options"`
 
+	Title *string `bson:"title"`
+
 	CreatedAt time.Time  `bson:"created_at"`
 	UpdatedAt time.Time  `bson:"updated_at"`
 	DeletedAt *time.Time `bson:"deleted_at"`
@@ -111,16 +113,36 @@ func (r *mgoConversation) ListByOwner(ctx context.Context, actor models.Actor) (
 }
 
 func (r *mgoConversation) DeleteMany(ctx context.Context, conversationIDs []string) error {
-	_, err := r.c.UpdateMany(ctx, bson.M{
+	if _, err := r.c.UpdateMany(ctx, bson.M{
 		"_id": bson.M{"$in": conversationIDs},
 	}, bson.M{
 		"$currentDate": bson.M{
 			"deleted_at": true,
 			"updated_at": true,
 		},
-	})
+	}); err != nil {
+		return err
+	}
 
-	return err
+	return nil
+}
+
+func (r *mgoConversation) UpdateTitle(ctx context.Context, conversationID string, title string) error {
+	_, err := r.c.UpdateOne(ctx, bson.M{
+		"_id": conversationID,
+	}, bson.M{
+		"$currentDate": bson.M{
+			"updated_at": true,
+		},
+		"$set": bson.M{
+			"title": title,
+		},
+	}, options.Update().SetUpsert(false))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *persistedConversation) ToDomainModel() *models.Conversation {
@@ -136,7 +158,7 @@ func (p *persistedConversation) ToDomainModel() *models.Conversation {
 			ModelID:    p.AIRelayOptions.ModelID,
 		},
 
-		Title: nil,
+		Title: p.Title,
 
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
