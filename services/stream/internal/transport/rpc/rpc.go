@@ -44,18 +44,18 @@ func New(ctx context.Context, app *app.App, mux *chi.Mux) *RPC {
 	svr.Register("send_error_message", "2025-02-12", schema("send_error_message"), rpc.SendErrorMessage)
 
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))
+	mux.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
 	mux.Get("/system/health", middlewares.HealthCheck)
 
 	mux.
 		With(
-			cors.Handler(cors.Options{
-				AllowedOrigins:   []string{"https://*", "http://*"},
-				AllowedMethods:   []string{"POST", "OPTIONS"},
-				AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
-				ExposedHeaders:   []string{"Link"},
-				AllowCredentials: false,
-				MaxAge:           300,
-			}),
 			middlewares.StripPrefix("/rpc"),
 			middlewares.RequestID,
 			middlewares.Logger(clog.Get(ctx)),

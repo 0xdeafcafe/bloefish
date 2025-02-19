@@ -53,18 +53,18 @@ func New(ctx context.Context, app *app.App) *RPC {
 
 	mux := chi.NewRouter()
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))
+	mux.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
 	mux.Get("/system/health", middlewares.HealthCheck)
 
 	mux.
 		With(
-			cors.Handler(cors.Options{
-				AllowedOrigins:   []string{"https://*", "http://*"},
-				AllowedMethods:   []string{"POST", "OPTIONS"},
-				AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
-				ExposedHeaders:   []string{"Link"},
-				AllowCredentials: false,
-				MaxAge:           300,
-			}),
 			middlewares.StripPrefix("/rpc"),
 			middlewares.RequestID,
 			middlewares.Logger(clog.Get(ctx)),
