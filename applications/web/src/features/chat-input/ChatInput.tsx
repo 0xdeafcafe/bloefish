@@ -1,6 +1,9 @@
-import { Card, Flex, HStack, Icon, IconButton, Status, Textarea } from '@chakra-ui/react';
+import { ButtonGroup, Card, Flex, HStack, Icon, IconButton, Status, Textarea } from '@chakra-ui/react';
+import { useTheme } from 'next-themes';
 import { useEffect, useRef, useState } from 'react';
-import { LuBot, LuSend } from 'react-icons/lu';
+import { LuBot, LuSend, LuChevronUp } from 'react-icons/lu';
+import { Button } from '~/components/ui/button';
+import { MenuContent, MenuItem, MenuItemCommand, MenuRoot, MenuTrigger } from '~/components/ui/menu';
 
 const maxPromptLength = 5000;
 
@@ -19,6 +22,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 	onChange,
 	onInvoke,
 }) => {
+	const theme = useTheme();
 	const [focused, setFocused] = useState(false);
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -44,6 +48,23 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 	useEffect(() => {
 		if (inputRef.current)
 			inputRef.current.focus();
+
+		function onKeyDown(event: KeyboardEvent) {
+			if (event.target === inputRef.current) return;
+			if (event.key !== '/') return;
+
+			if (inputRef.current) {
+				event.preventDefault();
+				event.stopPropagation();
+				inputRef.current.focus();
+			}
+		}
+
+		window.addEventListener('keydown', onKeyDown);
+
+		return () => {
+			window.removeEventListener('keydown', onKeyDown);
+		};
 	}, []);
 
 	return (
@@ -51,13 +72,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 			variant={'outline'}
 			w={'2xl'}
 			borderColor={focused ? 'purple.500' : 'border'}
-			blur={'10px'}
-			// TODO(afr): Fix light theme
-			background={'rgb(17 17 17 / 60%)'}
+			blur={'sm'}
+			background={theme.resolvedTheme === 'dark' ? 'rgb(17 17 17 / 40%)' : 'rgb(255 255 255 / 60%)'}
 		>
 			<Card.Body p={2}>
 				<HStack alignItems={'flex-start'} pb={2} pl={1} gap={0}>
-					<Icon mt={2} color={focused ? 'purple.500' : void 0}>
+					<Icon mt={'9px'} color={focused ? 'purple.500' : void 0}>
 						<LuBot />
 					</Icon>
 					<Textarea
@@ -83,14 +103,47 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 				</HStack>
 				<Flex justify={'flex-end'} align={'center'} gap={2}>
 					<Status.Root colorPalette={lengthStatusColor} userSelect={'none'} fontSize={'xs'} color={'GrayText'}>
-						{questionLength === 5000 ? '😱 ' : <Status.Indicator />}
-						{`${questionLength}/5000`}
+						{questionLength === maxPromptLength ? '😱 ' : <Status.Indicator />}
+						{`${questionLength}/${maxPromptLength}`}
 					</Status.Root>
+
+					<MenuRoot>
+						<MenuTrigger asChild>
+						<ButtonGroup size="2xs" attached variant="outline">
+							<Button
+								variant="outline"
+							>
+								{'OpenAI (GPT-4)'}
+							</Button>
+							<IconButton variant="outline">
+								<LuChevronUp />
+							</IconButton>
+						</ButtonGroup>
+						</MenuTrigger>
+						<MenuContent>
+							<MenuItem value="open_ai:gpt-4">
+								{'OpenAI (GPT-4)'} <MenuItemCommand>{'1'}</MenuItemCommand>
+							</MenuItem>
+							<MenuItem value="open_ai:gpt-4o">
+								{'OpenAI (GPT-4o)'} <MenuItemCommand>{'2'}</MenuItemCommand>
+							</MenuItem>
+							<MenuItem value="open_ai:o1">
+								{'OpenAI (o1)'} <MenuItemCommand>{'3'}</MenuItemCommand>
+							</MenuItem>
+							<MenuItem value="open_ai:o1-mini">
+								{'OpenAI (o1-mini)'} <MenuItemCommand>{'4'}</MenuItemCommand>
+							</MenuItem>
+							<MenuItem value="open_ai:o3-mini">
+								{'OpenAI (o3-mini)'} <MenuItemCommand>{'5'}</MenuItemCommand>
+							</MenuItem>
+						</MenuContent>
+					</MenuRoot>
+
 					<IconButton
 						aria-label={'Send message'}
 						disabled={disabled}
 						variant={'ghost'}
-						size={'sm'}
+						size={'2xs'}
 						onClick={() => onInvoke()}
 					>
 						<LuSend />
