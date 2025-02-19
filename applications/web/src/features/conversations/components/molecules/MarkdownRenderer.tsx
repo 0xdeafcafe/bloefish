@@ -1,5 +1,6 @@
-import { Blockquote, Card, List, Table, Text } from '@chakra-ui/react';
+import { Blockquote, Card, Link, List, Table, Text } from '@chakra-ui/react';
 import { styled } from 'styled-components';
+import { LuExternalLink } from 'react-icons/lu'
 import remarkGfm from 'remark-gfm';
 import Markdown from 'react-markdown';
 import { useTheme } from 'next-themes';
@@ -47,6 +48,14 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
 						h4: (props) => <Text as="h4" fontSize="md" fontWeight="bold" {...props} />,
 						h5: (props) => <Text as="h5" fontSize="sm" fontWeight="bold" {...props} />,
 						h6: (props) => <Text as="h6" fontSize="xs" fontWeight="bold" {...props} />,
+
+						a: (props) => {
+							return (
+								<Link colorPalette={'purple'} whiteSpace={'wrap'} variant={'underline'} {...props}>
+									{props.children} <LuExternalLink />
+								</Link>
+							)
+						},
 
 						blockquote: (props) => (
 							<Blockquote.Root>
