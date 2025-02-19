@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from '~/store';
 import type { StreamMessage } from './stream.types';
-import { addInteractionFragment } from '~/features/conversations/store';
+import { addInteractionFragment, updateInteractionMessageContent } from '~/features/conversations/store';
 import camelcaseKeys from 'camelcase-keys';
 
 export function useStreamListener() {
@@ -13,16 +13,38 @@ export function useStreamListener() {
 
 		ws.onmessage = (event) => {
 			const data = camelcaseKeys(JSON.parse(event.data)) as StreamMessage;
+
+			switch (data.type) {
+				case 'message_fragment': {
+					const [conversationId, interactionId] = data.channelId.split('/');
+					if (!conversationId || !interactionId) return;
+
+					dispatch(addInteractionFragment({
+						conversationId,
+						interactionId,
+						fragment: data.messageFragment,
+					}));
+					break;
+				}
+
+				case 'message_full':
+					const [conversationId, interactionId] = data.channelId.split('/');
+					if (!conversationId || !interactionId) return;
+
+					dispatch(updateInteractionMessageContent({
+						conversationId,
+						interactionId,
+						content: data.messageFull,
+					}));
+					break;
+
+				default:
+					break;
+			}
+
 			if (data.type !== 'message_fragment') return;
 
-			const [conversationId, interactionId] = data.channelId.split('/');
-			if (!conversationId || !interactionId) return;
-
-			dispatch(addInteractionFragment({
-				conversationId,
-				interactionId,
-				fragment: data.messageFragment,
-			}));
+			
 		};
 
 		ws.onopen = () => {
@@ -31,6 +53,7 @@ export function useStreamListener() {
 
 		ws.onclose = () => {
 			console.log('Disconnected from stream');
+
 			setTimeout(() => {
 				ws = new WebSocket(url);
 			}, 500);

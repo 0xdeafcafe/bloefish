@@ -28,8 +28,12 @@ export interface AddActiveInteractionPayload extends ConversationPlugin, Interac
 	aiRelayOptions: AiRelayOptions; // TODO(afr): this should come from the backend
 }
 
-export interface AddInteractionFragment extends ConversationPlugin, InteractionPlugin {
+export interface AddInteractionFragmentPayload extends ConversationPlugin, InteractionPlugin {
 	fragment: string;
+}
+
+export interface UpdateInteractionMessageContentPayload extends ConversationPlugin, InteractionPlugin {
+	content: string;
 }
 
 export interface Conversation {

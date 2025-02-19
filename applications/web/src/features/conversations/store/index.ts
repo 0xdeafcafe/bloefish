@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { AddActiveInteractionPayload, AddInteractionFragment, AddInteractionPayload, Conversation, CreateConversationPayload } from './types';
+import type { AddActiveInteractionPayload, AddInteractionFragmentPayload, AddInteractionPayload, Conversation, CreateConversationPayload, UpdateInteractionMessageContentPayload } from './types';
 
 const initialState: Record<string, Conversation | undefined> = {};
 
@@ -59,7 +59,7 @@ export const conversationsSlice = createSlice({
 				},
 			});
 		},
-		addInteractionFragment: (state, { payload }: PayloadAction<AddInteractionFragment>) => {
+		addInteractionFragment: (state, { payload }: PayloadAction<AddInteractionFragmentPayload>) => {
 			const conversation = state[payload.conversationId];
 			if (!conversation) {
 				return;
@@ -72,6 +72,19 @@ export const conversationsSlice = createSlice({
 
 			interaction.messageContent += payload.fragment;
 		},
+		updateInteractionMessageContent: (state, { payload }: PayloadAction<UpdateInteractionMessageContentPayload>) => {
+			const conversation = state[payload.conversationId];
+			if (!conversation) {
+				return;
+			}
+
+			const interaction = conversation.interactions.find(i => i.id === payload.interactionId);
+			if (!interaction) {
+				return;
+			}
+
+			interaction.messageContent = payload.content;
+		},
 	},
 });
 
@@ -81,5 +94,6 @@ export const {
 	addInteraction,
 	addActiveInteraction,
 	addInteractionFragment,
+	updateInteractionMessageContent,
 } = conversationsSlice.actions;
 export const conversationsReducer = conversationsSlice.reducer;
