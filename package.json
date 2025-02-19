@@ -9,6 +9,10 @@
     "lerna": "^8.1.9"
   },
   "scripts": {
-    "build": "lerna run build"
+    "build": "lerna run build",
+
+    "lint": "lerna run lint",
+    "lint-fix": "lerna run lint-fix",
+    "lint-dry": "lerna run lint-dry"
   }
 }
