@@ -1,7 +1,8 @@
-import { Box, Card, Em, Flex, HStack, Icon, Link, Status, Text } from '@chakra-ui/react';
+import { Box, Card, Flex, HStack, Link, Text } from '@chakra-ui/react';
 import { Sidebar } from './features/sidebar/Sidebar';
 import { LuExternalLink } from 'react-icons/lu';
 import { useStreamListener } from './api/bloefish/stream';
+import { PlatformStatus } from './components/molecules/PlatformStatus';
 
 export const App: React.FC<React.PropsWithChildren> = ({ children }) => {
 	useStreamListener();
@@ -28,10 +29,7 @@ export const App: React.FC<React.PropsWithChildren> = ({ children }) => {
 				</Card.Root>
 				<Box marginRight={1}>
 					<HStack justify={'end'} gap={2}>
-						<Status.Root colorPalette={'green'} size={'sm'}>
-							<Status.Indicator />
-							Online
-						</Status.Root>
+						<PlatformStatus />
 						<Text fontSize={'xs'} color={'GrayText'}>|</Text>
 						<Link href={'https://github.com/0xdeafcafe/bloefish'} target={'_blank'} rel={'noopener'} fontSize={'xs'}>
 							GitHub
