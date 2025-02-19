@@ -1,12 +1,16 @@
 # bloefish
 
+![go](https://github.com/0xdeafcafe/bloefish/actions/workflows/go.yml/badge.svg)
+![js](https://github.com/0xdeafcafe/bloefish/actions/workflows/js.yml/badge.svg)
+
+
 ## Introduction
 
 Bloefish is a local AI framework, aiming to provide a simple way to interact with various
 AI models and providers, via a few simple to use touch points.
 
 <p align="center">
-	<img src="./assets/web.png">
+	<img src="./assets/screenshot.webp">
 </p>
 
 ## Services
