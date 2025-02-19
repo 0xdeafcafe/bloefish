@@ -9,6 +9,8 @@ type Interaction struct {
 	MessageContent string   `json:"message_content"`
 	FileIDs        []string `json:"file_ids"`
 
+	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
+
 	Owner          *Actor          `json:"owner"`
 	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
 

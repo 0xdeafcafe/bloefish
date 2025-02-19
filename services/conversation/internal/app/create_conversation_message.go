@@ -58,33 +58,36 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 		return nil, fmt.Errorf("failed to create interaction: %w", err)
 	}
 
-	if newConversation, err := a.InteractionRepository.ConversationHasInteractions(ctx, convo.ID); err != nil {
-		return nil, err
-	} else if newConversation {
-		titleStreamingChannelID := fmt.Sprintf("%s/title", convo.ID)
-		forkedcontext.ForkContext(ctx, func(ctx context.Context) error {
-			if err := a.generateConversationTitle(ctx, &generateConversationTitleCommand{
-				Conversation: convo,
-				Owner: &airelay.Actor{
-					Type:       airelay.ActorType(req.Owner.Type),
-					Identifier: req.Owner.Identifier,
-				},
-				Interaction:        interaction,
-				StreamingChannelID: titleStreamingChannelID,
-				UseStreaming:       req.Options.UseStreaming,
-			}); err != nil {
-				if sendErrorErr := a.StreamService.SendErrorMessage(ctx, &stream.SendErrorMessageRequest{
-					ChannelID: titleStreamingChannelID,
-					Error:     cher.Coerce(err),
-				}); sendErrorErr != nil {
-					clog.Get(ctx).WithError(sendErrorErr).Error("failed to send title error message to stream service")
+	if convo.Title == nil {
+		if newConversation, err := a.InteractionRepository.ConversationHasInteractions(ctx, convo.ID); err != nil {
+			return nil, err
+		} else if newConversation {
+			titleStreamingChannelID := fmt.Sprintf("%s/title", convo.ID)
+
+			forkedcontext.ForkContext(ctx, func(ctx context.Context) error {
+				if err := a.generateConversationTitle(ctx, &generateConversationTitleCommand{
+					Conversation: convo,
+					Owner: &airelay.Actor{
+						Type:       airelay.ActorType(req.Owner.Type),
+						Identifier: req.Owner.Identifier,
+					},
+					Interaction:        interaction,
+					StreamingChannelID: titleStreamingChannelID,
+					UseStreaming:       req.Options.UseStreaming,
+				}); err != nil {
+					if sendErrorErr := a.StreamService.SendErrorMessage(ctx, &stream.SendErrorMessageRequest{
+						ChannelID: titleStreamingChannelID,
+						Error:     cher.Coerce(err),
+					}); sendErrorErr != nil {
+						clog.Get(ctx).WithError(sendErrorErr).Error("failed to send title error message to stream service")
+					}
+
+					clog.Get(ctx).WithError(err).Error("failed to generate conversation title")
 				}
 
-				clog.Get(ctx).WithError(err).Error("failed to generate conversation title")
-			}
-
-			return nil
-		})
+				return nil
+			})
+		}
 	}
 
 	activeInteraction, err := a.InteractionRepository.CreateActive(ctx, &models.CreateActiveInteractionCommand{
@@ -195,7 +198,7 @@ func (a *App) createConversationMessageReply(
 	messages := make([]*airelay.InvokeConversationMessageRequestMessage, 0, len(conversationInteractions))
 
 	for _, interaction := range conversationInteractions {
-		if interaction.CompletedAt == nil {
+		if interaction.CompletedAt == nil || interaction.MarkedAsExcludedAt != nil {
 			continue
 		}
 
@@ -209,8 +212,6 @@ func (a *App) createConversationMessageReply(
 		})
 	}
 
-	var messageContent string
-
 	aiRelayOptions := &models.AIRelayOptions{
 		ProviderID: cmd.Conversation.AIRelayOptions.ProviderID,
 		ModelID:    cmd.Conversation.AIRelayOptions.ModelID,
@@ -222,6 +223,7 @@ func (a *App) createConversationMessageReply(
 		}
 	}
 
+	var messageContent string
 	if cmd.UseStreaming {
 		response, err := a.AIRelayService.InvokeStreamingConversationMessage(ctx, &airelay.InvokeStreamingConversationMessageRequest{
 			StreamingChannelID: cmd.StreamingChannelID,

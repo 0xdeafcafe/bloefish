@@ -20,6 +20,8 @@ type persistedInteraction struct {
 	MessageContent string   `bson:"message_content"`
 	FileIDs        []string `bson:"file_ids"`
 
+	MarkedAsExcludedAt *time.Time `bson:"marked_as_excluded_at"`
+
 	Owner struct {
 		Type       string `bson:"type"`
 		Identifier string `bson:"identifier"`
@@ -54,11 +56,12 @@ func (r *mgoInteraction) Create(ctx context.Context, cmd *models.CreateInteracti
 			"updated_at": true,
 		},
 		"$setOnInsert": bson.M{
-			"_id":             ksuid.Generate(ctx, "interaction").String(),
-			"idempotency_key": cmd.IdempotencyKey,
-			"conversation_id": cmd.ConversationID,
-			"message_content": cmd.MessageContent,
-			"file_ids":        cmd.FileIDs,
+			"_id":                   ksuid.Generate(ctx, "interaction").String(),
+			"idempotency_key":       cmd.IdempotencyKey,
+			"conversation_id":       cmd.ConversationID,
+			"message_content":       cmd.MessageContent,
+			"file_ids":              cmd.FileIDs,
+			"marked_as_excluded_at": nil,
 
 			"owner": bson.M{
 				"type":       cmd.Owner.Type,
@@ -94,11 +97,12 @@ func (r *mgoInteraction) CreateActive(ctx context.Context, cmd *models.CreateAct
 			"updated_at": true,
 		},
 		"$setOnInsert": bson.M{
-			"_id":             ksuid.Generate(ctx, "interaction").String(),
-			"idempotency_key": cmd.IdempotencyKey,
-			"conversation_id": cmd.ConversationID,
-			"message_content": cmd.MessageContent,
-			"file_ids":        cmd.FileIDs,
+			"_id":                   ksuid.Generate(ctx, "interaction").String(),
+			"idempotency_key":       cmd.IdempotencyKey,
+			"conversation_id":       cmd.ConversationID,
+			"message_content":       cmd.MessageContent,
+			"file_ids":              cmd.FileIDs,
+			"marked_as_excluded_at": nil,
 
 			"owner": bson.M{
 				"type":       cmd.Owner.Type,
@@ -213,6 +217,49 @@ func (r *mgoInteraction) ConversationHasInteractions(ctx context.Context, conver
 	return count > 0, nil
 }
 
+func (r *mgoInteraction) DeleteMany(ctx context.Context, interactionIDs []string) error {
+	_, err := r.c.UpdateMany(ctx, bson.M{
+		"_id":        bson.M{"$in": interactionIDs},
+		"deleted_at": nil,
+	}, bson.M{
+		"$currentDate": bson.M{
+			"updated_at": true,
+			"deleted_at": true,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *mgoInteraction) UpdateExcludedState(ctx context.Context, interactionID string, excluded bool) error {
+	update := bson.M{
+		"$currentDate": bson.M{
+			"updated_at": true,
+		},
+	}
+
+	if excluded {
+		update["$currentDate"].(bson.M)["marked_as_excluded_at"] = true
+	} else {
+		update["$set"] = bson.M{
+			"marked_as_excluded_at": nil,
+		}
+	}
+
+	_, err := r.c.UpdateOne(ctx, bson.M{
+		"_id":        interactionID,
+		"deleted_at": nil,
+	}, update)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (p *persistedInteraction) ToDomainModel() *models.Interaction {
 	return &models.Interaction{
 		ID:             p.ID,
@@ -220,6 +267,8 @@ func (p *persistedInteraction) ToDomainModel() *models.Interaction {
 		ConversationID: p.ConversationID,
 		MessageContent: p.MessageContent,
 		FileIDs:        p.FileIDs,
+
+		MarkedAsExcludedAt: p.MarkedAsExcludedAt,
 
 		Owner: &models.Actor{
 			Type:       models.ActorType(p.Owner.Type),

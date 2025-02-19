@@ -11,6 +11,9 @@ type Service interface {
 	GetInteraction(ctx context.Context, req *GetInteractionRequest) (*GetInteractionResponse, error)
 	GetConversationWithInteractions(ctx context.Context, req *GetConversationWithInteractionsRequest) (*GetConversationWithInteractionsResponse, error)
 	ListConversationsWithInteractions(ctx context.Context, req *ListConversationsWithInteractionsRequest) (*ListConversationsWithInteractionsResponse, error)
+	DeleteConversations(ctx context.Context, req *DeleteConversationsRequest) error
+	DeleteInteractions(ctx context.Context, req *DeleteInteractionsRequest) error
+	UpdateInteractionExcludedState(ctx context.Context, req *UpdateInteractionExcludedStateRequest) error
 }
 
 type ActorType string
@@ -78,6 +81,8 @@ type CreateConversationMessageResponseInteraction struct {
 	AIRelayOptions  *AIRelayOptions `json:"ai_relay_options"`
 	StreamChannelID string          `json:"stream_channel_id"`
 
+	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
+
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
 	DeletedAt   *time.Time `json:"deleted_at"`
@@ -89,16 +94,19 @@ type GetInteractionRequest struct {
 }
 
 type GetInteractionResponse struct {
-	ID             string          `json:"id"`
-	ConversationID string          `json:"conversation_id"`
+	ID             string   `json:"id"`
+	ConversationID string   `json:"conversation_id"`
+	MessageContent string   `json:"message_content"`
+	FileIDs        []string `json:"file_ids"`
+
 	Owner          *Actor          `json:"owner"`
-	MessageContent string          `json:"message_content"`
-	FileIDs        []string        `json:"file_ids"`
 	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
-	CreatedAt      time.Time       `json:"created_at"`
-	UpdatedAt      time.Time       `json:"updated_at"`
-	DeletedAt      *time.Time      `json:"deleted_at"`
-	CompletedAt    *time.Time      `json:"completed_at"`
+
+	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
+	CreatedAt          time.Time  `json:"created_at"`
+	UpdatedAt          time.Time  `json:"updated_at"`
+	DeletedAt          *time.Time `json:"deleted_at"`
+	CompletedAt        *time.Time `json:"completed_at"`
 }
 
 type GetConversationWithInteractionsRequest struct {
@@ -121,12 +129,15 @@ type GetConversationWithInteractionsResponse struct {
 }
 
 type GetConversationWithInteractionsResponseInteraction struct {
-	ID              string          `json:"id"`
-	Owner           *Actor          `json:"owner"`
-	MessageContent  string          `json:"message_content"`
-	FileIDs         []string        `json:"file_ids"`
-	AIRelayOptions  *AIRelayOptions `json:"ai_relay_options"`
-	StreamChannelID string          `json:"stream_channel_id"`
+	ID              string   `json:"id"`
+	MessageContent  string   `json:"message_content"`
+	FileIDs         []string `json:"file_ids"`
+	StreamChannelID string   `json:"stream_channel_id"`
+
+	Owner          *Actor          `json:"owner"`
+	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
+
+	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
 
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
@@ -158,12 +169,15 @@ type ListConversationsWithInteractionsResponseConversation struct {
 }
 
 type ListConversationsWithInteractionsResponseConversationInteraction struct {
-	ID              string          `json:"id"`
-	Owner           *Actor          `json:"owner"`
-	MessageContent  string          `json:"message_content"`
-	FileIDs         []string        `json:"file_ids"`
-	StreamChannelID string          `json:"stream_channel_id"`
-	AIRelayOptions  *AIRelayOptions `json:"ai_relay_options"`
+	ID              string   `json:"id"`
+	MessageContent  string   `json:"message_content"`
+	FileIDs         []string `json:"file_ids"`
+	StreamChannelID string   `json:"stream_channel_id"`
+
+	Owner          *Actor          `json:"owner"`
+	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
+
+	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
 
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
@@ -173,4 +187,13 @@ type ListConversationsWithInteractionsResponseConversationInteraction struct {
 
 type DeleteConversationsRequest struct {
 	ConversationIDs []string `json:"conversation_ids"`
+}
+
+type DeleteInteractionsRequest struct {
+	InteractionIDs []string `json:"interaction_ids"`
+}
+
+type UpdateInteractionExcludedStateRequest struct {
+	InteractionID string `json:"interaction_id"`
+	Excluded      bool   `json:"excluded"`
 }

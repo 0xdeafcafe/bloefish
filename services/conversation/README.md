@@ -166,6 +166,8 @@ interface Response {
 			model_id: string;
 		};
 
+		marked_as_excluded_at: string | null; // ISO 8601
+
 		created_at: string; // ISO 8601
 		updated_at: string; // ISO 8601
 		deleted_at: string | null; // ISO 8601
@@ -220,6 +222,8 @@ interface Response {
 				model_id: string;
 			};
 
+			marked_as_excluded_at: string | null; // ISO 8601
+
 			created_at: string; // ISO 8601
 			updated_at: string; // ISO 8601
 			deleted_at: string | null; // ISO 8601
@@ -242,6 +246,35 @@ Deletes conversations and their interactions by the conversation ID.
 ```typescript
 interface Request {
 	conversation_ids: string[];
+}
+
+type Response = null;
+```
+
+#### `delete_interactions`
+
+Deletes interactions by the their ID.
+
+**Contract**
+
+```typescript
+interface Request {
+	interaction_ids: string;
+}
+
+type Response = null;
+```
+
+#### `update_interaction_excluded_state`
+
+Updates the excluded state of an interaction.
+
+**Contract**
+
+```typescript
+interface Request {
+	interaction_id: string;
+	excluded: boolean;
 }
 
 type Response = null;

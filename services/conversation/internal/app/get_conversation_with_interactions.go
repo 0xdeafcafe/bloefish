@@ -39,17 +39,21 @@ func (a *App) GetConversationWithInteractions(ctx context.Context, req *conversa
 
 	for i, interaction := range interactions {
 		resp.Interactions[i] = &conversation.GetConversationWithInteractionsResponseInteraction{
-			ID: interaction.ID,
+			ID:             interaction.ID,
+			MessageContent: interaction.MessageContent,
+			FileIDs:        interaction.FileIDs,
+
+			MarkedAsExcludedAt: interaction.MarkedAsExcludedAt,
+
 			Owner: &conversation.Actor{
 				Type:       conversation.ActorType(interaction.Owner.Type),
 				Identifier: interaction.Owner.Identifier,
 			},
-			MessageContent: interaction.MessageContent,
-			FileIDs:        interaction.FileIDs,
 			AIRelayOptions: &conversation.AIRelayOptions{
 				ProviderID: interaction.AIRelayOptions.ProviderID,
 				ModelID:    interaction.AIRelayOptions.ModelID,
 			},
+
 			CreatedAt:   interaction.CreatedAt,
 			UpdatedAt:   interaction.UpdatedAt,
 			CompletedAt: interaction.CompletedAt,

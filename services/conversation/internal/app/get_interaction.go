@@ -15,12 +15,15 @@ func (a *App) GetInteraction(ctx context.Context, req *conversation.GetInteracti
 	return &conversation.GetInteractionResponse{
 		ID:             foundInteraction.ID,
 		ConversationID: foundInteraction.ConversationID,
+		MessageContent: foundInteraction.MessageContent,
+		FileIDs:        foundInteraction.FileIDs,
+
+		MarkedAsExcludedAt: foundInteraction.MarkedAsExcludedAt,
+
 		Owner: &conversation.Actor{
 			Type:       conversation.ActorType(foundInteraction.Owner.Type),
 			Identifier: foundInteraction.Owner.Identifier,
 		},
-		MessageContent: foundInteraction.MessageContent,
-		FileIDs:        foundInteraction.FileIDs,
 		AIRelayOptions: &conversation.AIRelayOptions{
 			ProviderID: foundInteraction.AIRelayOptions.ProviderID,
 			ModelID:    foundInteraction.AIRelayOptions.ModelID,

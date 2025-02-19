@@ -21,5 +21,7 @@ type InteractionRepository interface {
 	GetByID(ctx context.Context, interactionID string) (*models.Interaction, error)
 	GetAllByConversationID(ctx context.Context, conversationID string) ([]*models.Interaction, error)
 	DeleteManyByConversationID(ctx context.Context, conversationID string) error
+	DeleteMany(ctx context.Context, interactionIDs []string) error
 	ConversationHasInteractions(ctx context.Context, conversationID string) (bool, error)
+	UpdateExcludedState(ctx context.Context, interactionID string, excluded bool) error
 }

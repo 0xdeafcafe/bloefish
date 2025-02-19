@@ -37,3 +37,15 @@ func (r *RPCClient) GetConversationWithInteractions(ctx context.Context, req *Ge
 func (r *RPCClient) ListConversationsWithInteractions(ctx context.Context, req *ListConversationsWithInteractionsRequest) (resp *ListConversationsWithInteractionsResponse, err error) {
 	return resp, r.client.Do(ctx, "list_conversations_with_interactions", "2025-02-12", req, &resp)
 }
+
+func (r *RPCClient) DeleteConversations(ctx context.Context, req *DeleteConversationsRequest) error {
+	return r.client.Do(ctx, "delete_conversations", "2025-02-12", req, nil)
+}
+
+func (r *RPCClient) DeleteInteractions(ctx context.Context, req *DeleteInteractionsRequest) error {
+	return r.client.Do(ctx, "delete_interactions", "2025-02-12", req, nil)
+}
+
+func (r *RPCClient) UpdateInteractionExcludedState(ctx context.Context, req *UpdateInteractionExcludedStateRequest) error {
+	return r.client.Do(ctx, "update_interaction_excluded_state", "2025-02-12", req, nil)
+}
