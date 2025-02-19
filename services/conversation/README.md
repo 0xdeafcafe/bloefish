@@ -41,7 +41,21 @@ interface Request {
 
 interface Response {
 	conversation_id: string;
+	owner: {
+		type: 'user';
+		identifier: string;
+	};
+	ai_relay_options: {
+		provider_id: 'open_ai';
+		model_id: string;
+	};
+	
+	title: string | null;
 	stream_channel_id: string;
+
+	created_at: string; // ISO 8601
+	updated_at: string; // ISO 8601
+	deleted_at: string | null; // ISO 8601
 }
 ```
 
@@ -74,9 +88,42 @@ interface Request {
 
 interface Response {
 	conversation_id: string;
-	interaction_id: string;
 
-	response_interaction_id: string;
+	input_interaction: {
+		id: string;
+		messageContent: string;
+		fileIds: string[];
+		owner: {
+			type: 'user';
+			identifier: string;
+		};
+		ai_relay_options: {
+			provider_id: 'open_ai';
+			model_id: string;
+		};
+		created_at: string; // ISO 8601
+		updated_at: string; // ISO 8601
+		deleted_at: string | null; // ISO 8601
+		completed_at: string | null; // ISO 8601
+	};
+	response_interaction: {
+		id: string;
+		messageContent: string;
+		fileIds: string[];
+		owner: {
+			type: 'bot';
+			identifier: string;
+		};
+		ai_relay_options: {
+			provider_id: 'open_ai';
+			model_id: string;
+		};
+		created_at: string; // ISO 8601
+		updated_at: string; // ISO 8601
+		deleted_at: string | null; // ISO 8601
+		completed_at: string | null; // ISO 8601
+	};
+
 	stream_channel_id: string;
 }
 ```
@@ -102,6 +149,10 @@ interface Response {
 		provider_id: 'open_ai';
 		model_id: string;
 	};
+
+	title: string | null;
+	stream_channel_id: string;
+
 	interactions: {
 		id: string;
 		owner: {
@@ -113,10 +164,17 @@ interface Response {
 		ai_relay_options: {
 			provider_id: 'open_ai';
 			model_id: string;
-		} | null;
+		};
+
 		created_at: string; // ISO 8601
+		updated_at: string; // ISO 8601
+		deleted_at: string | null; // ISO 8601
+		completed_at: string | null; // ISO 8601
 	}[];
+
 	created_at: string; // ISO 8601
+	updated_at: string; // ISO 8601
+	deleted_at: string | null; // ISO 8601
 }
 ```
 
@@ -145,6 +203,10 @@ interface Response {
 			provider_id: 'open_ai';
 			model_id: string;
 		};
+
+		title: string | null;
+		stream_channel_id: string;
+
 		interactions: {
 			id: string;
 			owner: {
@@ -156,10 +218,31 @@ interface Response {
 			ai_relay_options: {
 				provider_id: 'open_ai';
 				model_id: string;
-			} | null;
+			};
+
 			created_at: string; // ISO 8601
+			updated_at: string; // ISO 8601
+			deleted_at: string | null; // ISO 8601
+			completed_at: string | null; // ISO 8601
 		}[];
+
 		created_at: string; // ISO 8601
+		updated_at: string; // ISO 8601
+		deleted_at: string | null; // ISO 8601
 	}[];
 }
+```
+
+#### `delete_conversations`
+
+Deletes conversations and their interactions by the conversation ID.
+
+**Contract**
+
+```typescript
+interface Request {
+	conversation_ids: string[];
+}
+
+type Response = null;
 ```

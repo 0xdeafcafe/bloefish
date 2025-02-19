@@ -25,7 +25,9 @@ func (a *App) GetInteraction(ctx context.Context, req *conversation.GetInteracti
 			ProviderID: foundInteraction.AIRelayOptions.ProviderID,
 			ModelID:    foundInteraction.AIRelayOptions.ModelID,
 		},
-		CreatedAt: foundInteraction.CreatedAt,
-		UpdatedAt: foundInteraction.UpdatedAt,
+		CreatedAt:   foundInteraction.CreatedAt,
+		UpdatedAt:   foundInteraction.UpdatedAt,
+		DeletedAt:   foundInteraction.DeletedAt,
+		CompletedAt: foundInteraction.CompletedAt,
 	}, nil
 }

@@ -30,7 +30,7 @@ type persistedInteraction struct {
 	} `bson:"ai_relay_options"`
 
 	CreatedAt   time.Time  `bson:"created_at"`
-	UpdatedAt   *time.Time `bson:"updated_at"`
+	UpdatedAt   time.Time  `bson:"updated_at"`
 	DeletedAt   *time.Time `bson:"deleted_at"`
 	CompletedAt *time.Time `bson:"completed_at"`
 }
@@ -182,6 +182,23 @@ func (r *mgoInteraction) GetAllByConversationID(ctx context.Context, conversatio
 	}
 
 	return interactions, nil
+}
+
+func (r *mgoInteraction) DeleteManyByConversationID(ctx context.Context, conversationID string) error {
+	_, err := r.c.UpdateMany(ctx, bson.M{
+		"conversation_id": conversationID,
+		"deleted_at":      nil,
+	}, bson.M{
+		"$currentDate": bson.M{
+			"updated_at": true,
+			"deleted_at": true,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *persistedInteraction) ToDomainModel() *models.Interaction {

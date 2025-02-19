@@ -2,12 +2,14 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"runtime"
 	"sync"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/0xdeafcafe/bloefish/services/conversation"
 	"github.com/0xdeafcafe/bloefish/services/conversation/internal/domain/models"
-	"golang.org/x/sync/errgroup"
 )
 
 func (a *App) ListConversationsWithInteractions(ctx context.Context, req *conversation.ListConversationsWithInteractionsRequest) (*conversation.ListConversationsWithInteractionsResponse, error) {
@@ -66,9 +68,15 @@ func (a *App) ListConversationsWithInteractions(ctx context.Context, req *conver
 				ProviderID: convo.AIRelayOptions.ProviderID,
 				ModelID:    convo.AIRelayOptions.ModelID,
 			},
+
+			Title:           convo.Title,
+			StreamChannelID: convo.ID,
+
 			Interactions: make([]*conversation.ListConversationsWithInteractionsResponseConversationInteraction, len(relics[convo.ID])),
-			CreatedAt:    convo.CreatedAt,
-			DeletedAt:    convo.DeletedAt,
+
+			CreatedAt: convo.CreatedAt,
+			UpdatedAt: convo.UpdatedAt,
+			DeletedAt: convo.DeletedAt,
 		}
 
 		for j, interaction := range relics[convo.ID] {
@@ -78,12 +86,14 @@ func (a *App) ListConversationsWithInteractions(ctx context.Context, req *conver
 					Type:       conversation.ActorType(interaction.Owner.Type),
 					Identifier: interaction.Owner.Identifier,
 				},
-				MessageContent: interaction.MessageContent,
-				FileIDs:        interaction.FileIDs,
+				MessageContent:  interaction.MessageContent,
+				FileIDs:         interaction.FileIDs,
+				StreamChannelID: fmt.Sprintf("%s/%s", convo.ID, interaction.ID),
 				AIRelayOptions: &conversation.AIRelayOptions{
 					ProviderID: interaction.AIRelayOptions.ProviderID,
 					ModelID:    interaction.AIRelayOptions.ModelID,
 				},
+
 				CreatedAt:   interaction.CreatedAt,
 				CompletedAt: interaction.CompletedAt,
 				UpdatedAt:   interaction.UpdatedAt,

@@ -37,8 +37,16 @@ type CreateConversationRequest struct {
 }
 
 type CreateConversationResponse struct {
-	ConversationID        string `json:"conversation_id"`
-	StreamChannelIDPrefix string `json:"stream_channel_id_prefix"`
+	ID             string          `json:"id"`
+	Owner          *Actor          `json:"owner"`
+	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
+
+	Title           *string `json:"title"`
+	StreamChannelID string  `json:"stream_channel_id"`
+
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
 }
 
 type CreateConversationMessageRequest struct {
@@ -56,10 +64,24 @@ type CreateConversationMessageRequestOptions struct {
 }
 
 type CreateConversationMessageResponse struct {
-	ConversationID        string `json:"conversation_id"`
-	InteractionID         string `json:"interaction_id"`
-	ResponseInteractionID string `json:"response_interaction_id"`
-	StreamChannelID       string `json:"stream_channel_id"`
+	ConversationID      string                                        `json:"conversation_id"`
+	InputInteraction    *CreateConversationMessageResponseInteraction `json:"input_interaction"`
+	ResponseInteraction *CreateConversationMessageResponseInteraction `json:"response_interaction"`
+	StreamChannelID     string                                        `json:"stream_channel_id"`
+}
+
+type CreateConversationMessageResponseInteraction struct {
+	ID              string          `json:"id"`
+	Owner           *Actor          `json:"owner"`
+	MessageContent  string          `json:"message_content"`
+	FileIDs         []string        `json:"file_ids"`
+	AIRelayOptions  *AIRelayOptions `json:"ai_relay_options"`
+	StreamChannelID string          `json:"stream_channel_id"`
+
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
+	CompletedAt *time.Time `json:"completed_at"`
 }
 
 type GetInteractionRequest struct {
@@ -74,7 +96,9 @@ type GetInteractionResponse struct {
 	FileIDs        []string        `json:"file_ids"`
 	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
 	CreatedAt      time.Time       `json:"created_at"`
-	UpdatedAt      *time.Time      `json:"updated_at"`
+	UpdatedAt      time.Time       `json:"updated_at"`
+	DeletedAt      *time.Time      `json:"deleted_at"`
+	CompletedAt    *time.Time      `json:"completed_at"`
 }
 
 type GetConversationWithInteractionsRequest struct {
@@ -86,22 +110,28 @@ type GetConversationWithInteractionsResponse struct {
 	Owner          *Actor          `json:"owner"`
 	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
 
+	Title           *string `json:"title"`
+	StreamChannelID string  `json:"stream_channel_id"`
+
 	Interactions []*GetConversationWithInteractionsResponseInteraction `json:"interactions"`
 
 	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at"`
 }
 
 type GetConversationWithInteractionsResponseInteraction struct {
-	ID             string          `json:"id"`
-	Owner          *Actor          `json:"owner"`
-	MessageContent string          `json:"message_content"`
-	FileIDs        []string        `json:"file_ids"`
-	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
-	CreatedAt      time.Time       `json:"created_at"`
-	UpdatedAt      *time.Time      `json:"updated_at"`
-	CompletedAt    *time.Time      `json:"completed_at"`
-	DeletedAt      *time.Time      `json:"deleted_at"`
+	ID              string          `json:"id"`
+	Owner           *Actor          `json:"owner"`
+	MessageContent  string          `json:"message_content"`
+	FileIDs         []string        `json:"file_ids"`
+	AIRelayOptions  *AIRelayOptions `json:"ai_relay_options"`
+	StreamChannelID string          `json:"stream_channel_id"`
+
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	CompletedAt *time.Time `json:"completed_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
 }
 
 type ListConversationsWithInteractionsRequest struct {
@@ -113,22 +143,34 @@ type ListConversationsWithInteractionsResponse struct {
 }
 
 type ListConversationsWithInteractionsResponseConversation struct {
-	ID             string                                                              `json:"id"`
-	Owner          *Actor                                                              `json:"owner"`
-	AIRelayOptions *AIRelayOptions                                                     `json:"ai_relay_options"`
-	Interactions   []*ListConversationsWithInteractionsResponseConversationInteraction `json:"interactions"`
-	CreatedAt      time.Time                                                           `json:"created_at"`
-	DeletedAt      *time.Time                                                          `json:"deleted_at"`
+	ID             string          `json:"id"`
+	Owner          *Actor          `json:"owner"`
+	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
+
+	Title           *string `json:"title"`
+	StreamChannelID string  `json:"stream_channel_id"`
+
+	Interactions []*ListConversationsWithInteractionsResponseConversationInteraction `json:"interactions"`
+
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
 }
 
 type ListConversationsWithInteractionsResponseConversationInteraction struct {
-	ID             string          `json:"id"`
-	Owner          *Actor          `json:"owner"`
-	MessageContent string          `json:"message_content"`
-	FileIDs        []string        `json:"file_ids"`
-	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
-	CreatedAt      time.Time       `json:"created_at"`
-	UpdatedAt      *time.Time      `json:"updated_at"`
-	CompletedAt    *time.Time      `json:"completed_at"`
-	DeletedAt      *time.Time      `json:"deleted_at"`
+	ID              string          `json:"id"`
+	Owner           *Actor          `json:"owner"`
+	MessageContent  string          `json:"message_content"`
+	FileIDs         []string        `json:"file_ids"`
+	StreamChannelID string          `json:"stream_channel_id"`
+	AIRelayOptions  *AIRelayOptions `json:"ai_relay_options"`
+
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	CompletedAt *time.Time `json:"completed_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
+}
+
+type DeleteConversationsRequest struct {
+	ConversationIDs []string `json:"conversation_ids"`
 }

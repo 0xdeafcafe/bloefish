@@ -13,7 +13,7 @@ type Interaction struct {
 	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
 
 	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   *time.Time `json:"updated_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
 	DeletedAt   *time.Time `json:"deleted_at"`
 	CompletedAt *time.Time `json:"completed_at"`
 }

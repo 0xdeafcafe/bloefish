@@ -8,7 +8,10 @@ type Conversation struct {
 	IdempotencyKey string          `json:"idempotency_key"`
 	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
 
+	Title *string `json:"title"`
+
 	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at"`
 }
 

@@ -104,10 +104,43 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 	})
 
 	return &conversation.CreateConversationMessageResponse{
-		ConversationID:        convo.ID,
-		InteractionID:         interaction.ID,
-		ResponseInteractionID: activeInteraction.ID,
-		StreamChannelID:       streamingChannelID,
+		ConversationID: convo.ID,
+		InputInteraction: &conversation.CreateConversationMessageResponseInteraction{
+			ID: interaction.ID,
+			Owner: &conversation.Actor{
+				Type:       conversation.ActorType(interaction.Owner.Type),
+				Identifier: interaction.Owner.Identifier,
+			},
+			FileIDs:        interaction.FileIDs,
+			MessageContent: interaction.MessageContent,
+			AIRelayOptions: &conversation.AIRelayOptions{
+				ProviderID: interaction.AIRelayOptions.ProviderID,
+				ModelID:    interaction.AIRelayOptions.ModelID,
+			},
+			CreatedAt:   interaction.CreatedAt,
+			UpdatedAt:   interaction.UpdatedAt,
+			CompletedAt: interaction.CompletedAt,
+			DeletedAt:   interaction.DeletedAt,
+		},
+		ResponseInteraction: &conversation.CreateConversationMessageResponseInteraction{
+			ID: activeInteraction.ID,
+			Owner: &conversation.Actor{
+				Type:       conversation.ActorType(activeInteraction.Owner.Type),
+				Identifier: activeInteraction.Owner.Identifier,
+			},
+			FileIDs:        activeInteraction.FileIDs,
+			MessageContent: activeInteraction.MessageContent,
+			AIRelayOptions: &conversation.AIRelayOptions{
+				ProviderID: activeInteraction.AIRelayOptions.ProviderID,
+				ModelID:    activeInteraction.AIRelayOptions.ModelID,
+			},
+			StreamChannelID: streamingChannelID,
+			CreatedAt:       activeInteraction.CreatedAt,
+			UpdatedAt:       activeInteraction.UpdatedAt,
+			CompletedAt:     activeInteraction.CompletedAt,
+			DeletedAt:       activeInteraction.DeletedAt,
+		},
+		StreamChannelID: streamingChannelID,
 	}, nil
 }
 

@@ -26,6 +26,7 @@ type persistedConversation struct {
 	} `bson:"ai_relay_options"`
 
 	CreatedAt time.Time  `bson:"created_at"`
+	UpdatedAt time.Time  `bson:"updated_at"`
 	DeletedAt *time.Time `bson:"deleted_at"`
 }
 
@@ -54,7 +55,11 @@ func (r *mgoConversation) Create(ctx context.Context, cmd *models.CreateConversa
 				"provider_id": cmd.AIRelayOptions.ProviderID,
 				"model_id":    cmd.AIRelayOptions.ModelID,
 			},
+
+			"title": nil,
+
 			"created_at": time.Now(),
+			"updated_at": nil,
 			"deleted_at": nil,
 		},
 	}, options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After))
@@ -105,6 +110,19 @@ func (r *mgoConversation) ListByOwner(ctx context.Context, actor models.Actor) (
 	return conversations, nil
 }
 
+func (r *mgoConversation) DeleteMany(ctx context.Context, conversationIDs []string) error {
+	_, err := r.c.UpdateMany(ctx, bson.M{
+		"_id": bson.M{"$in": conversationIDs},
+	}, bson.M{
+		"$currentDate": bson.M{
+			"deleted_at": true,
+			"updated_at": true,
+		},
+	})
+
+	return err
+}
+
 func (p *persistedConversation) ToDomainModel() *models.Conversation {
 	return &models.Conversation{
 		ID:             p.ID,
@@ -117,7 +135,11 @@ func (p *persistedConversation) ToDomainModel() *models.Conversation {
 			ProviderID: p.AIRelayOptions.ProviderID,
 			ModelID:    p.AIRelayOptions.ModelID,
 		},
+
+		Title: nil,
+
 		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
 		DeletedAt: p.DeletedAt,
 	}
 }

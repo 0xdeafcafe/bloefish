@@ -27,9 +27,14 @@ func (a *App) GetConversationWithInteractions(ctx context.Context, req *conversa
 			ProviderID: convo.AIRelayOptions.ProviderID,
 			ModelID:    convo.AIRelayOptions.ModelID,
 		},
+		Title:           convo.Title,
+		StreamChannelID: convo.ID,
+
 		Interactions: make([]*conversation.GetConversationWithInteractionsResponseInteraction, len(interactions)),
-		CreatedAt:    convo.CreatedAt,
-		DeletedAt:    convo.DeletedAt,
+
+		CreatedAt: convo.CreatedAt,
+		UpdatedAt: convo.UpdatedAt,
+		DeletedAt: convo.DeletedAt,
 	}
 
 	for i, interaction := range interactions {
@@ -46,8 +51,8 @@ func (a *App) GetConversationWithInteractions(ctx context.Context, req *conversa
 				ModelID:    interaction.AIRelayOptions.ModelID,
 			},
 			CreatedAt:   interaction.CreatedAt,
-			CompletedAt: interaction.CompletedAt,
 			UpdatedAt:   interaction.UpdatedAt,
+			CompletedAt: interaction.CompletedAt,
 			DeletedAt:   interaction.DeletedAt,
 		}
 	}

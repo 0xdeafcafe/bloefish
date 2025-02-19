@@ -50,6 +50,7 @@ func New(ctx context.Context, app *app.App) *RPC {
 	svr.Register("get_interaction", "2025-02-12", schema("get_interaction"), rpc.GetInteraction)
 	svr.Register("get_conversation_with_interactions", "2025-02-12", schema("get_conversation_with_interactions"), rpc.GetConversationWithInteractions)
 	svr.Register("list_conversations_with_interactions", "2025-02-12", schema("list_conversations_with_interactions"), rpc.ListConversationsWithInteractions)
+	svr.Register("delete_conversations", "2025-02-12", schema("delete_conversations"), rpc.DeleteConversations)
 
 	mux := chi.NewRouter()
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))

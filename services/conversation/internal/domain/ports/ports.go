@@ -10,6 +10,7 @@ type ConversationRepository interface {
 	Create(ctx context.Context, cmd *models.CreateConversationCommand) (*models.Conversation, error)
 	GetByID(ctx context.Context, conversationID string) (*models.Conversation, error)
 	ListByOwner(ctx context.Context, actor models.Actor) ([]*models.Conversation, error)
+	DeleteMany(ctx context.Context, conversationIDs []string) error
 }
 
 type InteractionRepository interface {
@@ -18,4 +19,5 @@ type InteractionRepository interface {
 	MarkActiveAsComplete(ctx context.Context, interactionID, messageContent string) error
 	GetByID(ctx context.Context, interactionID string) (*models.Interaction, error)
 	GetAllByConversationID(ctx context.Context, conversationID string) ([]*models.Interaction, error)
+	DeleteManyByConversationID(ctx context.Context, conversationID string) error
 }

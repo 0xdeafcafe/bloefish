@@ -33,7 +33,19 @@ func (a *App) CreateConversation(ctx context.Context, req *conversation.CreateCo
 	}
 
 	return &conversation.CreateConversationResponse{
-		ConversationID:        convo.ID,
-		StreamChannelIDPrefix: convo.ID,
+		ID: convo.ID,
+		Owner: &conversation.Actor{
+			Type:       conversation.ActorType(convo.Owner.Type),
+			Identifier: convo.Owner.Identifier,
+		},
+		AIRelayOptions: &conversation.AIRelayOptions{
+			ProviderID: convo.AIRelayOptions.ProviderID,
+			ModelID:    convo.AIRelayOptions.ModelID,
+		},
+		Title:           convo.Title,
+		StreamChannelID: convo.ID,
+		CreatedAt:       convo.CreatedAt,
+		UpdatedAt:       convo.UpdatedAt,
+		DeletedAt:       convo.DeletedAt,
 	}, nil
 }
