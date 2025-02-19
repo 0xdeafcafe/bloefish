@@ -1,4 +1,4 @@
-import { Box, Center, Container, Flex, Grid, GridItem, HStack, Spinner, Stack, ButtonGroup, IconButton, Badge, Breadcrumb } from '@chakra-ui/react';
+import { Box, Center, Container, Flex, Grid, GridItem, HStack, Spinner, Stack, ButtonGroup, IconButton, Badge, Breadcrumb, Skeleton } from '@chakra-ui/react';
 import { LuMailQuestion, LuSlash, LuTrash2 } from 'react-icons/lu';
 import { useAppDispatch, useAppSelector } from '~/store';
 import { styled } from 'styled-components';
@@ -77,7 +77,7 @@ export const Conversation: React.FC = () => {
 			height={'full'}
 		>
 			<Helmet>
-				<title>{'Conversation title | Bloefish'}</title>
+				<title>{`${conversation.title || 'New conversation'} | Bloefish`}</title>
 			</Helmet>
 
 			<HStack
@@ -136,14 +136,11 @@ export const Conversation: React.FC = () => {
 									</Breadcrumb.Separator>
 									<Breadcrumb.Item>
 										<Breadcrumb.CurrentLink>
-											{'Generated conversation title'}
+											{Boolean(conversation.title) ? conversation.title : <Skeleton variant={'shine'} w={32} height={4} />}
 										</Breadcrumb.CurrentLink>
 									</Breadcrumb.Item>
 								</Breadcrumb.List>
 							</Breadcrumb.Root>
-							<Badge colorPalette={'pink'} size={'sm'}>
-								{`${conversation.aiRelayOptions.providerId} (${conversation.aiRelayOptions.modelId})`}
-							</Badge>
 						</Flex>
 						<ButtonGroup variant={'outline'} size={'xs'}>
 							<Tooltip content={'Delete conversation'}>

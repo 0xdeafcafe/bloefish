@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from '~/store';
 import type { StreamMessage } from './stream.types';
-import { addInteractionFragment, updateInteractionMessageContent } from '~/features/conversations/store';
+import { addInteractionFragment, updateConversationTitle, updateInteractionMessageContent } from '~/features/conversations/store';
 import camelcaseKeys from 'camelcase-keys';
 
 export function useStreamListener() {
@@ -19,6 +19,15 @@ export function useStreamListener() {
 					const [conversationId, interactionId] = data.channelId.split('/');
 					if (!conversationId || !interactionId) return;
 
+					if (interactionId === 'title') {
+						dispatch(updateConversationTitle({
+							conversationId,
+							title: data.messageFragment,
+							treatAsFragment: true,
+						}));
+						break;
+					}
+
 					dispatch(addInteractionFragment({
 						conversationId,
 						interactionId,
@@ -30,6 +39,15 @@ export function useStreamListener() {
 				case 'message_full':
 					const [conversationId, interactionId] = data.channelId.split('/');
 					if (!conversationId || !interactionId) return;
+
+					if (interactionId === 'title') {
+						dispatch(updateConversationTitle({
+							conversationId,
+							title: data.messageFull,
+							treatAsFragment: false,
+						}));
+						break;
+					}
 
 					dispatch(updateInteractionMessageContent({
 						conversationId,
@@ -43,8 +61,6 @@ export function useStreamListener() {
 			}
 
 			if (data.type !== 'message_fragment') return;
-
-			
 		};
 
 		ws.onopen = () => {

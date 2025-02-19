@@ -17,7 +17,7 @@ export interface CreateConversationPayload {
 	title: string | null;
 
 	createdAt: string;
-	updatedAt: string | null;
+	updatedAt: string;
 }
 
 export interface AddInteractionPayload extends ConversationPlugin, InteractionPlugin {
@@ -27,7 +27,7 @@ export interface AddInteractionPayload extends ConversationPlugin, InteractionPl
 	aiRelayOptions: AiRelayOptions;
 
 	createdAt: string;
-	updatedAt: string | null;
+	updatedAt: string;
 	completedAt: string | null;
 }
 
@@ -37,7 +37,7 @@ export interface AddActiveInteractionPayload extends ConversationPlugin, Interac
 	aiRelayOptions: AiRelayOptions; // TODO(afr): this should come from the backend
 
 	createdAt: string;
-	updatedAt: string | null;
+	updatedAt: string;
 	completedAt: string | null;
 }
 
@@ -47,6 +47,11 @@ export interface AddInteractionFragmentPayload extends ConversationPlugin, Inter
 
 export interface UpdateInteractionMessageContentPayload extends ConversationPlugin, InteractionPlugin {
 	content: string;
+}
+
+export interface UpdateConversationTitlePayload extends ConversationPlugin {
+	title: string;
+	treatAsFragment: boolean;
 }
 
 export interface DeleteConversationPayload {

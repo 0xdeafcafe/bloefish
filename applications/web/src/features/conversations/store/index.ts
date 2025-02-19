@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { AddActiveInteractionPayload, AddInteractionFragmentPayload, AddInteractionPayload, Conversation, CreateConversationPayload, DeleteConversationPayload as DeleteConversationsPayload, UpdateInteractionMessageContentPayload } from './types';
+import type { AddActiveInteractionPayload, AddInteractionFragmentPayload, AddInteractionPayload, Conversation, CreateConversationPayload, DeleteConversationPayload as DeleteConversationsPayload, UpdateConversationTitlePayload, UpdateInteractionMessageContentPayload } from './types';
 
 const initialState: Record<string, Conversation | undefined> = {};
 
@@ -104,6 +104,22 @@ export const conversationsSlice = createSlice({
 				state[conversationId] = void 0;
 			}
 		},
+		updateConversationTitle: (state, { payload }: PayloadAction<UpdateConversationTitlePayload>) => {
+			const conversation = state[payload.conversationId];
+			if (!conversation) {
+				return;
+			}
+
+			if (payload.treatAsFragment) {
+				if (conversation.title) {
+					conversation.title += payload.title;
+				} else {
+					conversation.title = payload.title;
+				}
+			} else {
+				conversation.title = payload.title;
+			}
+		},
 	},
 });
 
@@ -115,5 +131,6 @@ export const {
 	addInteractionFragment,
 	updateInteractionMessageContent,
 	deleteConversations,
+	updateConversationTitle,
 } = conversationsSlice.actions;
 export const conversationsReducer = conversationsSlice.reducer;

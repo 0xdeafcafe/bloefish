@@ -1,16 +1,16 @@
-import { Box, Breadcrumb, Button, ButtonGroup, Center, EmptyState, Icon, Spinner, Table, Text, VStack } from '@chakra-ui/react';
+import { Box, Breadcrumb, Button, ButtonGroup, Center, EmptyState, Icon, Link as ChakraLink, LinkOverlay, Spinner, Table, Text, VStack } from '@chakra-ui/react';
 import { useAppSelector } from '~/store';
 import { Helmet } from 'react-helmet-async';
 import { conversationApi } from '~/api/bloefish/conversation';
 import { userApi } from '~/api/bloefish/user';
 import type { Conversation } from './store/types';
-import { LuFishSymbol, LuSquareStack, LuX }  from 'react-icons/lu';
+import { LuFishSymbol, LuSquareArrowOutUpRight, LuSquareStack, LuX } from 'react-icons/lu';
 
 import { Panel } from '~/components/atoms/Panel';
 import { Checkbox } from '~/components/ui/checkbox';
 import { useState } from 'react';
 import { ActionBarContent, ActionBarRoot, ActionBarSelectionTrigger, ActionBarSeparator } from '~/components/ui/action-bar';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { DeleteConversationsDialog } from './components/organisms/DeleteConversationsDialog';
 import { Skeleton } from '~/components/ui/skeleton';
 import { FormatDuration } from '~/components/atoms/FormatDuration';
@@ -67,7 +67,7 @@ export const ConversationsList: React.FC = () => {
 	return (
 		<Container>
 			<Table.ScrollArea>
-				<Table.Root striped interactive stickyHeader size={'md'}>
+				<Table.Root striped interactive stickyHeader size={'md'} width={'100%'}>
 					<Table.Header>
 						<Table.Row>
 							<Table.ColumnHeader w={6}>
@@ -94,7 +94,7 @@ export const ConversationsList: React.FC = () => {
 							<Table.ColumnHeader>
 								{'Last updated at'}
 							</Table.ColumnHeader>
-							<Table.ColumnHeader w={52}>
+							<Table.ColumnHeader>
 								{'Actions'}
 							</Table.ColumnHeader>
 						</Table.Row>
@@ -115,30 +115,43 @@ export const ConversationsList: React.FC = () => {
 										)}
 									/>
 								</Table.Cell>
-								<Table.Cell>
-									{conversation.title ?? (
-										<Skeleton variant={'shine'} w={32} height={4} />
-									)}
-								</Table.Cell>
-								<Table.Cell>
-									<Text truncate>
-										{conversation.interactions.at(0)?.messageContent.substring(0, 100)}
-									</Text>
-								</Table.Cell>
-								<Table.Cell>
-									<FormatDuration pointInTime={conversation.createdAt} />
-								</Table.Cell>
-								<Table.Cell>
-									<FormatDuration pointInTime={conversation.interactions.at(0)?.updatedAt ?? conversation.updatedAt} />
-								</Table.Cell>
+								<ChakraLink asChild variant={'plain'} display={'contents'}>
+									<Link to={`/conversations/${conversation.id}`}>
+										<Table.Cell alignContent={'center'}>
+											{conversation.title ?? (
+												<Skeleton variant={'shine'} w={32} height={4} />
+											)}
+										</Table.Cell>
+										<Table.Cell>
+											<Text truncate>
+												{conversation.interactions.at(0)?.messageContent.substring(0, 70)}
+											</Text>
+										</Table.Cell>
+										<Table.Cell>
+											<FormatDuration pointInTime={conversation.createdAt} />
+										</Table.Cell>
+										<Table.Cell>
+											<FormatDuration pointInTime={conversation.interactions.at(0)?.updatedAt ?? conversation.updatedAt} />
+										</Table.Cell>
+									</Link>
+								</ChakraLink>
 								<Table.Cell>
 									<ButtonGroup size={'2xs'} variant={'outline'}>
-										<Button colorPalette="gray">
-											{'View'}
+										<Button asChild colorPalette="gray">
+											<Link to={`/conversations/${conversation.id}`}>
+												<Icon size={'xs'}>
+													<LuSquareArrowOutUpRight />
+												</Icon>
+												{'View'}
+											</Link>
 										</Button>
-										<Button colorPalette="red">
-											{'Delete'}
-										</Button>
+										<DeleteConversationsDialog
+											conversationIds={[conversation.id]}
+											onDeleteSuccess={() => setSelection([])}
+											deleteButtonSize={'2xs'}
+											deleteButtonIconSize={'xs'}
+											deleteButtonText={'Delete'}
+										/>
 									</ButtonGroup>
 								</Table.Cell>
 							</Table.Row>
@@ -179,6 +192,10 @@ export const ConversationsList: React.FC = () => {
 					</Button>
 					<DeleteConversationsDialog
 						conversationIds={selection}
+						onDeleteSuccess={() => setSelection([])}
+						deleteButtonSize={'xs'}
+						deleteButtonIconSize={'xs'}
+						deleteButtonText={`Delete conversation${selection.length > 1 ? 's' : ''}`}
 					/>
 				</ActionBarContent>
 			</ActionBarRoot>
