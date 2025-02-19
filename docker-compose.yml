@@ -31,7 +31,7 @@ services:
       MINIO_SECRET_KEY: "adminsecretkey"
     command: server /data
     volumes:
-      - ./.data:/data
+      - ./.data/minio:/data
     ports:
       - "9000:9000"
     networks:
