@@ -33,7 +33,7 @@ export interface AddInteractionFragment extends ConversationPlugin, InteractionP
 }
 
 export interface Conversation {
-	conversationId: string;
+	id: string;
 	streamChannelId: string;
 	owner: Actor;
 	aiRelayOptions: AiRelayOptions;
@@ -42,7 +42,7 @@ export interface Conversation {
 }
 
 export interface Interaction {
-	interactionId: string;
+	id: string;
 	conversationId: string;
 	streamChannelId: string | null;
 	owner: Actor;

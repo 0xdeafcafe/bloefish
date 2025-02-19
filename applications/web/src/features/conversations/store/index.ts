@@ -9,16 +9,17 @@ export const conversationsSlice = createSlice({
 	reducers: {
 		injectConversations: (state, { payload }: PayloadAction<Conversation[]>) => {
 			for (const conversation of payload) {
-				if (state[conversation.conversationId]) {
+				if (state[conversation.id]) {
+					// TODO(afr): Attempt to inject interactions
 					continue;
 				}
 
-				state[conversation.conversationId] = conversation;
+				state[conversation.id] = conversation;
 			}
 		},
 		startConversation: (state, { payload }: PayloadAction<CreateConversationPayload>) => {
 			state[payload.conversationId] = {
-				conversationId: payload.conversationId,
+				id: payload.conversationId,
 				streamChannelId: payload.streamChannelIdPrefix,
 				owner: payload.owner,
 				aiRelayOptions: payload.aiRelayOptions,
@@ -33,7 +34,7 @@ export const conversationsSlice = createSlice({
 
 			conversation.interactions.push({
 				conversationId: payload.conversationId,
-				interactionId: payload.interactionId,
+				id: payload.interactionId,
 				messageContent: payload.messageContent,
 				aiRelayOptions: payload.aiRelayOptions,
 				owner: payload.owner,
@@ -49,7 +50,7 @@ export const conversationsSlice = createSlice({
 			conversation.interactions.push({
 				streamChannelId: conversation.streamChannelId,
 				conversationId: payload.conversationId,
-				interactionId: payload.interactionId,
+				id: payload.interactionId,
 				messageContent: payload.messageContent,
 				aiRelayOptions: payload.aiRelayOptions,
 				owner: {
@@ -64,7 +65,7 @@ export const conversationsSlice = createSlice({
 				return;
 			}
 
-			const interaction = conversation.interactions.find(i => i.interactionId === payload.interactionId);
+			const interaction = conversation.interactions.find(i => i.id === payload.interactionId);
 			if (!interaction) {
 				return;
 			}
