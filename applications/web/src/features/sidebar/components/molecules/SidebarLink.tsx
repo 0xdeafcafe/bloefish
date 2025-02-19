@@ -29,10 +29,15 @@ export const SidebarLink: React.FC<SidebarButtonProps> = ({
 				paddingY={'5px'}
 				borderWidth={'1px'}
 				borderColor={active ? 'border.emphasized' : 'transparent'}
+				transition={'background 0.2s, border-color 0.2s'}
 				borderRadius={'md'}
 				onClick={onClick}
 				cursor={'pointer'}
 				zIndex={10000}
+				_hover={{
+					background: 'bg.emphasized',
+					borderColor: 'border.hover',
+				}}
 			>
 				<HStack>
 					<Icon color={active ? 'MenuText' : 'GrayText'}>
