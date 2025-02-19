@@ -1,8 +1,11 @@
 import { Avatar, Box, HStack, Separator, Stack, Text } from '@chakra-ui/react';
 import { SidebarLink } from './components/molecules/SidebarLink';
-import { LuBox, LuFolderOpen, LuMessageCirclePlus, LuSettings2, LuWorkflow } from 'react-icons/lu';
+import { LuFolderOpen, LuMessageCirclePlus, LuSettings2, LuWorkflow } from 'react-icons/lu';
 import { useLocation } from 'react-router';
 import { motion } from 'motion/react';
+import { SearchButton } from '~/components/ui/search-button';
+import { useAppDispatch } from '~/store';
+import { openOmni } from '../omnibar/store';
 
 const sidebarStates = [
 	'new_conversation',
@@ -16,6 +19,7 @@ type SidebarButtonState = typeof sidebarStates[number];
 export const Sidebar: React.FC = () => {
 	const state = useSidebarLocationState();
 	const indicatorTop = calculateIndicatorTop(state);
+	const dispatch = useAppDispatch();
 
 	return (
 		<Box
@@ -36,7 +40,15 @@ export const Sidebar: React.FC = () => {
 						Bloefish
 					</Text>
 				</HStack>
+
 				<Separator marginY={2} />
+
+				<SearchButton
+					marginX={6}
+					marginBottom={2}
+					onClick={() => dispatch(openOmni())}
+				/>
+
 				<Box position={'relative'}>
 					<motion.div
 						style={{
@@ -58,7 +70,7 @@ export const Sidebar: React.FC = () => {
 							duration: 0.5
 						}}
 					/>
-					<Stack paddingLeft={6}>
+					<Stack paddingX={6}>
 						<SidebarLink
 							active={state === 'new_conversation'}
 							content={'New conversation'}

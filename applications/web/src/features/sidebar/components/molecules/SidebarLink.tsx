@@ -1,4 +1,5 @@
 import { Box, HStack, Icon, Text } from "@chakra-ui/react";
+import { motion } from "motion/react";
 import { Link } from "react-router";
 
 interface SidebarButtonProps {
@@ -17,16 +18,18 @@ export const SidebarLink: React.FC<SidebarButtonProps> = ({
 	onClick,
 }) => {
 	return (
-		<Link to={path}>
+		<MotionLink 
+			to={path}
+			initial={{ scale: 1 }}
+			whileTap={{ scale: 0.95 }}
+		>
 			<Box
 				background={active ? 'bg.emphasized' : 'transparent'}
 				paddingX={3}
 				paddingY={'5px'}
 				borderWidth={'1px'}
-				borderEndWidth={0}
 				borderColor={active ? 'border.emphasized' : 'transparent'}
 				borderRadius={'md'}
-				borderRightRadius={0}
 				onClick={onClick}
 				cursor={'pointer'}
 				zIndex={10000}
@@ -38,6 +41,8 @@ export const SidebarLink: React.FC<SidebarButtonProps> = ({
 					<Text fontSize={"sm"} color={'MenuText'} fontWeight={'semibold'}>{content}</Text>
 				</HStack>
 			</Box>
-		</Link>
+		</MotionLink>
 	);
 };
+
+const MotionLink = motion(Link);
