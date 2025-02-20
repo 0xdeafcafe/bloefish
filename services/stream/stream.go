@@ -17,6 +17,7 @@ type StreamedMessageType string
 const (
 	StreamedMessageTypeMessageFull     StreamedMessageType = "message_full"
 	StreamedMessageTypeMessageFragment StreamedMessageType = "message_fragment"
+	StreamedMessageTypeError           StreamedMessageType = "error"
 )
 
 type SendMessageFullRequest struct {
@@ -35,8 +36,10 @@ type SendErrorMessageRequest struct {
 }
 
 type StreamedMessage struct {
-	ChannelID       string              `json:"channel_id"`
-	Type            StreamedMessageType `json:"type"`
-	MessageFull     *string             `json:"message_full"`
-	MessageFragment *string             `json:"message_fragment"`
+	ChannelID string              `json:"channel_id"`
+	Type      StreamedMessageType `json:"type"`
+
+	MessageFull     *string `json:"message_full"`
+	MessageFragment *string `json:"message_fragment"`
+	Error           *cher.E `json:"error"`
 }
