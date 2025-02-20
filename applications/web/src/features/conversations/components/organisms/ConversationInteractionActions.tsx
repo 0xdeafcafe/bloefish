@@ -1,6 +1,6 @@
 import { HStack } from '@chakra-ui/react';
 import { LuClipboardCopy, LuEye, LuEyeClosed, LuThumbsDown, LuThumbsUp } from 'react-icons/lu';
-import type { Conversation, Interaction } from '../../store/types';
+import type { Interaction } from '../../store/types';
 import { InteractionActionButton } from '../atoms/InteractionActionButton';
 import React from 'react';
 import { conversationApi } from '~/api/bloefish/conversation';
@@ -8,7 +8,6 @@ import { DeleteInteractionDialog } from './DeleteInteractionDialog';
 import { toaster } from '~/components/ui/toaster';
 
 interface ConversationInteractionActionsProps {
-	conversation: Conversation;
 	interaction: Interaction;
 	showDeleteOnError?: boolean;
 }

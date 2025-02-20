@@ -15,6 +15,7 @@ import { Tooltip } from '~/components/ui/tooltip';
 import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
 import { Panel } from '~/components/atoms/Panel';
 import type { AiRelayOptions } from '~/api/bloefish/shared.types';
+import React from 'react';
 
 export const Conversation: React.FC = () => {
 	const { conversationId } = useParams();
@@ -46,19 +47,35 @@ export const Conversation: React.FC = () => {
 	if (!conversation) {
 		if (convoFetching || convoLoading) {
 			return (
-				<Flex w={'full'} h={'full'} justify={'center'} align={'center'}>
-					<Spinner />
-				</Flex>
+				<React.Fragment>
+					<Helmet>
+						<title>{'Conversation loading... | Bloefish'}</title>
+					</Helmet>
+
+					<Panel.Body>
+						<Flex w={'full'} h={'full'} justify={'center'} align={'center'}>
+							<Spinner />
+						</Flex>
+					</Panel.Body>
+				</React.Fragment>
 			);
 		}
 
 		return (
-			<NotFound
-				title={'Conversation not found'}
-				pageTitle={'Conversation not found'}
-				description={'The conversation you are looking for does not exist, or this part of the app just hasn\'t been built yet. Your guess is as good as mine.'}
-				Icon={LuMailQuestion}
-			/>
+			<React.Fragment>
+				<Helmet>
+					<title>{'Conversation not found | Bloefish'}</title>
+				</Helmet>
+
+				<Panel.Body>
+					<NotFound
+						title={'Conversation not found'}
+						pageTitle={'Conversation not found'}
+						description={'The conversation you are looking for does not exist, or this part of the app just hasn\'t been built yet. Your guess is as good as mine.'}
+						Icon={LuMailQuestion}
+					/>
+				</Panel.Body>
+			</React.Fragment>
 		);
 	}
 
@@ -83,123 +100,115 @@ export const Conversation: React.FC = () => {
 	}
 
 	return (
-		<Box
-			position={'relative'}
-			width={'full'}
-			height={'full'}
-		>
+		<React.Fragment>
 			<Helmet>
 				<title>{`${conversation.title || 'New conversation'} | Bloefish`}</title>
 			</Helmet>
 
-			<HStack
-				position={'absolute'}
-				bottom={0} left={0} right={0}
-				justify={'center'}
-				gap={0}
-				filter={'blur(80px)'}
-			>
-				<MotionBox
-					animate={{ height: ['10px', '70px', '10px'] }}
-					transition={{ duration: 10, repeat: Infinity, repeatType: 'mirror' }}
-					width={'10%'} background={'pink.600'} opacity={1}
-				/>
-				<MotionBox
-					animate={{ height: ['10px', '40px', '10px'] }}
-					transition={{ duration: 9, repeat: Infinity, repeatType: 'mirror' }}
-					width={'20%'} background={'orange.600'} opacity={1}
-				/>
-				<MotionBox
-					animate={{ height: ['10px', '60px', '10px'] }}
-					transition={{ duration: 6, repeat: Infinity, repeatType: 'mirror' }}
-					width={'15%'} background={'purple.600'} opacity={1}
-				/>
-				<MotionBox
-					animate={{ height: ['10px', '30px', '10px'] }}
-					transition={{ duration: 15, repeat: Infinity, repeatType: 'mirror' }}
-					width={'8%'} background={'yellow.600'} opacity={1}
-				/>
-				<MotionBox
-					animate={{ height: ['10px', '55px', '10px'] }}
-					transition={{ duration: 12, repeat: Infinity, repeatType: 'mirror' }}
-					width={'14%'} background={'red.600'} opacity={1}
-				/>
-			</HStack>
-
-			<Grid
-				h="full"
-				templateRows="max-content 1fr max-content"
-				templateColumns="1fr"
-			>
-				<GridItem>
-					<Panel.Header>
-						<Flex gap={2} align={'center'}>
-							<Breadcrumb.Root>
-								<Breadcrumb.List>
-									<Breadcrumb.Item>
-										<Breadcrumb.Link asChild>
-											<Link to={'/conversations'}>
-												{'Conversations'}
-											</Link>
-										</Breadcrumb.Link>
-									</Breadcrumb.Item>
-									<Breadcrumb.Separator>
-										<LuSlash />
-									</Breadcrumb.Separator>
-									<Breadcrumb.Item>
-										<Breadcrumb.CurrentLink>
-											{Boolean(conversation.title) ? conversation.title : <Skeleton variant={'shine'} w={32} height={4} />}
-										</Breadcrumb.CurrentLink>
-									</Breadcrumb.Item>
-								</Breadcrumb.List>
-							</Breadcrumb.Root>
-						</Flex>
-						<ButtonGroup variant={'outline'} size={'xs'}>
-							<Tooltip content={'Delete conversation'}>
-								<IconButton
-									aria-label={'Delete conversation'}
-									colorPalette={'red'}
-									disabled
-								>
-									<LuTrash2 />
-								</IconButton>
-							</Tooltip>
-						</ButtonGroup>
-					</Panel.Header>
-				</GridItem>
-				<GridItem
-					position={'relative'}
-					overflowX={'scroll'}
-				>
-					<Container maxW={'5xl'} minW={'5xl'} py={10}>
-						<Stack
-							gap={6}
-							pb={20}
+			<Panel.Header>
+				<Flex gap={2} align={'center'}>
+					<Breadcrumb.Root>
+						<Breadcrumb.List>
+							<Breadcrumb.Item>
+								<Breadcrumb.Link asChild>
+									<Link to={'/conversations'}>
+										{'Conversations'}
+									</Link>
+								</Breadcrumb.Link>
+							</Breadcrumb.Item>
+							<Breadcrumb.Separator>
+								<LuSlash />
+							</Breadcrumb.Separator>
+							<Breadcrumb.Item>
+								<Breadcrumb.CurrentLink>
+									{Boolean(conversation.title) ? conversation.title : <Skeleton variant={'shine'} w={32} height={4} />}
+								</Breadcrumb.CurrentLink>
+							</Breadcrumb.Item>
+						</Breadcrumb.List>
+					</Breadcrumb.Root>
+				</Flex>
+				<ButtonGroup variant={'outline'} size={'xs'}>
+					<Tooltip content={'Delete conversation'}>
+						<IconButton
+							aria-label={'Delete conversation'}
+							colorPalette={'red'}
+							disabled
 						>
-							{sortedInteractions.map(i => (
-								<ConversationInteraction
-									key={i.id}
-									conversation={conversation}
-									interaction={i}
-								/>
-							))}
-						</Stack>
-					</Container>
-				</GridItem>
-				<GridItem>
-					<Center mb={6}>
-						<ChatInput
-							disabled={working}
-							value={question}
-							onChange={setQuestion}
-							onAiRelayOptionsChange={setAiRelayOptions}
-							onInvoke={askQuestion}
-						/>
-					</Center>
-				</GridItem>
-			</Grid>
-		</Box>
-	)
+							<LuTrash2 />
+						</IconButton>
+					</Tooltip>
+				</ButtonGroup>
+			</Panel.Header>
+
+			<Panel.Body>
+				<HStack
+					position={'absolute'}
+					bottom={0} left={0} right={0}
+					justify={'center'}
+					gap={0}
+					filter={'blur(80px)'}
+				>
+					<MotionBox
+						animate={{ height: ['10px', '70px', '10px'] }}
+						transition={{ duration: 10, repeat: Infinity, repeatType: 'mirror' }}
+						width={'10%'} background={'pink.600'} opacity={1}
+					/>
+					<MotionBox
+						animate={{ height: ['10px', '40px', '10px'] }}
+						transition={{ duration: 9, repeat: Infinity, repeatType: 'mirror' }}
+						width={'20%'} background={'orange.600'} opacity={1}
+					/>
+					<MotionBox
+						animate={{ height: ['10px', '60px', '10px'] }}
+						transition={{ duration: 6, repeat: Infinity, repeatType: 'mirror' }}
+						width={'15%'} background={'purple.600'} opacity={1}
+					/>
+					<MotionBox
+						animate={{ height: ['10px', '30px', '10px'] }}
+						transition={{ duration: 15, repeat: Infinity, repeatType: 'mirror' }}
+						width={'8%'} background={'yellow.600'} opacity={1}
+					/>
+					<MotionBox
+						animate={{ height: ['10px', '55px', '10px'] }}
+						transition={{ duration: 12, repeat: Infinity, repeatType: 'mirror' }}
+						width={'14%'} background={'red.600'} opacity={1}
+					/>
+				</HStack>
+
+				<Grid
+					h="full"
+					templateRows="1fr max-content"
+					templateColumns="1fr"
+				>
+					<GridItem
+						position={'relative'}
+						overflowX={'scroll'}
+					>
+						<Container maxW={'6xl'} minW={'sm'} py={10}>
+							<Stack
+								gap={6}
+								mx={10}
+								pb={20}
+							>
+								{sortedInteractions.map(i => <ConversationInteraction key={i.id} interaction={i} />)}
+							</Stack>
+						</Container>
+					</GridItem>
+					<GridItem>
+						<Center mb={6}>
+							<ChatInput
+								disabled={working}
+								value={question}
+								onChange={setQuestion}
+								onAiRelayOptionsChange={setAiRelayOptions}
+								onInvoke={askQuestion}
+							/>
+						</Center>
+					</GridItem>
+				</Grid>
+			</Panel.Body>
+		</React.Fragment>
+	);
 };
 
 const MotionBox = motion.create(Box);
