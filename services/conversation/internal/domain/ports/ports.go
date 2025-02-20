@@ -3,6 +3,7 @@ package ports
 import (
 	"context"
 
+	"github.com/0xdeafcafe/bloefish/libraries/cher"
 	"github.com/0xdeafcafe/bloefish/services/conversation/internal/domain/models"
 )
 
@@ -24,4 +25,5 @@ type InteractionRepository interface {
 	DeleteMany(ctx context.Context, interactionIDs []string) error
 	ConversationHasInteractions(ctx context.Context, conversationID string) (bool, error)
 	UpdateExcludedState(ctx context.Context, interactionID string, excluded bool) error
+	AddError(ctx context.Context, interactionID string, e cher.E) error
 }

@@ -3,6 +3,8 @@ package conversation
 import (
 	"context"
 	"time"
+
+	"github.com/0xdeafcafe/bloefish/libraries/cher"
 )
 
 type Service interface {
@@ -74,14 +76,17 @@ type CreateConversationMessageResponse struct {
 }
 
 type CreateConversationMessageResponseInteraction struct {
-	ID              string          `json:"id"`
-	Owner           *Actor          `json:"owner"`
-	MessageContent  string          `json:"message_content"`
-	FileIDs         []string        `json:"file_ids"`
-	AIRelayOptions  *AIRelayOptions `json:"ai_relay_options"`
-	StreamChannelID string          `json:"stream_channel_id"`
+	ID              string   `json:"id"`
+	FileIDs         []string `json:"file_ids"`
+	StreamChannelID string   `json:"stream_channel_id"`
 
 	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
+
+	MessageContent string   `json:"message_content"`
+	Errors         []cher.E `json:"errors"`
+
+	Owner          *Actor          `json:"owner"`
+	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
 
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
@@ -96,17 +101,20 @@ type GetInteractionRequest struct {
 type GetInteractionResponse struct {
 	ID             string   `json:"id"`
 	ConversationID string   `json:"conversation_id"`
-	MessageContent string   `json:"message_content"`
 	FileIDs        []string `json:"file_ids"`
+
+	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
+
+	MessageContent string   `json:"message_content"`
+	Errors         []cher.E `json:"errors"`
 
 	Owner          *Actor          `json:"owner"`
 	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
 
-	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
-	CreatedAt          time.Time  `json:"created_at"`
-	UpdatedAt          time.Time  `json:"updated_at"`
-	DeletedAt          *time.Time `json:"deleted_at"`
-	CompletedAt        *time.Time `json:"completed_at"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	DeletedAt   *time.Time `json:"deleted_at"`
+	CompletedAt *time.Time `json:"completed_at"`
 }
 
 type GetConversationWithInteractionsRequest struct {
@@ -130,14 +138,16 @@ type GetConversationWithInteractionsResponse struct {
 
 type GetConversationWithInteractionsResponseInteraction struct {
 	ID              string   `json:"id"`
-	MessageContent  string   `json:"message_content"`
 	FileIDs         []string `json:"file_ids"`
 	StreamChannelID string   `json:"stream_channel_id"`
 
+	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
+
+	MessageContent string   `json:"message_content"`
+	Errors         []cher.E `json:"errors"`
+
 	Owner          *Actor          `json:"owner"`
 	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
-
-	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
 
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
@@ -170,14 +180,16 @@ type ListConversationsWithInteractionsResponseConversation struct {
 
 type ListConversationsWithInteractionsResponseConversationInteraction struct {
 	ID              string   `json:"id"`
-	MessageContent  string   `json:"message_content"`
 	FileIDs         []string `json:"file_ids"`
 	StreamChannelID string   `json:"stream_channel_id"`
 
+	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
+
+	MessageContent string   `json:"message_content"`
+	Errors         []cher.E `json:"errors"`
+
 	Owner          *Actor          `json:"owner"`
 	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`
-
-	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
 
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`

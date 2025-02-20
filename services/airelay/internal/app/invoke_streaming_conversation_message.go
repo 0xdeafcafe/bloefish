@@ -2,8 +2,11 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 
+	"github.com/0xdeafcafe/bloefish/libraries/cher"
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/services/airelay"
 	"github.com/0xdeafcafe/bloefish/services/stream"
@@ -64,7 +67,31 @@ func (a *App) InvokeStreamingConversationMessage(ctx context.Context, req *airel
 	}
 
 	if err := chatStream.Err(); err != nil {
-		return nil, fmt.Errorf("failed to stream chat completions: %w", err)
+		var coercedError cher.E
+
+		var apierr *openai.Error
+		if errors.As(err, &apierr) {
+			// NOTE(afr): Relying only on the status code is going to bite me
+			switch apierr.StatusCode {
+			case http.StatusNotFound:
+				coercedError = cher.New("ai_model_not_found", cher.M{
+					"model_id": req.AIRelayOptions.ModelID,
+				})
+			}
+		}
+		if coercedError.Code == "" {
+			coercedError = cher.Coerce(err)
+		}
+
+		if err := a.StreamService.SendErrorMessage(ctx, &stream.SendErrorMessageRequest{
+			ChannelID: req.StreamingChannelID,
+			Error:     coercedError,
+		}); err != nil {
+			return nil, fmt.Errorf("failed to send message fragment: %w", err)
+		}
+
+		return nil, coercedError
+
 	}
 
 	return &airelay.InvokeStreamingConversationMessageResponse{

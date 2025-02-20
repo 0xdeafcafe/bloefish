@@ -1,15 +1,21 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/0xdeafcafe/bloefish/libraries/cher"
+)
 
 type Interaction struct {
 	ID             string   `json:"id"`
 	IdempotencyKey string   `json:"idempotency_key"`
 	ConversationID string   `json:"conversation_id"`
-	MessageContent string   `json:"message_content"`
 	FileIDs        []string `json:"file_ids"`
 
 	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
+
+	MessageContent string   `json:"message_content"`
+	Errors         []cher.E `json:"errors"`
 
 	Owner          *Actor          `json:"owner"`
 	AIRelayOptions *AIRelayOptions `json:"ai_relay_options"`

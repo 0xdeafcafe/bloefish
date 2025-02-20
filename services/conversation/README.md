@@ -73,6 +73,7 @@ interface Request {
 	idempotency_key: string;
 	message_content: string;
 	file_ids: string[];
+
 	owner: {
 		type: 'user';
 		identifier: string;
@@ -81,6 +82,7 @@ interface Request {
 		provider_id: 'open_ai';
 		model_id: string;
 	} | null;
+
 	options: {
 		use_streaming: boolean;
 	};
@@ -91,8 +93,20 @@ interface Response {
 
 	input_interaction: {
 		id: string;
-		messageContent: string;
 		fileIds: string[];
+	
+		marked_as_excluded_at: string | null; // ISO 8601
+
+		message_content: string;
+		errors: {
+			code: string;
+			message: string;
+			reasons: {
+				code: string;
+				message: string;
+			}[];
+		}[];
+
 		owner: {
 			type: 'user';
 			identifier: string;
@@ -101,6 +115,7 @@ interface Response {
 			provider_id: 'open_ai';
 			model_id: string;
 		};
+
 		created_at: string; // ISO 8601
 		updated_at: string; // ISO 8601
 		deleted_at: string | null; // ISO 8601
@@ -108,16 +123,29 @@ interface Response {
 	};
 	response_interaction: {
 		id: string;
-		messageContent: string;
 		fileIds: string[];
+	
+		marked_as_excluded_at: string | null; // ISO 8601
+
+		message_content: string;
+		errors: {
+			code: string;
+			message: string;
+			reasons: {
+				code: string;
+				message: string;
+			}[];
+		}[];
+
 		owner: {
-			type: 'bot';
+			type: 'user';
 			identifier: string;
 		};
 		ai_relay_options: {
 			provider_id: 'open_ai';
 			model_id: string;
 		};
+
 		created_at: string; // ISO 8601
 		updated_at: string; // ISO 8601
 		deleted_at: string | null; // ISO 8601
@@ -155,18 +183,28 @@ interface Response {
 
 	interactions: {
 		id: string;
+		file_ids: string[];
+
+		marked_as_excluded_at: string | null; // ISO 8601
+
+		message_content: string;
+		errors: {
+			code: string;
+			message: string;
+			reasons: {
+				code: string;
+				message: string;
+			}[];
+		}[];
+
 		owner: {
 			type: 'user' | 'bot';
 			identifier: string;
 		};
-		message_content: string;
-		file_ids: string[];
 		ai_relay_options: {
 			provider_id: 'open_ai';
 			model_id: string;
 		};
-
-		marked_as_excluded_at: string | null; // ISO 8601
 
 		created_at: string; // ISO 8601
 		updated_at: string; // ISO 8601
@@ -211,18 +249,28 @@ interface Response {
 
 		interactions: {
 			id: string;
+			file_ids: string[];
+
+			marked_as_excluded_at: string | null; // ISO 8601
+
+			message_content: string;
+			errors: {
+				code: string;
+				message: string;
+				reasons: {
+					code: string;
+					message: string;
+				}[];
+			}[];
+
 			owner: {
 				type: 'user' | 'bot';
 				identifier: string;
 			};
-			message_content: string;
-			file_ids: string[];
 			ai_relay_options: {
 				provider_id: 'open_ai';
 				model_id: string;
 			};
-
-			marked_as_excluded_at: string | null; // ISO 8601
 
 			created_at: string; // ISO 8601
 			updated_at: string; // ISO 8601

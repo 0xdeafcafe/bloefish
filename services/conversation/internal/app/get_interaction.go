@@ -15,10 +15,11 @@ func (a *App) GetInteraction(ctx context.Context, req *conversation.GetInteracti
 	return &conversation.GetInteractionResponse{
 		ID:             foundInteraction.ID,
 		ConversationID: foundInteraction.ConversationID,
-		MessageContent: foundInteraction.MessageContent,
 		FileIDs:        foundInteraction.FileIDs,
 
 		MarkedAsExcludedAt: foundInteraction.MarkedAsExcludedAt,
+		MessageContent:     foundInteraction.MessageContent,
+		Errors:             foundInteraction.Errors,
 
 		Owner: &conversation.Actor{
 			Type:       conversation.ActorType(foundInteraction.Owner.Type),
@@ -28,6 +29,7 @@ func (a *App) GetInteraction(ctx context.Context, req *conversation.GetInteracti
 			ProviderID: foundInteraction.AIRelayOptions.ProviderID,
 			ModelID:    foundInteraction.AIRelayOptions.ModelID,
 		},
+
 		CreatedAt:   foundInteraction.CreatedAt,
 		UpdatedAt:   foundInteraction.UpdatedAt,
 		DeletedAt:   foundInteraction.DeletedAt,

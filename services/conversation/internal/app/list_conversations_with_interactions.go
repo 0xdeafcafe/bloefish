@@ -82,11 +82,13 @@ func (a *App) ListConversationsWithInteractions(ctx context.Context, req *conver
 		for j, interaction := range relics[convo.ID] {
 			resp.Conversations[i].Interactions[j] = &conversation.ListConversationsWithInteractionsResponseConversationInteraction{
 				ID:              interaction.ID,
-				MessageContent:  interaction.MessageContent,
 				FileIDs:         interaction.FileIDs,
 				StreamChannelID: fmt.Sprintf("%s/%s", convo.ID, interaction.ID),
 
 				MarkedAsExcludedAt: interaction.MarkedAsExcludedAt,
+
+				MessageContent: interaction.MessageContent,
+				Errors:         interaction.Errors,
 
 				Owner: &conversation.Actor{
 					Type:       conversation.ActorType(interaction.Owner.Type),

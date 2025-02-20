@@ -128,6 +128,10 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 				clog.Get(ctx).WithError(sendErrorErr).Error("failed to send error message to stream service")
 			}
 
+			if saveErrorErr := a.InteractionRepository.AddError(ctx, activeInteraction.ID, cher.Coerce(err)); saveErrorErr != nil {
+				clog.Get(ctx).WithError(saveErrorErr).Error("failed to save error to interaction")
+			}
+
 			clog.Get(ctx).WithError(err).Error("failed to create conversation message reply")
 		}
 
@@ -137,39 +141,52 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 	return &conversation.CreateConversationMessageResponse{
 		ConversationID: convo.ID,
 		InputInteraction: &conversation.CreateConversationMessageResponseInteraction{
-			ID: interaction.ID,
-			Owner: &conversation.Actor{
-				Type:       conversation.ActorType(interaction.Owner.Type),
-				Identifier: interaction.Owner.Identifier,
-			},
-			FileIDs:        interaction.FileIDs,
+			ID:              interaction.ID,
+			FileIDs:         interaction.FileIDs,
+			StreamChannelID: streamingChannelID,
+
+			MarkedAsExcludedAt: interaction.MarkedAsExcludedAt,
+
 			MessageContent: interaction.MessageContent,
+			Errors:         interaction.Errors,
+
 			AIRelayOptions: &conversation.AIRelayOptions{
 				ProviderID: interaction.AIRelayOptions.ProviderID,
 				ModelID:    interaction.AIRelayOptions.ModelID,
 			},
+			Owner: &conversation.Actor{
+				Type:       conversation.ActorType(interaction.Owner.Type),
+				Identifier: interaction.Owner.Identifier,
+			},
+
 			CreatedAt:   interaction.CreatedAt,
 			UpdatedAt:   interaction.UpdatedAt,
 			CompletedAt: interaction.CompletedAt,
 			DeletedAt:   interaction.DeletedAt,
 		},
 		ResponseInteraction: &conversation.CreateConversationMessageResponseInteraction{
-			ID: activeInteraction.ID,
-			Owner: &conversation.Actor{
-				Type:       conversation.ActorType(activeInteraction.Owner.Type),
-				Identifier: activeInteraction.Owner.Identifier,
-			},
-			FileIDs:        activeInteraction.FileIDs,
+			ID:              activeInteraction.ID,
+			FileIDs:         activeInteraction.FileIDs,
+			StreamChannelID: streamingChannelID,
+
+			MarkedAsExcludedAt: activeInteraction.MarkedAsExcludedAt,
+
 			MessageContent: activeInteraction.MessageContent,
+			Errors:         activeInteraction.Errors,
+
 			AIRelayOptions: &conversation.AIRelayOptions{
 				ProviderID: activeInteraction.AIRelayOptions.ProviderID,
 				ModelID:    activeInteraction.AIRelayOptions.ModelID,
 			},
-			StreamChannelID: streamingChannelID,
-			CreatedAt:       activeInteraction.CreatedAt,
-			UpdatedAt:       activeInteraction.UpdatedAt,
-			CompletedAt:     activeInteraction.CompletedAt,
-			DeletedAt:       activeInteraction.DeletedAt,
+			Owner: &conversation.Actor{
+				Type:       conversation.ActorType(activeInteraction.Owner.Type),
+				Identifier: activeInteraction.Owner.Identifier,
+			},
+
+			CreatedAt:   activeInteraction.CreatedAt,
+			UpdatedAt:   activeInteraction.UpdatedAt,
+			CompletedAt: activeInteraction.CompletedAt,
+			DeletedAt:   activeInteraction.DeletedAt,
 		},
 		StreamChannelID: streamingChannelID,
 	}, nil

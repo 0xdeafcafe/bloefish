@@ -26,19 +26,37 @@ func (a *App) ListSupported(ctx context.Context) (*airelay.ListSupportedResponse
 
 	return &airelay.ListSupportedResponse{
 		Providers: []*airelay.ListSupportedResponseProvider{{
-			ID:   "provider_open_ai",
+			ID:   "open_ai",
 			Name: "Open AI",
 			Models: []*airelay.ListSupportedResponseProviderModel{{
-				ID: openai.ChatModelGPT4,
+				ID:   openai.ChatModelGPT4,
+				Name: "GPT 4",
 			}, {
-				ID: openai.ChatModelGPT4o,
+				ID:   openai.ChatModelGPT4Turbo,
+				Name: "GPT 4 turbo",
 			}, {
-				ID: openai.ChatModelO1,
+				ID:   openai.ChatModelGPT4o,
+				Name: "GPT 4o",
 			}, {
-				ID: openai.ChatModelO1Mini,
+				ID:   openai.ChatModelGPT4oMini,
+				Name: "GPT 4o mini",
 			}, {
-				ID: openai.ChatModelO3Mini,
+				ID:   openai.ChatModelGPT3_5Turbo,
+				Name: "GPT 3.5 turbo",
+			}, {
+				ID:   openai.ChatModelO1Mini,
+				Name: "o1 mini",
 			}},
+			// }, {
+			// 	ID:   openai.ChatModelO1,
+			// 	Name: "o1",
+			// }, {
+			// 	ID:   openai.ChatModelO1Mini,
+			// 	Name: "o1 mini",
+			// }, {
+			// 	ID:   openai.ChatModelO3Mini,
+			// 	Name: "o3 mini",
+			// }},
 		}},
 	}, nil
 }

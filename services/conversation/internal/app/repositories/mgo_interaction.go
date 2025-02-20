@@ -17,10 +17,12 @@ type persistedInteraction struct {
 	ID             string   `bson:"_id"`
 	IdempotencyKey string   `bson:"idempotency_key"`
 	ConversationID string   `bson:"conversation_id"`
-	MessageContent string   `bson:"message_content"`
 	FileIDs        []string `bson:"file_ids"`
 
 	MarkedAsExcludedAt *time.Time `bson:"marked_as_excluded_at"`
+
+	MessageContent string   `bson:"message_content"`
+	Errors         []cher.E `bson:"errors"`
 
 	Owner struct {
 		Type       string `bson:"type"`
@@ -260,15 +262,36 @@ func (r *mgoInteraction) UpdateExcludedState(ctx context.Context, interactionID 
 	return nil
 }
 
+func (r *mgoInteraction) AddError(ctx context.Context, interactionID string, e cher.E) error {
+	_, err := r.c.UpdateOne(ctx, bson.M{
+		"_id":        interactionID,
+		"deleted_at": nil,
+	}, bson.M{
+		"$currentDate": bson.M{
+			"updated_at": true,
+		},
+		"$push": bson.M{
+			"errors": e,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (p *persistedInteraction) ToDomainModel() *models.Interaction {
 	return &models.Interaction{
 		ID:             p.ID,
 		IdempotencyKey: p.IdempotencyKey,
 		ConversationID: p.ConversationID,
-		MessageContent: p.MessageContent,
 		FileIDs:        p.FileIDs,
 
 		MarkedAsExcludedAt: p.MarkedAsExcludedAt,
+
+		MessageContent: p.MessageContent,
+		Errors:         p.Errors,
 
 		Owner: &models.Actor{
 			Type:       models.ActorType(p.Owner.Type),

@@ -39,11 +39,12 @@ func (a *App) GetConversationWithInteractions(ctx context.Context, req *conversa
 
 	for i, interaction := range interactions {
 		resp.Interactions[i] = &conversation.GetConversationWithInteractionsResponseInteraction{
-			ID:             interaction.ID,
-			MessageContent: interaction.MessageContent,
-			FileIDs:        interaction.FileIDs,
+			ID:      interaction.ID,
+			FileIDs: interaction.FileIDs,
 
 			MarkedAsExcludedAt: interaction.MarkedAsExcludedAt,
+			MessageContent:     interaction.MessageContent,
+			Errors:             interaction.Errors,
 
 			Owner: &conversation.Actor{
 				Type:       conversation.ActorType(interaction.Owner.Type),
