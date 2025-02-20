@@ -1,14 +1,18 @@
-import { ButtonGroup, Card, Flex, HStack, Icon, IconButton, Status, Textarea } from '@chakra-ui/react';
+import { ButtonGroup, Card, Flex, HStack, Icon, IconButton, Kbd, Status, Textarea } from '@chakra-ui/react';
 import { useTheme } from 'next-themes';
+import React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { LuBot, LuSend, LuChevronUp } from 'react-icons/lu';
 // import type { AiRelayOptions } from '~/api/bloefish/shared.types';
 import { Button } from '~/components/ui/button';
 import { MenuContent, MenuItem, MenuItemCommand, MenuRoot, MenuTrigger } from '~/components/ui/menu';
+import { Tooltip } from '~/components/ui/tooltip';
 
 const maxPromptLength = 5000;
 
 type LengthStatus = 'green' | 'red' | 'yellow';
+
+type EnterMode = 'newline' | 'send';
 
 interface ChatInputProps {
 	disabled: boolean;
@@ -26,14 +30,17 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 	const theme = useTheme();
 	const [focused, setFocused] = useState(false);
 	const inputRef = useRef<HTMLTextAreaElement>(null);
+	const [enterMode, setEnterMode] = useState<EnterMode>('send');
 	// const [selectedModel, setSelectedModel] = useState<AiRelayOptions>({ providerId: 'open_ai', modelId: 'gpt-4o' });
 
 	const [questionLength, setQuestionLength] = useState(0);
 	const [lengthStatusColor, setLengthStatusColor] = useState<LengthStatus>('green');
 
 	useEffect(() => {
-		if (value.length > maxPromptLength) {
-			onChange(value.slice(0, maxPromptLength));
+		if (value.includes('\n')) {
+			setEnterMode('newline');
+		} else {
+			setEnterMode('send')
 		}
 
 		if (value.length > maxPromptLength - 500) {
@@ -42,6 +49,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 			setLengthStatusColor('yellow');
 		} else {
 			setLengthStatusColor('green');
+		}
+
+		if (value.length > maxPromptLength) {
+			onChange(value.slice(0, maxPromptLength));
 		}
 
 		setQuestionLength(value.length);
@@ -96,7 +107,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 						onFocus={() => setFocused(true)}
 						onBlur={() => setFocused(false)}
 						onKeyDown={(e) => {
-							if (e.key === 'Enter' && e.metaKey) {
+							if (e.key === 'Enter' && e.metaKey && enterMode === 'newline') {
+								e.preventDefault();
+								onInvoke();
+							}
+							
+							if (e.key === 'Enter' && !e.shiftKey && enterMode === 'send') {
 								e.preventDefault();
 								onInvoke();
 							}
@@ -141,15 +157,24 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 						</MenuContent>
 					</MenuRoot>
 
-					<IconButton
-						aria-label={'Send message'}
-						disabled={disabled}
-						variant={'ghost'}
-						size={'2xs'}
-						onClick={() => onInvoke()}
-					>
-						<LuSend />
-					</IconButton>
+					<Tooltip content={(
+						<React.Fragment>
+							{'Pressing Enter will send the message. However to make composing messages easier, if '}
+							{'your message spans multiple lines, then you must press '}
+							<Kbd>{'⌘ + ⏎'}</Kbd>
+							{' to send the message.'}
+						</React.Fragment>
+					)}>
+						<IconButton
+							aria-label={'Send message'}
+							disabled={disabled}
+							variant={'ghost'}
+							size={'2xs'}
+							onClick={() => onInvoke()}
+						>
+							<LuSend />
+						</IconButton>
+					</Tooltip>
 				</Flex>
 			</Card.Body>
 		</Card.Root>

@@ -124,10 +124,14 @@ export const ConversationsList: React.FC = () => {
 											)}
 										</Table.Cell>
 										<Table.Cell>
-											<FormatDuration pointInTime={conversation.createdAt} />
+											<FormatDuration
+												start={conversation.createdAt}
+											/>
 										</Table.Cell>
 										<Table.Cell>
-											<FormatDuration pointInTime={Object.values(conversation.interactions).at(0)?.updatedAt ?? conversation.updatedAt} />
+											<FormatDuration
+												start={Object.values(conversation.interactions).at(0)?.updatedAt ?? conversation.updatedAt}
+											/>
 										</Table.Cell>
 									</Link>
 								</ChakraLink>

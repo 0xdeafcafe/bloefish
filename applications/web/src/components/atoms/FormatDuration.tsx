@@ -1,18 +1,26 @@
-import { Text } from '@chakra-ui/react';
-import { format, formatDistanceToNow }from'date-fns';
+import { Text, type TextProps } from '@chakra-ui/react';
+import { format, formatDistance }from'date-fns';
 import { Tooltip } from '../ui/tooltip';
 
-interface FormatDurationProps {
-	pointInTime: string;
+interface FormatDurationProps extends TextProps {
+	start: string;
+	end?: string;
+	hideSuffix?: boolean;
 }
 
-export const FormatDuration: React.FC<FormatDurationProps> = ({ pointInTime }) => {
-	const pointInTimeDate = new Date(pointInTime);
-	const distance = formatDistanceToNow(pointInTimeDate);
+export const FormatDuration: React.FC<FormatDurationProps> = ({
+	start,
+	end,
+	hideSuffix,
+	...rest
+}) => {
+	const startDateTime = new Date(start);
+	const endDateTime = end ? new Date(end) : new Date();
+	const distance = formatDistance(startDateTime, endDateTime, { addSuffix: !hideSuffix });
 
 	return (
-		<Tooltip content={format(pointInTimeDate, 'PPpp')}>
-			<Text textDecoration={'dotted'} textDecorationLine={'underline'} cursor={'help'}>
+		<Tooltip content={format(endDateTime, 'PPpp')}>
+			<Text textDecoration={'dotted'} textDecorationLine={'underline'} cursor={'help'} {...rest}>
 				{distance}
 			</Text>
 		</Tooltip>
