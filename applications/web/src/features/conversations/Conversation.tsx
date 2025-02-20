@@ -14,6 +14,7 @@ import { ConversationInteraction } from './components/organisms/ConversationInte
 import { Tooltip } from '~/components/ui/tooltip';
 import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
 import { Panel } from '~/components/atoms/Panel';
+import type { AiRelayOptions } from '~/api/bloefish/shared.types';
 
 export const Conversation: React.FC = () => {
 	const { conversationId } = useParams();
@@ -28,6 +29,7 @@ export const Conversation: React.FC = () => {
 	}, { skip: true });
 
 	const [idempotencyKey, generateNewIdempotencyKey] = useIdempotencyKey();
+	const [aiRelayOptions, setAiRelayOptions] = useState<AiRelayOptions | null>(null);
 	const [question, setQuestion] = useState('');
 	const [working, setWorking] = useState(false);
 
@@ -61,7 +63,7 @@ export const Conversation: React.FC = () => {
 	}
 
 	async function askQuestion() {
-		if (working || !conversation) return;
+		if (working || !conversation || !aiRelayOptions) return;
 
 		setWorking(true);
 
@@ -70,6 +72,7 @@ export const Conversation: React.FC = () => {
 				conversationId: conversation.id,
 				idempotencyKey: idempotencyKey,
 				messageContent: question,
+				aiRelayOptions: aiRelayOptions,
 			})).unwrap();
 
 			generateNewIdempotencyKey();
@@ -189,6 +192,7 @@ export const Conversation: React.FC = () => {
 							disabled={working}
 							value={question}
 							onChange={setQuestion}
+							onAiRelayOptionsChange={setAiRelayOptions}
 							onInvoke={askQuestion}
 						/>
 					</Center>

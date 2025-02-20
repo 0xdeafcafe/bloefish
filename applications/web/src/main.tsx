@@ -7,7 +7,6 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { store } from './store';
 import { EnsureReadiness } from './components/molecules/EnsureReadiness';
 import { NotFound } from './pages/NotFound';
-import { PanelRoot } from './components/molecules/PanelRoot';
 import { NewConversation } from './features/new-conversation/NewConversation';
 import { Theme } from '@chakra-ui/react';
 import { Conversation } from './features/conversations/Conversation';
@@ -31,11 +30,11 @@ root.render(
 								<EnsureReadiness>
 									<Ready>
 										<Routes>
-											<Route path="/" element={wrap(NewConversation)} />
-											<Route path="/conversations/:conversationId" element={wrap(Conversation)} />
-											<Route path="/conversations" element={wrap(ConversationsList)} />
+											<Route path="/" element={<NewConversation />} />
+											<Route path="/conversations/:conversationId" element={<Conversation />} />
+											<Route path="/conversations" element={<ConversationsList />} />
 
-											<Route path="*" element={wrap(NotFound)} />
+											<Route path="*" element={<NotFound />} />
 										</Routes>
 									</Ready>
 								</EnsureReadiness>
@@ -49,11 +48,3 @@ root.render(
 		</HelmetProvider>
 	</React.StrictMode>
 );
-
-function wrap(Component: React.FC) {
-	return (
-		<PanelRoot>
-			{<Component />}
-		</PanelRoot>
-	)
-}

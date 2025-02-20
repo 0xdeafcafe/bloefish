@@ -112,7 +112,7 @@ export const OmniBar: React.FC = () => {
 							<OmniGroup title={'Search results'}>
 								{searchResults.map(r => (
 									<SearchItem
-										key={generateRandomString(10)}
+										key={generateRandomString(5)}
 										result={r.item}
 										matches={r.matches}
 									/>
@@ -141,7 +141,7 @@ export const OmniBar: React.FC = () => {
 							<OmniGroup title={'Commands'}>
 								{commands.map(c => (
 									<OmniButton
-										key={generateRandomString(10)}
+										key={generateRandomString(5)}
 										iconElement={c.icon}
 										onClick={() => {
 											dispatch(closeOmni());

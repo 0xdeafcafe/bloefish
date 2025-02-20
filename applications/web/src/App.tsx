@@ -1,4 +1,4 @@
-import { Box, Card, Flex, HStack, Link, Text } from '@chakra-ui/react';
+import { Flex, Grid, GridItem, HStack, Link, Text } from '@chakra-ui/react';
 import { Sidebar } from './features/sidebar/Sidebar';
 import { LuExternalLink } from 'react-icons/lu';
 import { useStreamListener } from './api/bloefish/stream';
@@ -12,18 +12,19 @@ export const App: React.FC<React.PropsWithChildren> = ({ children }) => {
 		<Flex minHeight={'100vh'} background={'Background'}>
 			<Sidebar />
 
-			<Flex flex={'1'} marginTop={3} marginRight={3} marginBottom={3} direction={'column'}>
-				<Card.Root
-					flex={'1'}
-					variant={'outline'}
-					boxShadow={'md'}
-					marginBottom={3}
-				>
-					<Panel.Body>
+			<Grid
+				flex={'1'}
+				maxH={'100vh'}
+				pt={3}
+				pr={3}
+				templateRows={'1fr auto'}
+			>
+				<GridItem asChild>
+					<Panel.Root>
 						{children}
-					</Panel.Body>
-				</Card.Root>
-				<Box marginRight={1}>
+					</Panel.Root>
+				</GridItem>
+				<GridItem marginRight={1} py={3}>
 					<HStack justify={'end'} gap={2}>
 						<PlatformStatus />
 						<Text fontSize={'xs'} color={'GrayText'}>|</Text>
@@ -43,8 +44,8 @@ export const App: React.FC<React.PropsWithChildren> = ({ children }) => {
 							Made with ❤️ in Amsterdam
 						</Text>
 					</HStack>
-				</Box>
-			</Flex>
+				</GridItem>
+			</Grid>
 		</Flex>
 	);
 };

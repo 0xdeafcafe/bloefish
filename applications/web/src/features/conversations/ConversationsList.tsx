@@ -1,4 +1,4 @@
-import { Box, Breadcrumb, Button, ButtonGroup, Center, EmptyState, Icon, Link as ChakraLink, Spinner, Table, VStack } from '@chakra-ui/react';
+import { Breadcrumb, Button, ButtonGroup, Center, EmptyState, Icon, Link as ChakraLink, Spinner, Table, VStack } from '@chakra-ui/react';
 import { useAppSelector } from '~/store';
 import { Helmet } from 'react-helmet-async';
 import { conversationApi } from '~/api/bloefish/conversation';
@@ -15,6 +15,7 @@ import { DeleteConversationsDialog } from './components/organisms/DeleteConversa
 import { Skeleton } from '~/components/ui/skeleton';
 import { FormatDuration } from '~/components/atoms/FormatDuration';
 import { toaster } from '~/components/ui/toaster';
+import React from 'react';
 
 export const ConversationsList: React.FC = () => {
 	const navigate = useNavigate();
@@ -70,101 +71,99 @@ export const ConversationsList: React.FC = () => {
 
 	return (
 		<Container>
-			<Table.ScrollArea>
-				<Table.Root striped interactive stickyHeader size={'md'} width={'100%'}>
-					<Table.Header>
-						<Table.Row>
-							<Table.ColumnHeader w={6}>
+			<Table.Root striped interactive stickyHeader size={'md'} width={'100%'}>
+				<Table.Header>
+					<Table.Row>
+						<Table.ColumnHeader>
+							<Checkbox
+								top="1"
+								aria-label="Select all conversations"
+								size={'sm'}
+								checked={indeterminate ? 'indeterminate' : selection.length > 0}
+								onCheckedChange={(changes) => setSelection(changes.checked
+									? truthyConversations.map((conversation) => conversation.id)
+									: [],
+								)}
+							/>
+						</Table.ColumnHeader>
+						<Table.ColumnHeader>
+							{'Title'}
+						</Table.ColumnHeader>
+						<Table.ColumnHeader>
+							{'Created at'}
+						</Table.ColumnHeader>
+						<Table.ColumnHeader>
+							{'Last updated at'}
+						</Table.ColumnHeader>
+						<Table.ColumnHeader>
+							{'Actions'}
+						</Table.ColumnHeader>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{sortedConversations.map(conversation => (
+						<Table.Row key={conversation.id}>
+							<Table.Cell>
 								<Checkbox
 									top="1"
-									aria-label="Select all conversations"
+									aria-label="Select conversation"
+									checked={selection.includes(conversation.id)}
 									size={'sm'}
-									checked={indeterminate ? 'indeterminate' : selection.length > 0}
-									onCheckedChange={(changes) => setSelection(changes.checked
-										? truthyConversations.map((conversation) => conversation.id)
-										: [],
+									onCheckedChange={(changes) => setSelection((prev) =>
+										changes.checked
+											? [...prev, conversation.id]
+											: selection.filter((name) => name !== conversation.id),
 									)}
 								/>
-							</Table.ColumnHeader>
-							<Table.ColumnHeader w={'full'}>
-								{'Title'}
-							</Table.ColumnHeader>
-							<Table.ColumnHeader>
-								{'Created at'}
-							</Table.ColumnHeader>
-							<Table.ColumnHeader>
-								{'Last updated at'}
-							</Table.ColumnHeader>
-							<Table.ColumnHeader>
-								{'Actions'}
-							</Table.ColumnHeader>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{sortedConversations.map(conversation => (
-							<Table.Row key={conversation.id}>
-								<Table.Cell>
-									<Checkbox
-										top="1"
-										aria-label="Select conversation"
-										checked={selection.includes(conversation.id)}
-										size={'sm'}
-										onCheckedChange={(changes) => setSelection((prev) =>
-											changes.checked
-												? [...prev, conversation.id]
-												: selection.filter((name) => name !== conversation.id),
+							</Table.Cell>
+							<ChakraLink asChild variant={'plain'} display={'contents'}>
+								<Link to={`/conversations/${conversation.id}`}>
+									<Table.Cell alignContent={'center'}>
+										{conversation.title ?? (
+											<Skeleton variant={'shine'} w={32} height={4} />
 										)}
-									/>
-								</Table.Cell>
-								<ChakraLink asChild variant={'plain'} display={'contents'}>
-									<Link to={`/conversations/${conversation.id}`}>
-										<Table.Cell alignContent={'center'}>
-											{conversation.title ?? (
-												<Skeleton variant={'shine'} w={32} height={4} />
-											)}
-										</Table.Cell>
-										<Table.Cell>
-											<FormatDuration
-												start={conversation.createdAt}
-											/>
-										</Table.Cell>
-										<Table.Cell>
-											<FormatDuration
-												start={Object.values(conversation.interactions).at(0)?.updatedAt ?? conversation.updatedAt}
-											/>
-										</Table.Cell>
-									</Link>
-								</ChakraLink>
-								<Table.Cell>
-									<ButtonGroup size={'2xs'} variant={'outline'}>
-										<Button asChild colorPalette="gray">
-											<Link to={`/conversations/${conversation.id}`}>
-												<Icon size={'xs'}>
-													<LuSquareArrowOutUpRight />
-												</Icon>
-												{'View'}
-											</Link>
-										</Button>
-										<DeleteConversationsDialog
-											conversationIds={[conversation.id]}
-											onDeleteSuccess={() => {
-												toaster.create({
-													type: 'error',
-													title: 'Conversation deleted',
-													description: 'The conversation has been deleted successfully.',
-												});
-											}}
-											deleteButtonSize={'2xs'}
-											deleteButtonIconSize={'xs'}
-											deleteButtonText={'Delete'}
+									</Table.Cell>
+									<Table.Cell>
+										<FormatDuration
+											start={conversation.createdAt}
 										/>
-									</ButtonGroup>
-								</Table.Cell>
-							</Table.Row>
-						))}
-					</Table.Body>
-				</Table.Root>
-			</Table.ScrollArea>
+									</Table.Cell>
+									<Table.Cell>
+										<FormatDuration
+											start={Object.values(conversation.interactions).at(0)?.updatedAt ?? conversation.updatedAt}
+										/>
+									</Table.Cell>
+								</Link>
+							</ChakraLink>
+							<Table.Cell>
+								<ButtonGroup size={'2xs'} variant={'outline'}>
+									<Button asChild colorPalette="gray">
+										<Link to={`/conversations/${conversation.id}`}>
+											<Icon size={'xs'}>
+												<LuSquareArrowOutUpRight />
+											</Icon>
+											{'View'}
+										</Link>
+									</Button>
+									<DeleteConversationsDialog
+										conversationIds={[conversation.id]}
+										onDeleteSuccess={() => {
+											toaster.create({
+												type: 'error',
+												title: 'Conversation deleted',
+												description: 'The conversation has been deleted successfully.',
+											});
+										}}
+										deleteButtonSize={'2xs'}
+										deleteButtonIconSize={'xs'}
+										deleteButtonText={'Delete'}
+									/>
+								</ButtonGroup>
+							</Table.Cell>
+						</Table.Row>
+					))}
+				</Table.Body>
+			</Table.Root>
 
 			<ActionBarRoot open={hasSelection}>
 				<ActionBarContent>
@@ -217,11 +216,7 @@ export const ConversationsList: React.FC = () => {
 };
 
 const Container: React.FC<React.PropsWithChildren> = ({ children }) => (
-	<Box
-		position={'relative'}
-		width={'full'}
-		height={'full'}
-	>
+	<React.Fragment>
 		<Helmet>
 			<title>{'Conversations | Bloefish'}</title>
 		</Helmet>
@@ -238,6 +233,8 @@ const Container: React.FC<React.PropsWithChildren> = ({ children }) => (
 			</Breadcrumb.Root>
 		</Panel.Header>
 
-		{children}
-	</Box>
+		<Panel.Body>
+			{children}
+		</Panel.Body>
+	</React.Fragment>
 );

@@ -3,21 +3,29 @@ import { useTheme } from 'next-themes';
 import React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { LuBot, LuSend, LuChevronUp } from 'react-icons/lu';
-// import type { AiRelayOptions } from '~/api/bloefish/shared.types';
+import { aiRelayApi } from '~/api/bloefish/ai-relay';
+import type { AiModel, AiProvider } from '~/api/bloefish/ai-relay.types';
+import type { AiRelayOptions } from '~/api/bloefish/shared.types';
 import { Button } from '~/components/ui/button';
 import { MenuContent, MenuItem, MenuItemCommand, MenuRoot, MenuTrigger } from '~/components/ui/menu';
 import { Tooltip } from '~/components/ui/tooltip';
+import { useLocalStorageState } from '~/hooks/use-local-storage-state';
+
+interface AvailableModel {
+	provider: AiProvider;
+	model: AiModel;
+}
 
 const maxPromptLength = 5000;
 
 type LengthStatus = 'green' | 'red' | 'yellow';
-
 type EnterMode = 'newline' | 'send';
 
 interface ChatInputProps {
 	disabled: boolean;
 	value: string;
 	onChange: (value: string) => void;
+	onAiRelayOptionsChange: (model: AiRelayOptions | null) => void;
 	onInvoke: () => void;
 }
 
@@ -25,16 +33,45 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 	disabled,
 	value,
 	onChange,
+	onAiRelayOptionsChange,
 	onInvoke,
 }) => {
+	const { data: providers } = aiRelayApi.useListSupportedQuery()
+
 	const theme = useTheme();
 	const [focused, setFocused] = useState(false);
 	const inputRef = useRef<HTMLTextAreaElement>(null);
-	const [enterMode, setEnterMode] = useState<EnterMode>('send');
-	// const [selectedModel, setSelectedModel] = useState<AiRelayOptions>({ providerId: 'open_ai', modelId: 'gpt-4o' });
 
+	const [availableModels, setAvailableModels] = useState<AvailableModel[]>();
+	const [selectedModel, setSelectedModel] = useLocalStorageState<AvailableModel>('chat_input.selected_model');
+
+	const [enterMode, setEnterMode] = useState<EnterMode>('send');
 	const [questionLength, setQuestionLength] = useState(0);
 	const [lengthStatusColor, setLengthStatusColor] = useState<LengthStatus>('green');
+
+	const modelSelectLoading = !availableModels || availableModels.length === 0;
+
+	useEffect(() => {
+		onAiRelayOptionsChange(selectedModel ? {
+			providerId: selectedModel.provider.id,
+			modelId: selectedModel.model.id,
+		} : null);
+	}, [selectedModel]);
+
+	useEffect(() => {
+		if (!providers) return;
+
+		const availableModels = coerceAvailableModels(providers.providers);
+
+		if (providers) 
+			setAvailableModels(availableModels);
+
+		if (!selectedModel && availableModels.length > 0) {
+			setSelectedModel(availableModels[0]);
+		} else if (selectedModel && !availableModels.find(model => model.provider.id === selectedModel.provider.id && model.model.id === selectedModel.model.id)) {
+			setSelectedModel(availableModels[0]);
+		}
+	}, [providers]);
 
 	useEffect(() => {
 		if (value.includes('\n')) {
@@ -127,33 +164,37 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
 					<MenuRoot>
 						<MenuTrigger asChild>
-						<ButtonGroup size="2xs" attached variant="outline">
-							<Button
-								variant="outline"
-							>
-								{'OpenAI (GPT-4)'}
-							</Button>
-							<IconButton variant="outline">
-								<LuChevronUp />
-							</IconButton>
-						</ButtonGroup>
+							<ButtonGroup size="2xs" attached variant={'outline'}>
+								<Button
+									loading={modelSelectLoading}
+									disabled={disabled || modelSelectLoading}
+									variant={'outline'}
+								>
+									{selectedModel && `${selectedModel.provider.name} (${selectedModel.model.name})`}
+								</Button>
+								<IconButton
+									loading={modelSelectLoading}
+									disabled={disabled || modelSelectLoading}
+									variant={'outline'}
+								>
+									<LuChevronUp />
+								</IconButton>
+							</ButtonGroup>
 						</MenuTrigger>
 						<MenuContent>
-							<MenuItem value="open_ai:gpt-4">
-								{'OpenAI (GPT-4)'} <MenuItemCommand>{'1'}</MenuItemCommand>
-							</MenuItem>
-							<MenuItem value="open_ai:gpt-4o">
-								{'OpenAI (GPT-4o)'} <MenuItemCommand>{'2'}</MenuItemCommand>
-							</MenuItem>
-							<MenuItem value="open_ai:o1">
-								{'OpenAI (o1)'} <MenuItemCommand>{'3'}</MenuItemCommand>
-							</MenuItem>
-							<MenuItem value="open_ai:o1-mini">
-								{'OpenAI (o1-mini)'} <MenuItemCommand>{'4'}</MenuItemCommand>
-							</MenuItem>
-							<MenuItem value="open_ai:o3-mini">
-								{'OpenAI (o3-mini)'} <MenuItemCommand>{'5'}</MenuItemCommand>
-							</MenuItem>
+							{availableModels?.map((model, index) => (
+								<MenuItem
+									value={`${model.provider.id}:${model.model.id}`}
+									key={`${model.provider.id}:${model.model.id}`}
+									onClick={() => setSelectedModel(model)}
+								>
+									{`${model.provider.name} (${model.model.name}) `}
+
+									{index < 9 && (
+										<MenuItemCommand>{index + 1}</MenuItemCommand>
+									)}
+								</MenuItem>
+							))}
 						</MenuContent>
 					</MenuRoot>
 
@@ -167,7 +208,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 					)}>
 						<IconButton
 							aria-label={'Send message'}
-							disabled={disabled}
+							disabled={disabled || modelSelectLoading}
 							variant={'ghost'}
 							size={'2xs'}
 							onClick={() => onInvoke()}
@@ -180,3 +221,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 		</Card.Root>
 	);
 };
+
+function coerceAvailableModels(providers: AiProvider[]): AvailableModel[] {
+	return providers.map((provider) => {
+		return provider.models.map((model) => {
+			return {
+				provider,
+				model,
+			};
+		});
+	}).flat();
+}

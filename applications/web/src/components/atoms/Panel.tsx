@@ -1,15 +1,24 @@
 import { Card, Flex } from "@chakra-ui/react";
+import { motion } from "motion/react";
 import type React from "react";
 
-const Body: React.FC<React.PropsWithChildren> = ({ children }) => (
-	<Card.Body
+const Root: React.FC<React.PropsWithChildren> = ({ children }) => (
+	<MotionCardRoot
+		flex={'1'}
+		variant={'outline'}
+		boxShadow={'md'}
 		p={0}
-		maxH={'calc(100vh - 3.5rem)'}
-		minH={'700px'}
 		overflow={'hidden'}
+		display={'grid'}
+		gridTemplateRows={'auto fit-content(1fr)'}
+
+		initial={{ scale: 0.95, opacity: 0, y: 10 }}
+		animate={{ scale: 1, opacity: 1, y: 0 }}
+		exit={{ scale: 0.95, opacity: 0, y: 10 }}
+		transition={{ duration: 0.3 }}
 	>
 		{children}
-	</Card.Body>
+	</MotionCardRoot>
 );
 
 const Header: React.FC<React.PropsWithChildren> = ({ children }) => (
@@ -31,7 +40,20 @@ const Header: React.FC<React.PropsWithChildren> = ({ children }) => (
 	</Card.Header>
 );
 
+const Body: React.FC<React.PropsWithChildren> = ({ children }) => (
+	<Card.Body
+		p={0}
+		height={'100%'}
+		overflowY={'scroll'}
+	>
+		{children}
+	</Card.Body>
+);
+
 export const Panel = {
+	Root,
+	Header,
 	Body,
-	Header,	
 };
+
+const MotionCardRoot = motion.create(Card.Root);
