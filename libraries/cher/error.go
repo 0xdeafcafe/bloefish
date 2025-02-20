@@ -33,10 +33,10 @@ const (
 
 // E implements the official CHER structure
 type E struct {
-	Code    string             `json:"code"`
-	Meta    M                  `json:"meta,omitempty"`
-	stack   []stacktrace.Frame `json:"-"`
-	Reasons []E                `json:"reasons,omitempty"`
+	Code    string             `json:"code"              bson:"code"`
+	Meta    M                  `json:"meta,omitempty"    bson:"meta"`
+	stack   []stacktrace.Frame `json:"-"                 bson:"-"`
+	Reasons []E                `json:"reasons,omitempty" bson:"reasons"`
 }
 
 // New returns a new E structure with code, meta, and optional reasons.
