@@ -9,3 +9,9 @@ export interface AiRelayOptions {
 	providerId: string;
 	modelId: string;
 }
+
+export interface Cher {
+	code: string;
+	meta: Record<string, any>;
+	reasons: Cher[];
+}

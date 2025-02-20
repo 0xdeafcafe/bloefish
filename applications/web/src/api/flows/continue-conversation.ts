@@ -9,6 +9,7 @@ interface ContinueConversation {
 	conversationId: string;
 	idempotencyKey: string;
 	messageContent: string;
+	aiRelayOptions: AiRelayOptions;
 }
 
 interface ContinueConversationReturned {
@@ -30,10 +31,6 @@ export const continueConversationChain = createAsyncThunk<
 		if (!user.data?.user)
 			return rejectWithValue('Invalid default user state');
 
-		const aiRelayOptions: AiRelayOptions = {
-			providerId: 'open_ai',
-			modelId: 'gpt-4',
-		};
 		const owner: Actor = {
 			type: 'user',
 			identifier: user.data.user.id,
@@ -46,7 +43,7 @@ export const continueConversationChain = createAsyncThunk<
 				messageContent: params.messageContent,
 				fileIds: [],
 				owner,
-				aiRelayOptions,
+				aiRelayOptions: params.aiRelayOptions,
 				options: {
 					useStreaming: true,
 				},
@@ -55,12 +52,14 @@ export const continueConversationChain = createAsyncThunk<
 			dispatch(addInteraction({
 				conversationId: params.conversationId,
 				interactionId: interaction.inputInteraction.id,
-				messageContent: params.messageContent,
 				streamChannelId: interaction.streamChannelId,
-
+				
 				markedAsExcludedAt: null,
 
-				aiRelayOptions,
+				messageContent: params.messageContent,
+				errors: [],
+
+				aiRelayOptions: params.aiRelayOptions,
 				owner,
 
 				createdAt: interaction.inputInteraction.createdAt,
@@ -70,11 +69,14 @@ export const continueConversationChain = createAsyncThunk<
 			dispatch(addActiveInteraction({
 				conversationId: params.conversationId,
 				interactionId: interaction.responseInteraction.id,
-				messageContent: '',
 				streamChannelId: interaction.streamChannelId,
+				
 				markedAsExcludedAt: null,
 
-				aiRelayOptions,
+				messageContent: '',
+				errors: [],
+
+				aiRelayOptions: params.aiRelayOptions,
 
 				createdAt: interaction.responseInteraction.createdAt,
 				updatedAt: interaction.responseInteraction.updatedAt,

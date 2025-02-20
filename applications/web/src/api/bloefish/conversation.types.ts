@@ -1,13 +1,15 @@
-import type { Actor, AiRelayOptions } from './shared.types';
+import type { Actor, AiRelayOptions, Cher } from './shared.types';
 
 export interface Interaction {
 	id: string;
-	messageContent: string;
 	fileIds: string[];
 	includedInAiContext: boolean;
 	streamChannelId: string;
 
 	markedAsExcludedAt: string | null;
+
+	messageContent: string;
+	errors: Cher[];
 
 	aiRelayOptions: AiRelayOptions;
 	owner: Actor;

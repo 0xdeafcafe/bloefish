@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router';
 import { ChatInput } from '../chat-input/ChatInput';
 import { Helmet } from 'react-helmet-async';
 import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
+import type { AiRelayOptions } from '~/api/bloefish/shared.types';
 
 const starterPrompts: string[] = [
 	'What is the meaning of life?',
@@ -22,14 +23,17 @@ const starterPrompts: string[] = [
 
 export const NewConversation: React.FC = () => {
 	const [timeOfDay, timeOfDayEmphasis, timeOfDayEmoji] = generateTimeOfDayText();
-	const [question, setQuestion] = useState('');
 	const [idempotencyKey, generateNewIdempotencyKey] = useIdempotencyKey();
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
 	const [working, setWorking] = useState(false);
 
+	const [question, setQuestion] = useState('');
+	const [aiRelayOptions, setAiRelayOptions] = useState<AiRelayOptions | null>(null);
+
 	async function askQuestion(questionOverride?: string) {
 		if (working) return;
+		if (!aiRelayOptions) return;
 
 		setWorking(true);
 
@@ -37,6 +41,7 @@ export const NewConversation: React.FC = () => {
 			await dispatch(startConversationChain({
 				idempotencyKey: idempotencyKey,
 				messageContent: questionOverride ?? question,
+				aiRelayOptions: aiRelayOptions,
 				navigate,
 			})).unwrap();
 			generateNewIdempotencyKey();
@@ -174,6 +179,7 @@ export const NewConversation: React.FC = () => {
 					<ChatInput
 						disabled={working}
 						onChange={setQuestion}
+						onAiRelayOptionsChange={setAiRelayOptions}
 						onInvoke={askQuestion}
 						value={question}
 					/>

@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { AddActiveInteractionPayload, AddInteractionFragmentPayload, AddInteractionPayload, Conversation, CreateConversationPayload, DeleteConversationsPayload as DeleteConversationsPayload, DeleteInteractionsPayload, UpdateConversationTitlePayload, UpdateInteractionExcludedStatePayload, UpdateInteractionMessageContentPayload } from './types';
+import type { AddActiveInteractionPayload, AddInteractionErrorPayload, AddInteractionFragmentPayload, AddInteractionPayload, Conversation, CreateConversationPayload, DeleteConversationsPayload as DeleteConversationsPayload, DeleteInteractionsPayload, UpdateConversationTitlePayload, UpdateInteractionExcludedStatePayload, UpdateInteractionMessageContentPayload } from './types';
 
 const initialState: Record<string, Conversation | undefined> = {};
 
@@ -46,6 +46,7 @@ export const conversationsSlice = createSlice({
 				streamChannelId: conversation.streamChannelId,
 
 				markedAsExcludedAt: payload.markedAsExcludedAt,
+				errors: payload.errors,
 
 				owner: payload.owner,
 				aiRelayOptions: payload.aiRelayOptions,
@@ -69,6 +70,7 @@ export const conversationsSlice = createSlice({
 				streamChannelId: conversation.streamChannelId,
 
 				markedAsExcludedAt: payload.markedAsExcludedAt,
+				errors: payload.errors,
 
 				owner: {
 					type: 'bot',
@@ -94,6 +96,19 @@ export const conversationsSlice = createSlice({
 			}
 
 			interaction.messageContent += payload.fragment;
+		},
+		addInteractionError: (state, { payload }: PayloadAction<AddInteractionErrorPayload>) => {
+			const conversation = state[payload.conversationId];
+			if (!conversation) {
+				return;
+			}
+
+			const interaction = conversation.interactions[payload.interactionId];
+			if (!interaction) {
+				return;
+			}
+
+			interaction.errors = [payload.error]; // TODO(afr): Support multiple errors?
 		},
 		updateInteractionMessageContent: (state, { payload }: PayloadAction<UpdateInteractionMessageContentPayload>) => {
 			const conversation = state[payload.conversationId];
@@ -168,6 +183,7 @@ export const {
 	addInteraction,
 	addActiveInteraction,
 	addInteractionFragment,
+	addInteractionError,
 	updateInteractionMessageContent,
 	deleteConversations,
 	updateConversationTitle,

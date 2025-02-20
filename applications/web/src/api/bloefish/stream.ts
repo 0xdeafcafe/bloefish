@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from '~/store';
 import type { StreamMessage } from './stream.types';
-import { addInteractionFragment, updateConversationTitle, updateInteractionMessageContent } from '~/features/conversations/store';
+import { addInteractionError, addInteractionFragment, updateConversationTitle, updateInteractionMessageContent } from '~/features/conversations/store';
 import camelcaseKeys from 'camelcase-keys';
 
 export function useStreamListener() {
@@ -12,17 +12,17 @@ export function useStreamListener() {
 		let ws = new WebSocket(url);
 
 		ws.onmessage = (event) => {
-			const data = camelcaseKeys(JSON.parse(event.data)) as StreamMessage;
+			const message = camelcaseKeys(JSON.parse(event.data)) as StreamMessage;
 
-			switch (data.type) {
+			switch (message.type) {
 				case 'message_fragment': {
-					const [conversationId, interactionId] = data.channelId.split('/');
+					const [conversationId, interactionId] = message.channelId.split('/');
 					if (!conversationId || !interactionId) return;
 
 					if (interactionId === 'title') {
 						dispatch(updateConversationTitle({
 							conversationId,
-							title: data.messageFragment,
+							title: message.messageFragment,
 							treatAsFragment: true,
 						}));
 						break;
@@ -31,19 +31,19 @@ export function useStreamListener() {
 					dispatch(addInteractionFragment({
 						conversationId,
 						interactionId,
-						fragment: data.messageFragment,
+						fragment: message.messageFragment,
 					}));
 					break;
 				}
 
 				case 'message_full': {
-					const [conversationId, interactionId] = data.channelId.split('/');
+					const [conversationId, interactionId] = message.channelId.split('/');
 					if (!conversationId || !interactionId) return;
 
 					if (interactionId === 'title') {
 						dispatch(updateConversationTitle({
 							conversationId,
-							title: data.messageFull,
+							title: message.messageFull,
 							treatAsFragment: false,
 						}));
 						break;
@@ -52,7 +52,19 @@ export function useStreamListener() {
 					dispatch(updateInteractionMessageContent({
 						conversationId,
 						interactionId,
-						content: data.messageFull,
+						content: message.messageFull,
+					}));
+					break;
+				}
+
+				case 'error': {
+					const [conversationId, interactionId] = message.channelId.split('/');
+					if (!conversationId || !interactionId) return;
+
+					dispatch(addInteractionError({
+						conversationId,
+						interactionId,
+						error: message.error,
 					}));
 					break;
 				}
@@ -60,8 +72,6 @@ export function useStreamListener() {
 				default:
 					break;
 			}
-
-			if (data.type !== 'message_fragment') return;
 		};
 
 		ws.onopen = () => {
@@ -73,7 +83,7 @@ export function useStreamListener() {
 
 			setTimeout(() => {
 				ws = new WebSocket(url);
-			}, 500);
+			}, 1000);
 		};
 
 		ws.onerror = (error) => {

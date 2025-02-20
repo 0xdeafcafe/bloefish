@@ -56,10 +56,12 @@ export const conversationApi = createApi({
 							{
 								conversationId: data.id,
 								id: interaction.id,
-								messageContent: interaction.messageContent,
 								streamChannelId: interaction.streamChannelId,
-
+								
 								markedAsExcludedAt: interaction.markedAsExcludedAt,
+
+								messageContent: interaction.messageContent,
+								errors: interaction.errors,
 
 								owner: interaction.owner,
 								aiRelayOptions: interaction.aiRelayOptions,
@@ -103,9 +105,12 @@ export const conversationApi = createApi({
 							{
 								conversationId: conversation.id,
 								id: interaction.id,
-								messageContent: interaction.messageContent,
 								streamChannelId: interaction.streamChannelId,
+
 								markedAsExcludedAt: interaction.markedAsExcludedAt,
+
+								messageContent: interaction.messageContent,
+								errors: interaction.errors,
 
 								aiRelayOptions: interaction.aiRelayOptions,
 								owner: interaction.owner,

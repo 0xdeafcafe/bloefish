@@ -1,14 +1,15 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import { conversationApi } from "../bloefish/conversation";
-import type { RootState } from "~/store";
-import { userApi } from "../bloefish/user";
-import type { useNavigate } from "react-router";
-import { addActiveInteraction, addInteraction, startConversation } from "~/features/conversations/store";
-import type { Actor, AiRelayOptions } from "../bloefish/shared.types";
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { conversationApi } from '../bloefish/conversation';
+import type { RootState } from '~/store';
+import { userApi } from '../bloefish/user';
+import type { useNavigate } from 'react-router';
+import { addActiveInteraction, addInteraction, startConversation } from '~/features/conversations/store';
+import type { Actor, AiRelayOptions } from '../bloefish/shared.types';
 
 interface StartConversation {
 	idempotencyKey: string;
 	messageContent: string;
+	aiRelayOptions: AiRelayOptions;
 	navigate: ReturnType<typeof useNavigate>;
 }
 
@@ -31,10 +32,6 @@ export const startConversationChain = createAsyncThunk<
 		if (!user.data?.user)
 			return rejectWithValue('Invalid default user state');
 
-		const aiRelayOptions: AiRelayOptions = {
-			providerId: 'open_ai',
-			modelId: 'gpt-4',
-		};
 		const owner: Actor = {
 			type: 'user',
 			identifier: user.data.user.id,
@@ -44,13 +41,13 @@ export const startConversationChain = createAsyncThunk<
 			const conversation = await dispatch(conversationApi.endpoints.createConversation.initiate({
 				idempotencyKey: params.idempotencyKey,
 				owner,
-				aiRelayOptions,
+				aiRelayOptions: params.aiRelayOptions,
 			})).unwrap();
 
 			dispatch(startConversation({
 				conversationId: conversation.id,
 				owner,
-				aiRelayOptions,
+				aiRelayOptions: params.aiRelayOptions,
 
 				streamChannelId: conversation.streamChannelId,
 				title: conversation.title,
@@ -65,7 +62,7 @@ export const startConversationChain = createAsyncThunk<
 				messageContent: params.messageContent,
 				fileIds: [],
 				owner,
-				aiRelayOptions,
+				aiRelayOptions: params.aiRelayOptions,
 				options: {
 					useStreaming: true,
 				},
@@ -75,11 +72,14 @@ export const startConversationChain = createAsyncThunk<
 				conversationId: conversation.id,
 				interactionId: interaction.inputInteraction.id,
 				streamChannelId: interaction.streamChannelId,
-				messageContent: params.messageContent,
+
 				markedAsExcludedAt: null,
 
+				messageContent: params.messageContent,
+				errors: [],
+
 				owner,
-				aiRelayOptions,
+				aiRelayOptions: params.aiRelayOptions,
 
 				createdAt: interaction.inputInteraction.createdAt,
 				updatedAt: interaction.inputInteraction.updatedAt,
@@ -89,10 +89,13 @@ export const startConversationChain = createAsyncThunk<
 				conversationId: conversation.id,
 				interactionId: interaction.responseInteraction.id,
 				streamChannelId: interaction.streamChannelId,
-				messageContent: '',
+
 				markedAsExcludedAt: null,
 
-				aiRelayOptions,
+				messageContent: '',
+				errors: [],
+
+				aiRelayOptions: params.aiRelayOptions,
 
 				createdAt: interaction.responseInteraction.createdAt,
 				updatedAt: interaction.responseInteraction.updatedAt,
