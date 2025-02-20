@@ -28,15 +28,15 @@ func TestGetCallerFrames(t *testing.T) {
 
 	is.True(len(frames) > 3)
 
-	is.True(strings.HasSuffix(frames[0].File, "/lib/stacktrace/frames_test.go"))
+	is.True(strings.HasSuffix(frames[0].File, "/libraries/stacktrace/frames_test.go"))
 	is.Equal(frames[0].Line, thisLineNumber+3)
 	is.Equal(frames[0].Function, "github.com/0xdeafcafe/bloefish/libraries/stacktrace.func1")
 
-	is.True(strings.HasSuffix(frames[1].File, "/lib/stacktrace/frames_test.go"))
+	is.True(strings.HasSuffix(frames[1].File, "/libraries/stacktrace/frames_test.go"))
 	is.Equal(frames[1].Line, thisLineNumber+7)
 	is.Equal(frames[1].Function, "github.com/0xdeafcafe/bloefish/libraries/stacktrace.func2")
 
-	is.True(strings.HasSuffix(frames[2].File, "/lib/stacktrace/frames_test.go"))
+	is.True(strings.HasSuffix(frames[2].File, "/libraries/stacktrace/frames_test.go"))
 	is.Equal(frames[2].Line, thisLineNumber+13)
 	is.Equal(frames[2].Function, "github.com/0xdeafcafe/bloefish/libraries/stacktrace.TestGetCallerFrames")
 }

@@ -19,7 +19,7 @@ func TestNew(t *testing.T) {
 
 	is.Equal(err.Code, Code("foo"))
 	is.Equal(err.Meta, nil)
-	is.True(strings.HasSuffix(err.Stack[0].File, "/lib/merr/merr_test.go"))
+	is.True(strings.HasSuffix(err.Stack[0].File, "/libraries/merr/merr_test.go"))
 	is.Equal(err.Reasons, nil)
 }
 
@@ -31,7 +31,7 @@ func TestNewMeta(t *testing.T) {
 
 	is.Equal(err.Code, Code("foo"))
 	is.Equal(err.Meta, M{"a": "b"})
-	is.True(strings.HasSuffix(err.Stack[0].File, "/lib/merr/merr_test.go"))
+	is.True(strings.HasSuffix(err.Stack[0].File, "/libraries/merr/merr_test.go"))
 	is.Equal(err.Reasons, nil)
 }
 
@@ -47,7 +47,7 @@ func TestWrap(t *testing.T) {
 	is.True(ok)
 	is.Equal(err.Code, Code("foo"))
 	is.Equal(err.Meta, nil)
-	is.True(strings.HasSuffix(err.Stack[0].File, "/lib/merr/merr_test.go"))
+	is.True(strings.HasSuffix(err.Stack[0].File, "/libraries/merr/merr_test.go"))
 	is.Equal(len(err.Reasons), 1)
 	is.Equal(err.Reasons[0], errors.New("underlying error")) //nolint:goerr113,forbidigo // needed for testing
 }
@@ -64,7 +64,7 @@ func TestWrapMeta(t *testing.T) {
 	is.True(ok)
 	is.Equal(err.Code, Code("foo"))
 	is.Equal(err.Meta, M{"a": "b"})
-	is.True(strings.HasSuffix(err.Stack[0].File, "/lib/merr/merr_test.go"))
+	is.True(strings.HasSuffix(err.Stack[0].File, "/libraries/merr/merr_test.go"))
 	is.Equal(len(err.Reasons), 1)
 	is.Equal(err.Reasons[0], errors.New("underlying error")) //nolint:goerr113,forbidigo // needed for testing
 }
@@ -92,12 +92,12 @@ func TestString(t *testing.T) {
 
 	err.Stack = []stacktrace.Frame{
 		{
-			File:     "/lib/foo/foo.go",
+			File:     "/libraries/foo/foo.go",
 			Line:     123,
 			Function: "github.com/0xdeafcafe/bloefish/libraries/foo.doFoo",
 		},
 		{
-			File:     "/lib/foo/bar.go",
+			File:     "/libraries/foo/bar.go",
 			Line:     456,
 			Function: "github.com/0xdeafcafe/bloefish/libraries/foo.barThing",
 		},
@@ -106,9 +106,9 @@ func TestString(t *testing.T) {
 	expected := `foo (map[a:b])
 
 github.com/0xdeafcafe/bloefish/libraries/foo.doFoo
-	/lib/foo/foo.go:123
+	/libraries/foo/foo.go:123
 github.com/0xdeafcafe/bloefish/libraries/foo.barThing
-	/lib/foo/bar.go:456
+	/libraries/foo/bar.go:456
 `
 
 	is.Equal(err.String(), expected)
