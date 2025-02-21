@@ -141,40 +141,6 @@ export const Conversation: React.FC = () => {
 			</Panel.Header>
 
 			<Panel.Body>
-				<HStack
-					position={'absolute'}
-					bottom={0} left={0} right={0}
-					justify={'center'}
-					gap={0}
-					filter={'blur(80px)'}
-				>
-					<MotionBox
-						animate={{ height: ['10px', '70px', '10px'] }}
-						transition={{ duration: 10, repeat: Infinity, repeatType: 'mirror' }}
-						width={'10%'} background={'pink.600'} opacity={1}
-					/>
-					<MotionBox
-						animate={{ height: ['10px', '40px', '10px'] }}
-						transition={{ duration: 9, repeat: Infinity, repeatType: 'mirror' }}
-						width={'20%'} background={'orange.600'} opacity={1}
-					/>
-					<MotionBox
-						animate={{ height: ['10px', '60px', '10px'] }}
-						transition={{ duration: 6, repeat: Infinity, repeatType: 'mirror' }}
-						width={'15%'} background={'purple.600'} opacity={1}
-					/>
-					<MotionBox
-						animate={{ height: ['10px', '30px', '10px'] }}
-						transition={{ duration: 15, repeat: Infinity, repeatType: 'mirror' }}
-						width={'8%'} background={'yellow.600'} opacity={1}
-					/>
-					<MotionBox
-						animate={{ height: ['10px', '55px', '10px'] }}
-						transition={{ duration: 12, repeat: Infinity, repeatType: 'mirror' }}
-						width={'14%'} background={'red.600'} opacity={1}
-					/>
-				</HStack>
-
 				<Grid
 					h="full"
 					templateRows="1fr max-content"
@@ -183,6 +149,7 @@ export const Conversation: React.FC = () => {
 					<GridItem
 						position={'relative'}
 						overflowX={'scroll'}
+						boxShadow={'md'}
 					>
 						<Container maxW={'6xl'} minW={'sm'} py={10}>
 							<Stack
@@ -194,8 +161,42 @@ export const Conversation: React.FC = () => {
 							</Stack>
 						</Container>
 					</GridItem>
-					<GridItem>
-						<Center mb={6}>
+					<GridItem position={'relative'} borderTop="1px solid" borderTopColor={'border.emphasized'} overflow={'hidden'}>
+						<HStack
+							position={'absolute'}
+							bottom={0} left={0} right={0}
+							justify={'center'}
+							gap={0}
+							filter={'blur(80px)'}
+						>
+							<MotionBox
+								animate={{ height: ['20px', '90px', '20px'] }}
+								transition={{ duration: 10, repeat: Infinity, repeatType: 'mirror' }}
+								width={'10%'} background={'pink.600'} opacity={1}
+							/>
+							<MotionBox
+								animate={{ height: ['20px', '60px', '20px'] }}
+								transition={{ duration: 9, repeat: Infinity, repeatType: 'mirror' }}
+								width={'20%'} background={'orange.600'} opacity={1}
+							/>
+							<MotionBox
+								animate={{ height: ['20px', '80px', '20px'] }}
+								transition={{ duration: 6, repeat: Infinity, repeatType: 'mirror' }}
+								width={'15%'} background={'purple.600'} opacity={1}
+							/>
+							<MotionBox
+								animate={{ height: ['20px', '30px', '20px'] }}
+								transition={{ duration: 15, repeat: Infinity, repeatType: 'mirror' }}
+								width={'8%'} background={'yellow.600'} opacity={1}
+							/>
+							<MotionBox
+								animate={{ height: ['20px', '55px', '20px'] }}
+								transition={{ duration: 12, repeat: Infinity, repeatType: 'mirror' }}
+								width={'14%'} background={'red.600'} opacity={1}
+							/>
+						</HStack>
+
+						<Center mb={6} mt={6}>
 							<ChatInput
 								disabled={working}
 								value={question}
