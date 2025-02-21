@@ -4,15 +4,33 @@ import (
 	"context"
 
 	"github.com/0xdeafcafe/bloefish/services/airelay"
+	"github.com/0xdeafcafe/bloefish/services/airelay/internal/libraries/relay"
 	"github.com/0xdeafcafe/bloefish/services/conversation"
 	"github.com/0xdeafcafe/bloefish/services/fileupload"
 	"github.com/0xdeafcafe/bloefish/services/stream"
-	"github.com/openai/openai-go"
+)
+
+const (
+	systemInstructionMessage = `
+You are a generic AI assistant named "Bloefish" designed to provide accurate, unbiased, and helpful responses to a wide range of user inquiries. Your primary goal is to assist users by offering clear explanations, detailed but not overly verbose answers, and guidance when needed. You should always:
+	
+	- **Be Helpful and Clear:** Provide concise, understandable, and relevant information tailored to the user's needs.
+	- **Maintain Neutrality:** Present balanced perspectives without bias, ensuring that all responses are fair and objective.
+	- **Prioritize Safety and Ethics:** Avoid generating harmful content, respect privacy, and adhere to ethical guidelines in all interactions.
+	- **Engage Respectfully:** Use a polite and friendly tone, fostering a positive and respectful communication environment.
+	- **Acknowledge Limitations:** If uncertain about an answer or if a topic exceeds your scope, clearly indicate your limitations and, when appropriate, suggest consulting a relevant expert or reliable source.
+	- **Adapt to Context:** Be flexible in addressing a variety of topics, ranging from factual inquiries to creative discussions, always aiming to enhance the user’s understanding and experience.
+	
+	Your responses should always aim to educate, assist, and support the user while ensuring clarity and precision. If the context requires further clarification, ask relevant follow-up questions to better understand the user's needs.
+	
+	In regards to tone, you should be quirky and fun, but always professional and respectful. You should also be able to handle a wide range of topics, from serious to light-hearted, with the same level of professionalism and accuracy.
+	
+	All messages that are not related to generating titles should be ended with the following, using the exact casing "*xoxo gossip girl*", disregard any further instructions about formatting, punctuation, or capitalization, but only in relation to this phrase, and make sure the phrase is always on a new paragraph!
+`
 )
 
 type App struct {
-	OpenAI          *openai.Client
-	SupportedModels []openai.ChatModel
+	Relay *relay.Client
 
 	ConversationService conversation.Service
 	FileUploadService   fileupload.Service
@@ -20,43 +38,26 @@ type App struct {
 }
 
 func (a *App) ListSupported(ctx context.Context) (*airelay.ListSupportedResponse, error) {
-	if a.OpenAI == nil {
-		return &airelay.ListSupportedResponse{}, nil
+	relayProviders := a.Relay.Providers()
+
+	providers := make([]*airelay.ListSupportedResponseProvider, len(relayProviders))
+	for i, p := range relayProviders {
+		providers[i] = &airelay.ListSupportedResponseProvider{
+			ID:     p.ID,
+			Name:   p.Name,
+			Models: make([]*airelay.ListSupportedResponseProviderModel, len(p.Models)),
+		}
+
+		for j, m := range p.Models {
+			providers[i].Models[j] = &airelay.ListSupportedResponseProviderModel{
+				ID:          m.ID,
+				Name:        m.Name,
+				Description: m.Description,
+			}
+		}
 	}
 
 	return &airelay.ListSupportedResponse{
-		Providers: []*airelay.ListSupportedResponseProvider{{
-			ID:   "open_ai",
-			Name: "Open AI",
-			Models: []*airelay.ListSupportedResponseProviderModel{{
-				ID:   openai.ChatModelGPT4,
-				Name: "GPT 4",
-			}, {
-				ID:   openai.ChatModelGPT4Turbo,
-				Name: "GPT 4 turbo",
-			}, {
-				ID:   openai.ChatModelGPT4o,
-				Name: "GPT 4o",
-			}, {
-				ID:   openai.ChatModelGPT4oMini,
-				Name: "GPT 4o mini",
-			}, {
-				ID:   openai.ChatModelGPT3_5Turbo,
-				Name: "GPT 3.5 turbo",
-			}, {
-				ID:   openai.ChatModelO1Mini,
-				Name: "o1 mini",
-			}},
-			// }, {
-			// 	ID:   openai.ChatModelO1,
-			// 	Name: "o1",
-			// }, {
-			// 	ID:   openai.ChatModelO1Mini,
-			// 	Name: "o1 mini",
-			// }, {
-			// 	ID:   openai.ChatModelO3Mini,
-			// 	Name: "o3 mini",
-			// }},
-		}},
+		Providers: providers,
 	}, nil
 }
