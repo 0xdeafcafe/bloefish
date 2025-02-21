@@ -39,7 +39,7 @@
 			"properties": {
 				"provider_id": {
 					"type": "string",
-					"enum": ["open_ai"]
+					"minLength": 1
 				},
 				"model_id": {
 					"type": "string",
