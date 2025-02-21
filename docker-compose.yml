@@ -52,6 +52,7 @@ services:
       STREAM_SERVICE_BASE_URL: http://svc_stream:4000/rpc
       FILE_UPLOAD_SERVICE_BASE_URL: http://svc_file_upload:4000/rpc
       CONVERSATION_SERVICE_BASE_URL: http://svc_conversation:4000/rpc
+      AI_PROVIDERS_OLLAMA_ENDPOINT: http://host.docker.internal:11434
     depends_on:
       - db_mongodb
     ports:
