@@ -95,7 +95,7 @@ export const ConversationInteractionActions: React.FC<ConversationInteractionAct
 				</React.Fragment>
 			)}
 
-			{showDeleteOnError && hasErrors && (
+			{(showDeleteOnError || hasErrors) && (
 				<DeleteInteractionDialog
 					disabled={pending}
 					interactionId={interaction.id}
