@@ -2,7 +2,10 @@ package relay
 
 import (
 	"context"
+	"errors"
+	"net"
 
+	"github.com/0xdeafcafe/bloefish/libraries/cher"
 	"github.com/0xdeafcafe/bloefish/libraries/ollama"
 )
 
@@ -24,10 +27,17 @@ func (c *Client) newOllamaChatStream(ctx context.Context, params ChatStreamParam
 		Messages: messages,
 	})
 	if err != nil {
+		var opErr *net.OpError
+		if errors.As(err, &opErr) {
+			return nil, cher.New("ollama_connection_issue", nil, cher.Coerce(err))
+		}
+
 		return nil, err
 	}
 
-	return &ollamaChatStreamIterator{inner: stream}, nil
+	return &ollamaChatStreamIterator{
+		inner: stream,
+	}, nil
 }
 
 func (i *ollamaChatStreamIterator) Next() bool {

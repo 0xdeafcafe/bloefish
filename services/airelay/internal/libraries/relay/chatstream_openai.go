@@ -15,7 +15,6 @@ type openAIChatStreamIterator struct {
 }
 
 func (c *Client) newOpenAIChatStream(ctx context.Context, params ChatStreamParams) (ChatStreamIterator, error) {
-
 	messages := make([]openai.ChatCompletionMessageParamUnion, len(params.Messages))
 	for i, msg := range params.Messages {
 		content := msg.Content

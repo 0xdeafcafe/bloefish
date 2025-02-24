@@ -43,11 +43,12 @@ func (a *App) InvokeStreamingConversationMessage(ctx context.Context, req *airel
 	})
 	if err != nil {
 		if errors.Is(err, relay.ErrUnsupportedProvider) {
-			return nil, cher.New("unsupported_provider", cher.M{
+			return nil, cher.New("unsupported_ai_provider", cher.M{
 				"provider_id": req.AIRelayOptions.ProviderID,
 			})
 		}
-		return nil, fmt.Errorf("failed to create chat stream: %w", err)
+
+		return nil, err
 	}
 
 	for chatStream.Next() {
