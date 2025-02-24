@@ -1,8 +1,8 @@
 # Build the Go code
 build-go:
-	rm -rf ./bin
-	mkdir -p ./bin
-	GOOS=linux go build -o ./bin/bloefish ./cmd/bloefish/...
+	rm -rf ./.bin
+	mkdir -p ./.bin
+	GOOS=linux go build -o ./.bin/bloefish ./cmd/bloefish/...
 
 build-js:
 	yarn build

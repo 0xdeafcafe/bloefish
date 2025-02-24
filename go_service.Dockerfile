@@ -7,5 +7,5 @@ EXPOSE 4000
 RUN mkdir -p /usr/local/app
 WORKDIR /usr/local/app
 
-COPY ./bin/bloefish ./bloefish
+COPY ./.bin/bloefish ./bloefish
 ENTRYPOINT ["./bloefish"]
