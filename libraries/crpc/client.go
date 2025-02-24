@@ -41,7 +41,6 @@ func NewClient(ctx context.Context, baseURL string, c *http.Client) *Client {
 // Do executes an RPC request against the configured server.
 func (c *Client) Do(ctx context.Context, method, version string, src, dst any, requestModifiers ...func(r *http.Request)) error {
 	err := c.client.Do(ctx, "POST", path.Join(version, method), nil, src, dst, requestModifiers...)
-
 	if err == nil {
 		return nil
 	}
