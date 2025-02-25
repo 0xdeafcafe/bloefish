@@ -152,6 +152,20 @@ services:
     extra_hosts:
       - "svc_stream.bloefish.local:127.0.0.1"
 
+  svc_skill_set:
+    restart: always
+    build:
+      context: .
+      dockerfile: go_service.Dockerfile
+    command: ["skill_set"]
+    hostname: svc_skill_set
+    ports:
+      - "4006:4000"
+    networks:
+      - bloefish_network
+    extra_hosts:
+      - "svc_skill_set.bloefish.local:127.0.0.1"
+
   # Apps
   app_web:
     restart: always

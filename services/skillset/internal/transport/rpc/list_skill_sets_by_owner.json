@@ -1,0 +1,28 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+
+	"required": [
+		"owner"
+	],
+
+	"properties": {
+		"owner": {
+			"type": "object",
+			"additionalProperties": false,
+
+			"required": ["type", "identifier"],
+			
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": ["user"]
+				},
+				"identifier": {
+					"type": "string",
+					"minLength": 1
+				}
+			}
+		}
+	}
+}

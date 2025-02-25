@@ -1,0 +1,15 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+
+	"required": [
+		"skill_set_id"
+	],
+
+	"properties": {
+		"skill_set_id": {
+			"type": "string",
+			"minLength": 1
+		}
+	}
+}
