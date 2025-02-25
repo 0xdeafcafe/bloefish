@@ -6,13 +6,14 @@ import (
 	"os"
 	"strings"
 
+	"github.com/sirupsen/logrus"
+	"github.com/uptrace/opentelemetry-go-extra/otellogrus"
+	"go.opentelemetry.io/otel"
+
 	"github.com/0xdeafcafe/bloefish/libraries/cher"
 	"github.com/0xdeafcafe/bloefish/libraries/contexts"
 	"github.com/0xdeafcafe/bloefish/libraries/errfuncs"
 	"github.com/0xdeafcafe/bloefish/libraries/version"
-	"github.com/sirupsen/logrus"
-	"github.com/uptrace/opentelemetry-go-extra/otellogrus"
-	"go.opentelemetry.io/otel"
 )
 
 type contextKey string
@@ -176,10 +177,10 @@ func Set(ctx context.Context, log *logrus.Entry) context.Context {
 func Get(ctx context.Context) *logrus.Entry {
 	ctxLogger := getContextLogger(ctx)
 	if ctxLogger != nil {
-		return ctxLogger.GetLogger()
+		return ctxLogger.GetLogger().WithContext(ctx)
 	}
 
-	logger := logrus.NewEntry(logrus.New())
+	logger := logrus.NewEntry(logrus.New()).WithContext(ctx)
 
 	logger.Warn("no clog exists in the context")
 
