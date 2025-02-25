@@ -11,6 +11,8 @@ import (
 	"github.com/0xdeafcafe/bloefish/libraries/errfuncs"
 	"github.com/0xdeafcafe/bloefish/libraries/version"
 	"github.com/sirupsen/logrus"
+	"github.com/uptrace/opentelemetry-go-extra/otellogrus"
+	"go.opentelemetry.io/otel"
 )
 
 type contextKey string
@@ -54,10 +56,10 @@ type Config struct {
 	// Format configures the output format. Possible options:
 	//   - text - logrus default text output, good for local development
 	//   - json - fields and message encoded as json, good for storage in e.g. cloudwatch
-	Format Format `json:"format"`
+	Format Format `env:"format"`
 
 	// Debug enables debug level logging, otherwise INFO level
-	Debug bool `json:"debug"`
+	Debug bool `env:"debug"`
 }
 
 // Configure applies standard Logging structure options to a logrus Entry.
@@ -71,6 +73,15 @@ func (c Config) Configure(ctx context.Context) *logrus.Entry {
 		ServiceKey: serviceName,
 		VersionKey: version.Revision,
 	})
+
+	if otel.GetTracerProvider() != nil {
+		log.Logger.Hooks.Add(otellogrus.NewHook(otellogrus.WithLevels(
+			logrus.PanicLevel,
+			logrus.FatalLevel,
+			logrus.ErrorLevel,
+			logrus.WarnLevel,
+		)))
+	}
 
 	hostname, err := os.Hostname()
 	if err != nil {
