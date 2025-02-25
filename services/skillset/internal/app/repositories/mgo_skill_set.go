@@ -94,12 +94,17 @@ func (m *mgoSkillSet) ListSkillSetsByOwner(ctx context.Context, ownerType, owner
 	}
 	defer cursor.Close(ctx)
 
-	var skillSets []*models.SkillSet
+	var skillSets []*persistedSkillSet
 	if err := cursor.All(ctx, &skillSets); err != nil {
 		return nil, err
 	}
 
-	return skillSets, nil
+	skillSetsDomain := make([]*models.SkillSet, len(skillSets))
+	for i, skillSet := range skillSets {
+		skillSetsDomain[i] = skillSet.ToDomainModel()
+	}
+
+	return skillSetsDomain, nil
 }
 
 func (p *persistedSkillSet) ToDomainModel() *models.SkillSet {

@@ -159,6 +159,8 @@ services:
       dockerfile: go_service.Dockerfile
     command: ["skill_set"]
     hostname: svc_skill_set
+    environment:
+      MONGO_URI: mongodb://db_mongodb:27017
     ports:
       - "4006:4000"
     networks:
