@@ -5,6 +5,7 @@ import (
 
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/config"
+	"github.com/0xdeafcafe/bloefish/libraries/telemetry"
 	"github.com/0xdeafcafe/bloefish/services/airelay"
 	"github.com/0xdeafcafe/bloefish/services/conversation/internal/app"
 	"github.com/0xdeafcafe/bloefish/services/conversation/internal/app/repositories"
@@ -14,9 +15,10 @@ import (
 )
 
 type Config struct {
-	Server  config.Server  `env:"SERVER"`
-	Logging clog.Config    `env:"LOGGING"`
-	Mongo   config.MongoDB `env:"MONGO"`
+	Server    config.Server    `env:"SERVER"`
+	Telemetry telemetry.Config `env:"TELEMETRY"`
+	Logging   clog.Config      `env:"LOGGING"`
+	Mongo     config.MongoDB   `env:"MONGO"`
 
 	AIRelayService config.UnauthenticatedService `env:"AI_RELAY_SERVICE"`
 	StreamService  config.UnauthenticatedService `env:"STREAM_SERVICE"`
@@ -27,6 +29,10 @@ func defaultConfig() Config {
 	return Config{
 		Server: config.Server{
 			Addr: ":4001",
+		},
+
+		Telemetry: telemetry.Config{
+			Enable: true,
 		},
 
 		Logging: clog.Config{
@@ -54,8 +60,15 @@ func defaultConfig() Config {
 func Run(ctx context.Context) error {
 	cfg := defaultConfig()
 	config.MustHydrateFromEnvironment(ctx, &cfg)
-	ctx = clog.Set(ctx, cfg.Logging.Configure(ctx))
 
+	shutdown := cfg.Telemetry.MustSetup(ctx)
+	defer func() {
+		if err := shutdown(ctx); err != nil {
+			clog.Get(ctx).WithError(err).Error("failed to shutdown telemetry")
+		}
+	}()
+
+	ctx = clog.Set(ctx, cfg.Logging.Configure(ctx))
 	_, mongoDatabase := cfg.Mongo.MustConnect(ctx)
 
 	app := &app.App{

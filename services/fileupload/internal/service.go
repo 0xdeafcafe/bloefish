@@ -6,6 +6,7 @@ import (
 
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/config"
+	"github.com/0xdeafcafe/bloefish/libraries/telemetry"
 	"github.com/0xdeafcafe/bloefish/services/fileupload/internal/app"
 	"github.com/0xdeafcafe/bloefish/services/fileupload/internal/app/repositories"
 	"github.com/0xdeafcafe/bloefish/services/fileupload/internal/app/services"
@@ -15,9 +16,10 @@ import (
 )
 
 type Config struct {
-	Server  config.Server  `env:"SERVER"`
-	Logging clog.Config    `env:"LOGGING"`
-	Mongo   config.MongoDB `env:"MONGO"`
+	Server    config.Server    `env:"SERVER"`
+	Telemetry telemetry.Config `env:"TELEMETRY"`
+	Logging   clog.Config      `env:"LOGGING"`
+	Mongo     config.MongoDB   `env:"MONGO"`
 
 	Minio MinioConfig `env:"MINIO"`
 
@@ -35,6 +37,10 @@ func defaultConfig() Config {
 	return Config{
 		Server: config.Server{
 			Addr: ":4005",
+		},
+
+		Telemetry: telemetry.Config{
+			Enable: true,
 		},
 
 		Logging: clog.Config{
@@ -61,8 +67,15 @@ func defaultConfig() Config {
 func Run(ctx context.Context) error {
 	cfg := defaultConfig()
 	config.MustHydrateFromEnvironment(ctx, &cfg)
-	ctx = clog.Set(ctx, cfg.Logging.Configure(ctx))
 
+	shutdown := cfg.Telemetry.MustSetup(ctx)
+	defer func() {
+		if err := shutdown(ctx); err != nil {
+			clog.Get(ctx).WithError(err).Error("failed to shutdown telemetry")
+		}
+	}()
+
+	ctx = clog.Set(ctx, cfg.Logging.Configure(ctx))
 	_, mongoDatabase := cfg.Mongo.MustConnect(ctx)
 
 	minioClient, err := minio.New(cfg.Minio.Endpoint, &minio.Options{

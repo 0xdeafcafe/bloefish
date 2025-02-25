@@ -6,6 +6,7 @@ import (
 
 	"github.com/0xdeafcafe/bloefish/libraries/config"
 	"github.com/0xdeafcafe/bloefish/libraries/crpc"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 type RPCClient struct {
@@ -14,7 +15,9 @@ type RPCClient struct {
 
 func NewRPCClient(ctx context.Context, cfg config.UnauthenticatedService) Service {
 	return &RPCClient{
-		client: crpc.NewClient(ctx, cfg.BaseURL, &http.Client{}),
+		client: crpc.NewClient(ctx, cfg.BaseURL, &http.Client{
+			Transport: otelhttp.NewTransport(http.DefaultTransport),
+		}),
 	}
 }
 

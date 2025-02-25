@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/pkg/errors"
+	"github.com/riandyrn/otelchi"
 
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/config"
@@ -50,6 +51,7 @@ func New(ctx context.Context, app *app.App) *RPC {
 	svr.Register("invoke_streaming_conversation_message", "2025-02-12", schema("invoke_streaming_conversation_message"), rpc.InvokeStreamingConversationMessage)
 
 	mux := chi.NewRouter()
+	mux.Use(otelchi.Middleware(svcInfo.ServiceHTTPName, otelchi.WithChiRoutes(mux)))
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))
 	mux.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},

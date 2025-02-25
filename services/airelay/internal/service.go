@@ -9,6 +9,7 @@ import (
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/config"
 	"github.com/0xdeafcafe/bloefish/libraries/ollama"
+	"github.com/0xdeafcafe/bloefish/libraries/telemetry"
 	"github.com/0xdeafcafe/bloefish/services/airelay/internal/app"
 	"github.com/0xdeafcafe/bloefish/services/airelay/internal/libraries/relay"
 	"github.com/0xdeafcafe/bloefish/services/airelay/internal/transport/rpc"
@@ -18,8 +19,9 @@ import (
 )
 
 type Config struct {
-	Server  config.Server `env:"SERVER"`
-	Logging clog.Config   `env:"LOGGING"`
+	Server    config.Server    `env:"SERVER"`
+	Telemetry telemetry.Config `env:"TELEMETRY"`
+	Logging   clog.Config      `env:"LOGGING"`
 
 	ConversationService config.UnauthenticatedService `env:"CONVERSATION_SERVICE"`
 	FileUploadService   config.UnauthenticatedService `env:"FILE_UPLOAD_SERVICE"`
@@ -63,6 +65,10 @@ func defaultConfig() Config {
 			BaseURL: "http://localhost:4004/rpc",
 		},
 
+		Telemetry: telemetry.Config{
+			Enable: true,
+		},
+
 		AIProviders: AIProviders{
 			OpenAI: OpenAIConfig{},
 			Ollama: OllamaConfig{
@@ -75,6 +81,14 @@ func defaultConfig() Config {
 func Run(ctx context.Context) error {
 	cfg := defaultConfig()
 	config.MustHydrateFromEnvironment(ctx, &cfg)
+
+	shutdown := cfg.Telemetry.MustSetup(ctx)
+	defer func() {
+		if err := shutdown(ctx); err != nil {
+			clog.Get(ctx).WithError(err).Error("failed to shutdown telemetry")
+		}
+	}()
+
 	ctx = clog.Set(ctx, cfg.Logging.Configure(ctx))
 
 	app := &app.App{

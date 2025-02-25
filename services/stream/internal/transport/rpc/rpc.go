@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/riandyrn/otelchi"
 
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/contexts"
@@ -44,6 +45,7 @@ func New(ctx context.Context, app *app.App, mux *chi.Mux) *RPC {
 	svr.Register("send_error_message", "2025-02-12", schema("send_error_message"), rpc.SendErrorMessage)
 
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))
+	mux.Use(otelchi.Middleware(svcInfo.ServiceHTTPName, otelchi.WithChiRoutes(mux)))
 	mux.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
