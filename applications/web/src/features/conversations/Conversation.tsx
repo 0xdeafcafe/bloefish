@@ -145,19 +145,17 @@ export const Conversation: React.FC = () => {
 					flex={1}
 					display={'grid'}
 					templateRows={'1fr auto'}
+					templateColumns={'1fr'}
 					overflow={'hidden'}
 				>
 					<GridItem
-						overflow={'auto'}
+						overflowY={'scroll'}
+						overflowX={'hidden'}
 						position={'relative'}
 						minHeight={0}
 					>
 						<Container maxW={'6xl'} minW={'sm'} py={10} pb={40} w={'full'}>
-							<Stack
-								gap={6}
-								mx={10}
-								w={'auto'}
-							>
+							<Stack gap={6} mx={10}>
 								{sortedInteractions.map(i => <ConversationInteraction key={i.id} interaction={i} />)}
 							</Stack>
 						</Container>

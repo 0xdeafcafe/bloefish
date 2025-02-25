@@ -19,12 +19,12 @@ export const ConversationInteraction: React.FC<ConversationInteractionProps> = (
 			id={interaction.id}
 			gap={6}
 			opacity={interaction.markedAsExcludedAt ? 0.5 : 1}
-			templateColumns={user ? '100px 1fr auto' : 'auto 1fr 100px'}
+			templateColumns={user ? '100px minmax(0, 1fr) auto' : 'auto minmax(0, 1fr) 100px'}
 		>
 			{user ? (
 				<React.Fragment>
 					<GridItem />
-					<GridItem display={'flex'} flexDirection={'row-reverse'}>
+					<GridItem display={'flex'} flexDirection={'row-reverse'} maxW="full">
 						<InteractionContent interaction={interaction} />
 					</GridItem>
 					<GridItem>

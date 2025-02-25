@@ -17,15 +17,16 @@ export const InteractionContent: React.FC<InteractionContentProps> = ({
 	const onlyErrors = Boolean(interaction.messageContent === '' && interaction.errors?.length > 0)
 
 	return (
-		<Stack gap={2}>
+		<Stack gap={2} overflow={'scroll'} maxW={'100%'}>
 			{onlyErrors ? (
 				<InteractionErrors errors={interaction.errors} />
 			) : (
 				<Card.Root
-					borderRadius={"lg"}
+					borderRadius={'lg'}
 					zIndex={11}
 					blur={'10px'}
 					width={'fit-content'}
+					maxW={'100%'}
 					background={theme.resolvedTheme === 'dark' ? 'rgb(17 17 17 / 40%)' : 'rgb(255 255 255 / 40%)'}
 				>
 					<Card.Body p={3} px={5}>
