@@ -1,0 +1,62 @@
+{
+	"id": "request_000000D2IOLn4aAlDEwQ2jKKWE7e4",
+	"verb": "post",
+	"headers": {},
+	"url": [
+		{
+			"type": "variable_group_item",
+			"payload": {
+				"itemId": "item_000000D2IOG96QuqX3acHw7uhcpoS"
+			}
+		},
+		"/rpc/2025-02-12/list_skill_sets_by_owner"
+	],
+	"query": {},
+	"body": {
+		"type": "json",
+		"payload": {
+			"jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys": {
+				"id": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"name": "<Root>",
+				"enabled": true,
+				"parentId": null,
+				"type": "object"
+			},
+			"jsonentry_000000D2IOrzxfZuydawI57IIFLr6": {
+				"id": "jsonentry_000000D2IOrzxfZuydawI57IIFLr6",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "object",
+				"name": "owner",
+				"enabled": true
+			},
+			"jsonentry_000000D2IOtRAZQbNyivbIsDvtFT4": {
+				"id": "jsonentry_000000D2IOtRAZQbNyivbIsDvtFT4",
+				"parentId": "jsonentry_000000D2IOrzxfZuydawI57IIFLr6",
+				"type": "string",
+				"name": "type",
+				"enabled": true,
+				"value": [
+					"user"
+				]
+			},
+			"jsonentry_000000D2IOtRAZQbNyivbIsDvtFUZ": {
+				"id": "jsonentry_000000D2IOtRAZQbNyivbIsDvtFUZ",
+				"parentId": "jsonentry_000000D2IOrzxfZuydawI57IIFLr6",
+				"type": "string",
+				"name": "identifier",
+				"enabled": true,
+				"value": [
+					{
+						"type": "variable_group_item",
+						"payload": {
+							"itemId": "item_000000D1jaU8PHV02up84Np3SSWwN"
+						}
+					}
+				]
+			}
+		}
+	},
+	"options": {
+		"followRedirects": false
+	}
+}

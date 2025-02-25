@@ -10,7 +10,8 @@
 		"item_000000D1jaU8PHV02up84Np3SSWwN": "actor_default_user_id",
 		"item_000000D1jhs1A68yspI37E0b10cHq": "svc_ai_relay_url",
 		"item_000000D1la34WQEmrAee6Ar7OIfYp": "svc_file_upload_url",
-		"item_000000D1m0lOjiNAiKiSWBahdLC56": "svc_stream_url"
+		"item_000000D1m0lOjiNAiKiSWBahdLC56": "svc_stream_url",
+		"item_000000D2IOG96QuqX3acHw7uhcpoS": "svc_skill_set_url"
 	},
 	"values": {
 		"group_000000D1hX1aCn89xC2nucN5oz4VP&item_000000D1hX1aCn89xC2nucN5oz4VR": [
@@ -51,6 +52,12 @@
 		],
 		"group_000000D1hX1aCn89xC2nucN5oz4VQ&item_000000D1m0lOjiNAiKiSWBahdLC56": [
 			"http://localhost:4004"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VP&item_000000D2IOG96QuqX3acHw7uhcpoS": [
+			"http://svc_skill_set.bloefish.local:4006"
+		],
+		"group_000000D1hX1aCn89xC2nucN5oz4VQ&item_000000D2IOG96QuqX3acHw7uhcpoS": [
+			"http://localhost:4006"
 		]
 	}
 }

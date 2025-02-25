@@ -1,0 +1,102 @@
+{
+	"id": "request_000000D2IOIuemTOOYgRQHoTEwKRu",
+	"verb": "post",
+	"headers": {},
+	"url": [
+		{
+			"type": "variable_group_item",
+			"payload": {
+				"itemId": "item_000000D2IOG96QuqX3acHw7uhcpoS"
+			}
+		},
+		"/rpc/2025-02-12/create_skill_set"
+	],
+	"query": {},
+	"body": {
+		"type": "json",
+		"payload": {
+			"jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys": {
+				"id": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"name": "<Root>",
+				"enabled": true,
+				"parentId": null,
+				"type": "object"
+			},
+			"jsonentry_000000D1jngwfI91Z0IwxjLL1a7Li": {
+				"id": "jsonentry_000000D1jngwfI91Z0IwxjLL1a7Li",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "string",
+				"name": "name",
+				"enabled": true,
+				"value": [
+					"Taylor Swift Fangirl"
+				]
+			},
+			"jsonentry_000000D2IOOfUNs81vCOfAqBnVupf": {
+				"id": "jsonentry_000000D2IOOfUNs81vCOfAqBnVupf",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "string",
+				"name": "description",
+				"enabled": true,
+				"value": [
+					"Adds much needed context about our lord and saviour, tswizzle"
+				]
+			},
+			"jsonentry_000000D2IOOfUNs81vCOfAqBnVuqj": {
+				"id": "jsonentry_000000D2IOOfUNs81vCOfAqBnVuqj",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "string",
+				"name": "icon",
+				"enabled": true,
+				"value": [
+					"mic_vocal"
+				]
+			},
+			"jsonentry_000000D2IOOfUNs81vCOfAqBnVusE": {
+				"id": "jsonentry_000000D2IOOfUNs81vCOfAqBnVusE",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "string",
+				"name": "prompt",
+				"enabled": true,
+				"value": [
+					"Taylor Alison Swift is an American singer-songwriter. Known for her autobiographical songwriting, artistic reinventions, and cultural impact, Swift is a leading figure in popular music and the subject of extensive media coverage, with a vast fanbase known as Swifties."
+				]
+			},
+			"jsonentry_000000D2IOpYzgRpyfzZc0udyqkyz": {
+				"id": "jsonentry_000000D2IOpYzgRpyfzZc0udyqkyz",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "object",
+				"name": "owner",
+				"enabled": true
+			},
+			"jsonentry_000000D2IOq0RV17nOeBYODqwjxIi": {
+				"id": "jsonentry_000000D2IOq0RV17nOeBYODqwjxIi",
+				"parentId": "jsonentry_000000D2IOpYzgRpyfzZc0udyqkyz",
+				"type": "string",
+				"name": "type",
+				"enabled": true,
+				"value": [
+					"user"
+				]
+			},
+			"jsonentry_000000D2IOq0RV17nOeBYODqwjxKD": {
+				"id": "jsonentry_000000D2IOq0RV17nOeBYODqwjxKD",
+				"parentId": "jsonentry_000000D2IOpYzgRpyfzZc0udyqkyz",
+				"type": "string",
+				"name": "identifier",
+				"enabled": true,
+				"value": [
+					{
+						"type": "variable_group_item",
+						"payload": {
+							"itemId": "item_000000D1jaU8PHV02up84Np3SSWwN"
+						}
+					}
+				]
+			}
+		}
+	},
+	"options": {
+		"followRedirects": false
+	}
+}

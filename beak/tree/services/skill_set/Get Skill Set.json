@@ -1,0 +1,40 @@
+{
+	"id": "request_000000D2IOLtw2JaAQ6ZWp9dGCQFi",
+	"verb": "post",
+	"headers": {},
+	"url": [
+		{
+			"type": "variable_group_item",
+			"payload": {
+				"itemId": "item_000000D2IOG96QuqX3acHw7uhcpoS"
+			}
+		},
+		"/rpc/2025-02-12/get_skill_set"
+	],
+	"query": {},
+	"body": {
+		"type": "json",
+		"payload": {
+			"jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys": {
+				"id": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"name": "<Root>",
+				"enabled": true,
+				"parentId": null,
+				"type": "object"
+			},
+			"jsonentry_000000D1jngwfI91Z0IwxjLL1a7Li": {
+				"id": "jsonentry_000000D1jngwfI91Z0IwxjLL1a7Li",
+				"parentId": "jsonentry_000000D1jnfAs1rsI7gVCE6VA1Jys",
+				"type": "string",
+				"name": "skill_set_id",
+				"enabled": true,
+				"value": [
+					"skillset_000000D2IOqzvS5HBC8L2HDqZbeCn"
+				]
+			}
+		}
+	},
+	"options": {
+		"followRedirects": false
+	}
+}
