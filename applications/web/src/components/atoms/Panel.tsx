@@ -8,9 +8,8 @@ const Root: React.FC<React.PropsWithChildren> = ({ children }) => (
 		variant={'outline'}
 		boxShadow={'md'}
 		p={0}
-		overflow={'hidden'}
-		display={'grid'}
-		gridTemplateRows={'auto fit-content(1fr)'}
+		// I'm not happy about this, but i'm also too fucking annoyed to spend any more time on this
+		maxH={'calc(100vh - 42px - 12px)'}
 
 		initial={{ scale: 0.95, opacity: 0, y: 10 }}
 		animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -43,8 +42,8 @@ const Header: React.FC<React.PropsWithChildren> = ({ children }) => (
 const Body: React.FC<React.PropsWithChildren> = ({ children }) => (
 	<Card.Body
 		p={0}
-		height={'100%'}
-		overflowY={'scroll'}
+		height={'full'}
+		overflowY={'auto'}
 	>
 		{children}
 	</Card.Body>

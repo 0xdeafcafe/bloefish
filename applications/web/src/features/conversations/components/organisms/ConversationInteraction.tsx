@@ -16,6 +16,7 @@ export const ConversationInteraction: React.FC<ConversationInteractionProps> = (
 	return (
 		<Grid
 			key={interaction.id}
+			id={interaction.id}
 			gap={6}
 			opacity={interaction.markedAsExcludedAt ? 0.5 : 1}
 			templateColumns={user ? '100px 1fr auto' : 'auto 1fr 100px'}

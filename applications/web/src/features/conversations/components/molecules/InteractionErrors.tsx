@@ -2,12 +2,12 @@ import { Alert, Box, Stack, Text } from '@chakra-ui/react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { LuFileQuestion } from 'react-icons/lu';
-import type { Cher } from '~/api/bloefish/shared.types';
+import type { BloefishError } from '~/api/bloefish/shared.types';
 import { Button } from '~/components/ui/button';
 import { generateRandomString } from '~/utils/random';
 
 interface InteractionErrorsProps {
-	errors: Cher[] | null;
+	errors: BloefishError[] | null;
 }
 
 export const InteractionErrors: React.FC<InteractionErrorsProps> = ({
@@ -24,7 +24,7 @@ export const InteractionErrors: React.FC<InteractionErrorsProps> = ({
 	);
 };
 
-const InteractionError: React.FC<{ error: Cher }> = ({ error }) => {
+const InteractionError: React.FC<{ error: BloefishError }> = ({ error }) => {
 	const [expanded, setExpanded] = useState(false);
 
 	switch (error.code) {
@@ -56,16 +56,19 @@ const InteractionError: React.FC<{ error: Cher }> = ({ error }) => {
 						<Alert.Description>
 							There was an unknown system issue. Show the error 
 							<MotionBox
-								mt={2}
 								maxW={'full'}
 								initial={false}
 								animate={{
 									height: expanded ? 'auto' : 0,
-									opacity: expanded ? 1 : 0
+									opacity: expanded ? 1 : 0,
+									marginTop: expanded ? '10px' : 0,
 								}}
 								transition={{ duration: 0.2 }}
 								// overflow="hidden"
 							>
+								<Box>
+
+								</Box>
 								<Text textStyle={'xs'}>
 									<pre>
 										{JSON.stringify(error, null, 2)}

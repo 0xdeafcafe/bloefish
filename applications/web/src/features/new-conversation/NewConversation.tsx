@@ -14,11 +14,13 @@ import type { AiRelayOptions } from '~/api/bloefish/shared.types';
 const starterPrompts: string[] = [
 	'What is the meaning of life?',
 	'Magnets, how do they work?',
+	'If the universe is so big, why won\'t it fight me?',
+	'Why was 6 afraid of 7?',
 	'Explain the concept of a monad',
 	'Write a React counter component',
 	'How do I use the Go Mongo Driver?',
-	'Why does Hill yap so much?',
-	'If the universe is so big, why won\'t it fight me?',
+	'How many r\'s are there in Strawberry?',
+	'How many calories does my girlfriend burn jumping to conclusion?',
 ];
 
 export const NewConversation: React.FC = () => {
@@ -55,6 +57,7 @@ export const NewConversation: React.FC = () => {
 			position={'relative'}
 			width={'full'}
 			height={'full'}
+			overflow={'hidden'}
 		>
 			<Helmet>
 				<title>{'Welcome | Bloefish'}</title>
@@ -98,6 +101,8 @@ export const NewConversation: React.FC = () => {
 				height={'full'}
 				direction={'column'}
 				align={'center'}
+				gap={6}
+				pb={6}
 				maxWidth={'3xl'}
 				margin={'0 auto'}
 			>
@@ -122,7 +127,7 @@ export const NewConversation: React.FC = () => {
 					</Box>
 
 					<Text
-						fontSize={'5xl'}
+						fontSize={'4xl'}
 						fontWeight={'semibold'}
 						textAlign={'center'}
 						lineHeight={'shorter'}
@@ -175,7 +180,7 @@ export const NewConversation: React.FC = () => {
 					</Flex>
 				</Flex>
 
-				<Box mb={6}>
+				<Box w={'full'} px={6}>
 					<ChatInput
 						disabled={working}
 						onChange={setQuestion}

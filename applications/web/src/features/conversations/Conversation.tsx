@@ -142,26 +142,27 @@ export const Conversation: React.FC = () => {
 
 			<Panel.Body>
 				<Grid
-					h="full"
-					templateRows="1fr max-content"
-					templateColumns="1fr"
+					flex={1}
+					display={'grid'}
+					templateRows={'1fr auto'}
+					overflow={'hidden'}
 				>
 					<GridItem
+						overflow={'auto'}
 						position={'relative'}
-						overflowX={'scroll'}
-						boxShadow={'md'}
+						minHeight={0}
 					>
-						<Container maxW={'6xl'} minW={'sm'} py={10}>
+						<Container maxW={'6xl'} minW={'sm'} py={10} pb={40} w={'full'}>
 							<Stack
 								gap={6}
 								mx={10}
-								pb={20}
+								w={'auto'}
 							>
 								{sortedInteractions.map(i => <ConversationInteraction key={i.id} interaction={i} />)}
 							</Stack>
 						</Container>
 					</GridItem>
-					<GridItem position={'relative'} borderTop="1px solid" borderTopColor={'border.emphasized'} overflow={'hidden'}>
+					<GridItem position={'relative'} borderTop={'1px solid'} borderTopColor={'border.emphasized'} overflow={'hidden'}>
 						<HStack
 							position={'absolute'}
 							bottom={0} left={0} right={0}
@@ -196,7 +197,12 @@ export const Conversation: React.FC = () => {
 							/>
 						</HStack>
 
-						<Center mb={6} mt={6}>
+						<Center
+							maxW={'2xl'}
+							w={'full'}
+							p={6}
+							margin={'0 auto'}
+						>
 							<ChatInput
 								disabled={working}
 								value={question}

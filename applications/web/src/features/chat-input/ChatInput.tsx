@@ -1,13 +1,13 @@
-import { ButtonGroup, Card, Flex, HStack, Icon, IconButton, Kbd, Status, Textarea } from '@chakra-ui/react';
+import { Card, Flex, HStack, Icon, IconButton, Kbd, Status, Textarea } from '@chakra-ui/react';
 import { useTheme } from 'next-themes';
 import React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { LuBot, LuSend, LuChevronUp } from 'react-icons/lu';
+import { LuBot, LuSend, LuChevronDown, LuGraduationCap, LuPackage } from 'react-icons/lu';
 import { aiRelayApi } from '~/api/bloefish/ai-relay';
 import type { AiModel, AiProvider } from '~/api/bloefish/ai-relay.types';
 import type { AiRelayOptions } from '~/api/bloefish/shared.types';
 import { Button } from '~/components/ui/button';
-import { MenuContent, MenuItem, MenuItemCommand, MenuRoot, MenuTrigger } from '~/components/ui/menu';
+import { MenuContent, MenuItemCommand, MenuRadioItem, MenuRadioItemGroup, MenuRoot, MenuTrigger } from '~/components/ui/menu';
 import { Tooltip } from '~/components/ui/tooltip';
 import { useLocalStorageState } from '~/hooks/use-local-storage-state';
 
@@ -63,7 +63,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
 		const availableModels = coerceAvailableModels(providers.providers);
 
-		if (providers) 
+		if (providers)
 			setAvailableModels(availableModels);
 
 		if (!selectedModel && availableModels.length > 0) {
@@ -120,7 +120,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 	return (
 		<Card.Root
 			variant={'outline'}
-			w={'2xl'}
+			w={'100%'}
 			borderColor={focused ? 'purple.500' : 'border'}
 			blur={'sm'}
 			background={theme.resolvedTheme === 'dark' ? 'rgb(17 17 17 / 40%)' : 'rgb(255 255 255 / 60%)'}
@@ -148,7 +148,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 								e.preventDefault();
 								onInvoke();
 							}
-							
+
 							if (e.key === 'Enter' && !e.shiftKey && enterMode === 'send') {
 								e.preventDefault();
 								onInvoke();
@@ -156,66 +156,95 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 						}}
 					/>
 				</HStack>
-				<Flex justify={'flex-end'} align={'center'} gap={2}>
-					<Status.Root colorPalette={lengthStatusColor} userSelect={'none'} fontSize={'xs'} color={'GrayText'}>
-						{questionLength === maxPromptLength ? '😱 ' : <Status.Indicator />}
-						{`${questionLength}/${maxPromptLength}`}
-					</Status.Root>
+				<Flex justify={'space-between'} gap={4}>
+					<Flex gap={2}>
+						<Tooltip content={'Select a skill set to include in this message'}>
+							<Button
+								size={'2xs'}
+								disabled
+								variant={'outline'}
+							>
+								<LuGraduationCap />
+								<LuChevronDown />
+							</Button>
+						</Tooltip>
+						<Tooltip content={'Select a file to include in this message'}>
+							<Button
+								size={'2xs'}
+								disabled
+								variant={'outline'}
+							>
+								<LuPackage />
+								<LuChevronDown />
+							</Button>
+						</Tooltip>
+					</Flex>
+					<Flex justify={'flex-end'} align={'center'} gap={2}>
+						<Status.Root colorPalette={lengthStatusColor} userSelect={'none'} fontSize={'xs'} color={'GrayText'}>
+							{questionLength === maxPromptLength ? '😱 ' : <Status.Indicator />}
+							{`${questionLength}/${maxPromptLength}`}
+						</Status.Root>
 
-					<MenuRoot>
-						<MenuTrigger asChild>
-							<ButtonGroup size="2xs" attached variant={'outline'}>
+						<MenuRoot onExitComplete={() => inputRef.current?.focus()} >
+							<MenuTrigger asChild>
 								<Button
+									size={'2xs'}
 									loading={modelSelectLoading}
 									disabled={disabled || modelSelectLoading}
 									variant={'outline'}
 								>
+									<LuBot />
+									{' '}
 									{selectedModel && `${selectedModel.provider.name} (${selectedModel.model.name})`}
+									{' '}
+									<LuChevronDown />
 								</Button>
-								<IconButton
-									loading={modelSelectLoading}
-									disabled={disabled || modelSelectLoading}
-									variant={'outline'}
-								>
-									<LuChevronUp />
-								</IconButton>
-							</ButtonGroup>
-						</MenuTrigger>
-						<MenuContent>
-							{availableModels?.map((model, index) => (
-								<MenuItem
-									value={`${model.provider.id}:${model.model.id}`}
-									key={`${model.provider.id}:${model.model.id}`}
-									onClick={() => setSelectedModel(model)}
-								>
-									{`${model.provider.name} (${model.model.name}) `}
+							</MenuTrigger>
+							<MenuContent>
+								<MenuRadioItemGroup
+									value={selectedModel ? `${selectedModel.provider.id}:${selectedModel.model.id}` : ''}
+									onValueChange={(e) => {
+										const model = availableModels?.find((model) => `${model.provider.id}:${model.model.id}` === e.value);
 
-									{index < 9 && (
-										<MenuItemCommand>{index + 1}</MenuItemCommand>
-									)}
-								</MenuItem>
-							))}
-						</MenuContent>
-					</MenuRoot>
+										if (model) setSelectedModel(model);
+									}}
+								>
+									{availableModels?.map((model, index) => (
+										<MenuRadioItem
+											value={`${model.provider.id}:${model.model.id}`}
+											key={`${model.provider.id}:${model.model.id}`}
+											onClick={() => (model)}
+										>
+											{`${model.provider.name} (${model.model.name}) `}
 
-					<Tooltip content={(
-						<React.Fragment>
-							{'Pressing Enter will send the message. However to make composing messages easier, if '}
-							{'your message spans multiple lines, then you must press '}
-							<Kbd>{'⌘ + ⏎'}</Kbd>
-							{' to send the message.'}
-						</React.Fragment>
-					)}>
-						<IconButton
-							aria-label={'Send message'}
-							disabled={disabled || modelSelectLoading}
-							variant={'ghost'}
-							size={'2xs'}
-							onClick={() => onInvoke()}
-						>
-							<LuSend />
-						</IconButton>
-					</Tooltip>
+											{index < 9 && (
+												<MenuItemCommand>{index + 1}</MenuItemCommand>
+											)}
+										</MenuRadioItem>
+									))}
+								</MenuRadioItemGroup>
+							</MenuContent>
+						</MenuRoot>
+
+						<Tooltip content={(
+							<React.Fragment>
+								{'Pressing Enter will send the message. However to make composing messages easier, if '}
+								{'your message spans multiple lines, then you must press '}
+								<Kbd>{'⌘ + ⏎'}</Kbd>
+								{' to send the message.'}
+							</React.Fragment>
+						)}>
+							<IconButton
+								aria-label={'Send message'}
+								disabled={disabled || modelSelectLoading}
+								variant={'ghost'}
+								size={'2xs'}
+								onClick={() => onInvoke()}
+							>
+								<LuSend />
+							</IconButton>
+						</Tooltip>
+					</Flex>
 				</Flex>
 			</Card.Body>
 		</Card.Root>

@@ -1,6 +1,6 @@
 import { Avatar, Box, HStack, Separator, Stack, Text } from '@chakra-ui/react';
 import { SidebarLink } from './components/molecules/SidebarLink';
-import { LuFolderOpen, LuFolderRoot, LuGraduationCap, LuLifeBuoy, LuMessageCirclePlus, LuMonitor, LuMoon, LuScrollText, LuSettings2, LuSun, LuWorkflow } from 'react-icons/lu';
+import { LuFolderOpen, LuFolderRoot, LuGraduationCap, LuLifeBuoy, LuMessageCirclePlus, LuMonitor, LuMoon, LuPackage, LuScrollText, LuSettings2, LuSun, LuWorkflow } from 'react-icons/lu';
 import { useLocation } from 'react-router';
 import { motion } from 'motion/react';
 import { SearchButton } from '~/components/ui/search-button';
@@ -11,9 +11,10 @@ import { SegmentedControl } from '~/components/ui/segmented-control';
 const sidebarTopStates = [
 	'new_conversation',
 	'conversations',
+	'workflows',
 	'still_sets',
 	'projects',
-	'workflows',
+	'assets',
 ] as const;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -96,6 +97,12 @@ export const Sidebar: React.FC = () => {
 							icon={<LuFolderOpen />}
 						/>
 						<SidebarLink
+							active={sidebarState === 'workflows'}
+							content={'Workflows'}
+							path={'/workflows'}
+							icon={<LuWorkflow />}
+						/>
+						<SidebarLink
 							active={sidebarState === 'still_sets'}
 							content={'Skill sets'}
 							path={'/skill-sets'}
@@ -108,10 +115,10 @@ export const Sidebar: React.FC = () => {
 							icon={<LuFolderRoot />}
 						/>
 						<SidebarLink
-							active={sidebarState === 'workflows'}
-							content={'Workflows'}
-							path={'/workflows'}
-							icon={<LuWorkflow />}
+							active={sidebarState === 'assets'}
+							content={'Assets'}
+							path={'/assets'}
+							icon={<LuPackage />}
 						/>
 					</Stack>
 				</Box>

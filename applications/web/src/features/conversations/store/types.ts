@@ -1,4 +1,4 @@
-import type { Actor, AiRelayOptions, Cher } from '~/api/bloefish/shared.types';
+import type { Actor, AiRelayOptions, BloefishError } from '~/api/bloefish/shared.types';
 
 export interface ConversationPlugin {
 	conversationId: string;
@@ -24,7 +24,7 @@ export interface AddInteractionPayload extends ConversationPlugin, InteractionPl
 	streamChannelId: string;
 	owner: Actor;
 	messageContent: string;
-	errors: Cher[];
+	errors: BloefishError[];
 	aiRelayOptions: AiRelayOptions;
 	markedAsExcludedAt: string | null;
 
@@ -38,7 +38,7 @@ export interface AddActiveInteractionPayload extends ConversationPlugin, Interac
 	streamChannelId: string;
 	aiRelayOptions: AiRelayOptions; // TODO(afr): this should come from the backend
 	markedAsExcludedAt: string | null;
-	errors: Cher[];
+	errors: BloefishError[];
 
 	createdAt: string;
 	updatedAt: string;
@@ -50,7 +50,7 @@ export interface AddInteractionFragmentPayload extends ConversationPlugin, Inter
 }
 
 export interface AddInteractionErrorPayload extends ConversationPlugin, InteractionPlugin {
-	error: Cher;
+	error: BloefishError;
 }
 
 export interface UpdateInteractionMessageContentPayload extends ConversationPlugin, InteractionPlugin {
@@ -96,7 +96,7 @@ export interface Interaction {
 	messageContent: string;
 
 	markedAsExcludedAt: string | null;
-	errors: Cher[];
+	errors: BloefishError[];
 
 	owner: Actor;
 	aiRelayOptions: AiRelayOptions;
