@@ -1,4 +1,4 @@
-import type { Actor, AiRelayOptions, Cher } from './shared.types';
+import type { Actor, AiRelayOptions, BloefishError } from './shared.types';
 
 export interface Interaction {
 	id: string;
@@ -9,7 +9,7 @@ export interface Interaction {
 	markedAsExcludedAt: string | null;
 
 	messageContent: string;
-	errors: Cher[];
+	errors: BloefishError[];
 
 	aiRelayOptions: AiRelayOptions;
 	owner: Actor;

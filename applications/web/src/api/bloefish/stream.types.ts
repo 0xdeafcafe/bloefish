@@ -1,4 +1,4 @@
-import type { Cher } from "./shared.types";
+import type { BloefishError } from "./shared.types";
 
 export interface StreamMessageFull {
 	channelId: string;
@@ -21,7 +21,7 @@ export interface StreamErrorMessage {
 	type: 'error';
 	messageFull: null;
 	messageFragment: null;
-	error: Cher;
+	error: BloefishError;
 }
 
 export type StreamMessage = StreamMessageFull | StreamMessageFragment | StreamErrorMessage;

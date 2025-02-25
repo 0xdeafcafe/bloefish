@@ -10,8 +10,8 @@ export interface AiRelayOptions {
 	modelId: string;
 }
 
-export interface Cher {
+export interface BloefishError {
 	code: string;
-	meta: Record<string, any>;
-	reasons: Cher[];
+	meta: Record<string, unknown>;
+	reasons: BloefishError[];
 }
