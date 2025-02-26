@@ -153,6 +153,7 @@ export const Conversation: React.FC = () => {
 						overflowX={'hidden'}
 						position={'relative'}
 						minHeight={0}
+						boxShadow={'md'}
 					>
 						<Container maxW={'6xl'} minW={'sm'} py={10} pb={40} w={'full'}>
 							<Stack gap={6} mx={10}>
