@@ -193,6 +193,8 @@ function useSidebarLocationState(): SidebarState | null {
 			return 'projects';
 		case loc.pathname.startsWith('/preferences'):
 			return 'preferences';
+		case loc.pathname.startsWith('/assets'):
+			return 'assets';
 		
 		default: return null;
 	}

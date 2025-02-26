@@ -15,6 +15,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { ConversationsList } from './features/conversations/ConversationsList';
 import { OmniBar } from './features/omnibar/OmniBar';
 import { Toaster } from './components/ui/toaster';
+import { SkillSetList } from './features/skill-sets/SkillSetList';
 
 const root = createRoot(document.getElementById('root')!);
 
@@ -31,8 +32,11 @@ root.render(
 									<Ready>
 										<Routes>
 											<Route path="/" element={<NewConversation />} />
+
 											<Route path="/conversations/:conversationId" element={<Conversation />} />
 											<Route path="/conversations" element={<ConversationsList />} />
+
+											<Route path="/skill-sets" element={<SkillSetList />} />
 
 											<Route path="*" element={<NotFound />} />
 										</Routes>
