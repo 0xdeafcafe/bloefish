@@ -9,12 +9,10 @@ import { toaster } from '~/components/ui/toaster';
 
 interface ConversationInteractionActionsProps {
 	interaction: Interaction;
-	showDeleteOnError?: boolean;
 }
 
 export const ConversationInteractionActions: React.FC<ConversationInteractionActionsProps> = ({
 	interaction,
-	showDeleteOnError,
 }) => {
 	const [updateExcludedState, excludedMutationState] = conversationApi.useUpdateInteractionExcludedStateMutation();
 
@@ -95,19 +93,17 @@ export const ConversationInteractionActions: React.FC<ConversationInteractionAct
 				</React.Fragment>
 			)}
 
-			{(showDeleteOnError || hasErrors) && (
-				<DeleteInteractionDialog
-					disabled={pending}
-					interactionId={interaction.id}
-					onDeleteSuccess={() => {
-						toaster.create({
-							type: 'error',
-							title: 'Message deleted',
-							description: 'The message has been deleted from the conversation',
-						});
-					}}
-				/>
-			)}
+			<DeleteInteractionDialog
+				disabled={pending}
+				interactionId={interaction.id}
+				onDeleteSuccess={() => {
+					toaster.create({
+						type: 'error',
+						title: 'Message deleted',
+						description: 'The message has been deleted from the conversation',
+					});
+				}}
+			/>
 		</HStack>
 	);
 };

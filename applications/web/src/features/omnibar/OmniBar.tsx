@@ -51,8 +51,6 @@ export const OmniBar: React.FC = () => {
 		limit: 10,
 	});
 
-	console.log(searchResults);
-
 	useEffect(() => {
 		function onKeyDown(event: KeyboardEvent) {
 			if (event.key === 'k' && event.metaKey) {
