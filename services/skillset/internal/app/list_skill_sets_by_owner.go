@@ -13,11 +13,11 @@ func (a *App) ListSkillSetsByOwner(ctx context.Context, req *skillset.ListSkillS
 	}
 
 	resp := &skillset.ListSkillSetsByOwnerResponse{
-		SkillSets: make([]*skillset.ListSkillSetsByOwnerResponseSkillSet, len(skillSets)),
+		SkillSets: make([]*skillset.SkillSet, len(skillSets)),
 	}
 
 	for i, skillSet := range skillSets {
-		resp.SkillSets[i] = &skillset.ListSkillSetsByOwnerResponseSkillSet{
+		resp.SkillSets[i] = &skillset.SkillSet{
 			ID:          skillSet.ID,
 			Name:        skillSet.Name,
 			Icon:        skillSet.Icon,

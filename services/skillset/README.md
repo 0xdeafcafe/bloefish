@@ -101,6 +101,46 @@ interface Request {
 type Response = null;
 ```
 
+#### `get_many_skill_sets`
+
+Gets many skill sets by ID.
+
+The `allow_deleted` field is optional, and if is `true`, then deleted skill sets will be included. If omitted or `false`, then if a deleted skill set is requested an error will be returned.
+
+The `owner` is optional, and if provided will filter the results to only include skill sets owned by the specified user.
+
+**Contract**
+
+```typescript
+interface Request {
+	skill_set_ids: string[];
+	owner: {
+		type: 'user';
+		identifier: string;
+	} | null;
+	allow_deleted: boolean | null;
+}
+
+interface Response {
+	skill_sets: {
+		id: string;
+		name: string;
+		icon: string;
+		description: string;
+		prompt: string;
+
+		owner: {
+			type: 'user';
+			identifier: string;
+		};
+
+		created_at: string;
+		updated_at: string;
+		deleted_at: string | null;
+	}[];
+}
+```
+
 #### `list_skill_sets_by_owner`
 
 Lists all skill sets for an owner.

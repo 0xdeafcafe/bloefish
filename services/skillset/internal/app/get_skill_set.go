@@ -13,19 +13,21 @@ func (a *App) GetSkillSet(ctx context.Context, req *skillset.GetSkillSetRequest)
 	}
 
 	return &skillset.GetSkillSetResponse{
-		ID:          skillSet.ID,
-		Name:        skillSet.Name,
-		Icon:        skillSet.Icon,
-		Description: skillSet.Description,
-		Prompt:      skillSet.Prompt,
+		SkillSet: skillset.SkillSet{
+			ID:          skillSet.ID,
+			Name:        skillSet.Name,
+			Icon:        skillSet.Icon,
+			Description: skillSet.Description,
+			Prompt:      skillSet.Prompt,
 
-		Owner: &skillset.Actor{
-			Type:       skillset.ActorType(skillSet.Owner.Type),
-			Identifier: skillSet.Owner.Identifier,
+			Owner: &skillset.Actor{
+				Type:       skillset.ActorType(skillSet.Owner.Type),
+				Identifier: skillSet.Owner.Identifier,
+			},
+
+			CreatedAt: skillSet.CreatedAt,
+			UpdatedAt: skillSet.UpdatedAt,
+			DeletedAt: skillSet.DeletedAt,
 		},
-
-		CreatedAt: skillSet.CreatedAt,
-		UpdatedAt: skillSet.UpdatedAt,
-		DeletedAt: skillSet.DeletedAt,
 	}, nil
 }

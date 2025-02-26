@@ -107,6 +107,46 @@ func (m *mgoSkillSet) ListSkillSetsByOwner(ctx context.Context, ownerType, owner
 	return skillSetsDomain, nil
 }
 
+func (m *mgoSkillSet) GetManySkillSets(ctx context.Context, ids []string) ([]*models.SkillSet, error) {
+	cursor, err := m.c.Find(ctx, bson.M{
+		"_id": bson.M{"$in": ids},
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var skillSets []*persistedSkillSet
+	if err := cursor.All(ctx, &skillSets); err != nil {
+		return nil, err
+	}
+
+	if len(skillSets) != len(ids) {
+		foundIDs := make(map[string]bool)
+		for _, skillSet := range skillSets {
+			foundIDs[skillSet.ID] = true
+		}
+
+		missingIDs := make([]string, 0)
+		for _, id := range ids {
+			if !foundIDs[id] {
+				missingIDs = append(missingIDs, id)
+			}
+		}
+
+		return nil, cher.New("skill_sets_not_found", cher.M{
+			"missing_skill_set_ids": missingIDs,
+		})
+	}
+
+	skillSetsDomain := make([]*models.SkillSet, len(skillSets))
+	for i, skillSet := range skillSets {
+		skillSetsDomain[i] = skillSet.ToDomainModel()
+	}
+
+	return skillSetsDomain, nil
+}
+
 func (p *persistedSkillSet) ToDomainModel() *models.SkillSet {
 	return &models.SkillSet{
 		ID:          p.ID,

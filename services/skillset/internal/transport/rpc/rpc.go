@@ -48,6 +48,7 @@ func New(ctx context.Context, app *app.App) *RPC {
 
 	svr.Register("create_skill_set", "2025-02-12", schema("create_skill_set"), rpc.CreateSkillSet)
 	svr.Register("get_skill_set", "2025-02-12", schema("get_skill_set"), rpc.GetSkillSet)
+	svr.Register("get_many_skill_sets", "2025-02-12", schema("get_many_skill_sets"), rpc.GetManySkillSets)
 	svr.Register("list_skill_sets_by_owner", "2025-02-12", schema("list_skill_sets_by_owner"), rpc.ListSkillSetsByOwner)
 
 	mux := chi.NewRouter()

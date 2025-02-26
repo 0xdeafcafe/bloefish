@@ -8,6 +8,7 @@ import (
 type Service interface {
 	CreateSkillSet(ctx context.Context, req *CreateSkillSetRequest) error
 	GetSkillSet(ctx context.Context, req *GetSkillSetRequest) (*GetSkillSetResponse, error)
+	GetManySkillSets(ctx context.Context, req *GetManySkillSetsRequest) (*GetManySkillSetsResponse, error)
 	ListSkillSetsByOwner(ctx context.Context, req *ListSkillSetsByOwnerRequest) (*ListSkillSetsByOwnerResponse, error)
 }
 
@@ -16,6 +17,20 @@ type ActorType string
 const (
 	ActorTypeUser ActorType = "user"
 )
+
+type SkillSet struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Icon        string `json:"icon"`
+	Description string `json:"description"`
+	Prompt      string `json:"prompt"`
+
+	Owner *Actor `json:"owner"`
+
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
+}
 
 type Actor struct {
 	Type       ActorType `json:"type"`
@@ -35,17 +50,17 @@ type GetSkillSetRequest struct {
 }
 
 type GetSkillSetResponse struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Icon        string `json:"icon"`
-	Description string `json:"description"`
-	Prompt      string `json:"prompt"`
+	SkillSet
+}
 
-	Owner *Actor `json:"owner"`
+type GetManySkillSetsRequest struct {
+	SkillSetIDs  []string `json:"skill_set_ids"`
+	Owner        *Actor   `json:"owner"`
+	AllowDeleted bool     `json:"allow_deleted"`
+}
 
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at"`
+type GetManySkillSetsResponse struct {
+	SkillSets []*SkillSet `json:"skill_sets"`
 }
 
 type ListSkillSetsByOwnerRequest struct {
@@ -53,19 +68,5 @@ type ListSkillSetsByOwnerRequest struct {
 }
 
 type ListSkillSetsByOwnerResponse struct {
-	SkillSets []*ListSkillSetsByOwnerResponseSkillSet `json:"skill_sets"`
-}
-
-type ListSkillSetsByOwnerResponseSkillSet struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Icon        string `json:"icon"`
-	Description string `json:"description"`
-	Prompt      string `json:"prompt"`
-
-	Owner *Actor `json:"owner"`
-
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at"`
+	SkillSets []*SkillSet `json:"skill_sets"`
 }
