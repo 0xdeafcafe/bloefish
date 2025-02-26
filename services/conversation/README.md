@@ -73,6 +73,7 @@ interface Request {
 	idempotency_key: string;
 	message_content: string;
 	file_ids: string[];
+	skill_set_ids: string[];
 
 	owner: {
 		type: 'user';
@@ -93,7 +94,8 @@ interface Response {
 
 	input_interaction: {
 		id: string;
-		fileIds: string[];
+		file_ids: string[];
+		skill_set_ids: string[];
 	
 		marked_as_excluded_at: string | null; // ISO 8601
 
@@ -123,7 +125,8 @@ interface Response {
 	};
 	response_interaction: {
 		id: string;
-		fileIds: string[];
+		file_ids: string[];
+		skill_set_ids: string[];
 	
 		marked_as_excluded_at: string | null; // ISO 8601
 
@@ -184,6 +187,7 @@ interface Response {
 	interactions: {
 		id: string;
 		file_ids: string[];
+		skill_set_ids: string[];
 
 		marked_as_excluded_at: string | null; // ISO 8601
 
@@ -250,6 +254,7 @@ interface Response {
 		interactions: {
 			id: string;
 			file_ids: string[];
+			skill_set_ids: string[];
 
 			marked_as_excluded_at: string | null; // ISO 8601
 

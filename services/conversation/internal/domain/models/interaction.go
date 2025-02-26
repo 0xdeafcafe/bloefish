@@ -11,6 +11,7 @@ type Interaction struct {
 	IdempotencyKey string   `json:"idempotency_key"`
 	ConversationID string   `json:"conversation_id"`
 	FileIDs        []string `json:"file_ids"`
+	SkillSetIDs    []string `json:"skill_set_ids"`
 
 	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
 
@@ -30,6 +31,7 @@ type CreateInteractionCommand struct {
 	IdempotencyKey string
 	ConversationID string
 	FileIDs        []string
+	SkillSetIDs    []string
 	MessageContent string
 	Owner          *CreateInteractionCommandOwner
 	AIRelayOptions *CreateInteractionCommandAIRelayOptions
@@ -49,6 +51,7 @@ type CreateActiveInteractionCommand struct {
 	IdempotencyKey string
 	ConversationID string
 	FileIDs        []string
+	SkillSetIDs    []string
 	MessageContent string
 	Owner          *CreateActiveInteractionCommandOwner
 	AIRelayOptions *CreateActiveInteractionCommandAIRelayOptions

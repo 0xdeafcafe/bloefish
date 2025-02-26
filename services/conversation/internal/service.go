@@ -10,6 +10,7 @@ import (
 	"github.com/0xdeafcafe/bloefish/services/conversation/internal/app"
 	"github.com/0xdeafcafe/bloefish/services/conversation/internal/app/repositories"
 	"github.com/0xdeafcafe/bloefish/services/conversation/internal/transport/rpc"
+	"github.com/0xdeafcafe/bloefish/services/skillset"
 	"github.com/0xdeafcafe/bloefish/services/stream"
 	"github.com/0xdeafcafe/bloefish/services/user"
 )
@@ -20,9 +21,10 @@ type Config struct {
 	Logging   clog.Config      `env:"LOGGING"`
 	Mongo     config.MongoDB   `env:"MONGO"`
 
-	AIRelayService config.UnauthenticatedService `env:"AI_RELAY_SERVICE"`
-	StreamService  config.UnauthenticatedService `env:"STREAM_SERVICE"`
-	UserService    config.UnauthenticatedService `env:"USER_SERVICE"`
+	AIRelayService  config.UnauthenticatedService `env:"AI_RELAY_SERVICE"`
+	SkillSetService config.UnauthenticatedService `env:"SKILL_SET_SERVICE"`
+	StreamService   config.UnauthenticatedService `env:"STREAM_SERVICE"`
+	UserService     config.UnauthenticatedService `env:"USER_SERVICE"`
 }
 
 func defaultConfig() Config {
@@ -47,6 +49,9 @@ func defaultConfig() Config {
 
 		AIRelayService: config.UnauthenticatedService{
 			BaseURL: "http://localhost:4003/rpc",
+		},
+		SkillSetService: config.UnauthenticatedService{
+			BaseURL: "http://localhost:4006/rpc",
 		},
 		StreamService: config.UnauthenticatedService{
 			BaseURL: "http://localhost:4004/rpc",
@@ -75,9 +80,10 @@ func Run(ctx context.Context) error {
 		ConversationRepository: repositories.NewMgoConversation(mongoDatabase),
 		InteractionRepository:  repositories.NewMgoInteraction(mongoDatabase),
 
-		AIRelayService: airelay.NewRPCClient(ctx, cfg.AIRelayService),
-		StreamService:  stream.NewRPCClient(ctx, cfg.StreamService),
-		UserService:    user.NewRPCClient(ctx, cfg.UserService),
+		AIRelayService:  airelay.NewRPCClient(ctx, cfg.AIRelayService),
+		SkillSetService: skillset.NewRPCClient(ctx, cfg.SkillSetService),
+		StreamService:   stream.NewRPCClient(ctx, cfg.StreamService),
+		UserService:     user.NewRPCClient(ctx, cfg.UserService),
 	}
 
 	rpc := rpc.New(ctx, app)

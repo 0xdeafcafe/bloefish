@@ -59,6 +59,7 @@ type CreateConversationMessageRequest struct {
 	IdempotencyKey string                                   `json:"idempotency_key"`
 	MessageContent string                                   `json:"message_content"`
 	FileIDs        []string                                 `json:"file_ids"`
+	SkillSetIDs    []string                                 `json:"skill_set_ids"`
 	Owner          *Actor                                   `json:"owner"`
 	AIRelayOptions *AIRelayOptions                          `json:"ai_relay_options"`
 	Options        *CreateConversationMessageRequestOptions `json:"options"`
@@ -78,6 +79,7 @@ type CreateConversationMessageResponse struct {
 type CreateConversationMessageResponseInteraction struct {
 	ID              string   `json:"id"`
 	FileIDs         []string `json:"file_ids"`
+	SkillSetIDs     []string `json:"skill_set_ids"`
 	StreamChannelID string   `json:"stream_channel_id"`
 
 	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
@@ -102,6 +104,7 @@ type GetInteractionResponse struct {
 	ID             string   `json:"id"`
 	ConversationID string   `json:"conversation_id"`
 	FileIDs        []string `json:"file_ids"`
+	SkillSetIDs    []string `json:"skill_set_ids"`
 
 	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
 
@@ -139,6 +142,7 @@ type GetConversationWithInteractionsResponse struct {
 type GetConversationWithInteractionsResponseInteraction struct {
 	ID              string   `json:"id"`
 	FileIDs         []string `json:"file_ids"`
+	SkillSetIDs     []string `json:"skill_set_ids"`
 	StreamChannelID string   `json:"stream_channel_id"`
 
 	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`
@@ -181,6 +185,7 @@ type ListConversationsWithInteractionsResponseConversation struct {
 type ListConversationsWithInteractionsResponseConversationInteraction struct {
 	ID              string   `json:"id"`
 	FileIDs         []string `json:"file_ids"`
+	SkillSetIDs     []string `json:"skill_set_ids"`
 	StreamChannelID string   `json:"stream_channel_id"`
 
 	MarkedAsExcludedAt *time.Time `json:"marked_as_excluded_at"`

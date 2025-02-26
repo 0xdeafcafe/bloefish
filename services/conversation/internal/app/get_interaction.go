@@ -16,6 +16,7 @@ func (a *App) GetInteraction(ctx context.Context, req *conversation.GetInteracti
 		ID:             foundInteraction.ID,
 		ConversationID: foundInteraction.ConversationID,
 		FileIDs:        foundInteraction.FileIDs,
+		SkillSetIDs:    foundInteraction.SkillSetIDs,
 
 		MarkedAsExcludedAt: foundInteraction.MarkedAsExcludedAt,
 		MessageContent:     foundInteraction.MessageContent,

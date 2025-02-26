@@ -83,6 +83,7 @@ func (a *App) ListConversationsWithInteractions(ctx context.Context, req *conver
 			resp.Conversations[i].Interactions[j] = &conversation.ListConversationsWithInteractionsResponseConversationInteraction{
 				ID:              interaction.ID,
 				FileIDs:         interaction.FileIDs,
+				SkillSetIDs:     interaction.SkillSetIDs,
 				StreamChannelID: fmt.Sprintf("%s/%s", convo.ID, interaction.ID),
 
 				MarkedAsExcludedAt: interaction.MarkedAsExcludedAt,

@@ -18,6 +18,7 @@ type persistedInteraction struct {
 	IdempotencyKey string   `bson:"idempotency_key"`
 	ConversationID string   `bson:"conversation_id"`
 	FileIDs        []string `bson:"file_ids"`
+	SkillSetIDs    []string `bson:"skill_set_ids"`
 
 	MarkedAsExcludedAt *time.Time `bson:"marked_as_excluded_at"`
 
@@ -63,6 +64,7 @@ func (r *mgoInteraction) Create(ctx context.Context, cmd *models.CreateInteracti
 			"conversation_id":       cmd.ConversationID,
 			"message_content":       cmd.MessageContent,
 			"file_ids":              cmd.FileIDs,
+			"skill_set_ids":         cmd.SkillSetIDs,
 			"marked_as_excluded_at": nil,
 
 			"owner": bson.M{
@@ -104,6 +106,7 @@ func (r *mgoInteraction) CreateActive(ctx context.Context, cmd *models.CreateAct
 			"conversation_id":       cmd.ConversationID,
 			"message_content":       cmd.MessageContent,
 			"file_ids":              cmd.FileIDs,
+			"skill_set_ids":         cmd.SkillSetIDs,
 			"marked_as_excluded_at": nil,
 
 			"owner": bson.M{
@@ -287,6 +290,7 @@ func (p *persistedInteraction) ToDomainModel() *models.Interaction {
 		IdempotencyKey: p.IdempotencyKey,
 		ConversationID: p.ConversationID,
 		FileIDs:        p.FileIDs,
+		SkillSetIDs:    p.SkillSetIDs,
 
 		MarkedAsExcludedAt: p.MarkedAsExcludedAt,
 

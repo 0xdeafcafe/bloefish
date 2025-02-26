@@ -2,13 +2,13 @@ package app
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/0xdeafcafe/bloefish/libraries/cher"
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/forkedcontext"
 	"github.com/0xdeafcafe/bloefish/services/airelay"
+	"github.com/0xdeafcafe/bloefish/services/skillset"
 	"github.com/0xdeafcafe/bloefish/services/stream"
 
 	"github.com/0xdeafcafe/bloefish/services/conversation"
@@ -22,6 +22,18 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 	}
 	if req.Owner.Identifier != defaultUser.User.ID {
 		return nil, cher.New("invalid_owner", cher.M{"identifier": req.Owner.Identifier})
+	}
+
+	skillSets, err := a.SkillSetService.GetManySkillSets(ctx, &skillset.GetManySkillSetsRequest{
+		SkillSetIDs: req.SkillSetIDs,
+		Owner: &skillset.Actor{
+			Type:       skillset.ActorType(req.Owner.Type),
+			Identifier: req.Owner.Identifier,
+		},
+		AllowDeleted: false,
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	convo, err := a.ConversationRepository.GetByID(ctx, req.ConversationID)
@@ -47,6 +59,7 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 		IdempotencyKey: req.IdempotencyKey,
 		ConversationID: convo.ID,
 		FileIDs:        req.FileIDs,
+		SkillSetIDs:    req.SkillSetIDs,
 		MessageContent: req.MessageContent,
 		Owner: &models.CreateInteractionCommandOwner{
 			Type:       models.ActorType(req.Owner.Type),
@@ -94,6 +107,7 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 		IdempotencyKey: fmt.Sprintf("%s-response", req.IdempotencyKey),
 		ConversationID: convo.ID,
 		FileIDs:        []string{},
+		SkillSetIDs:    []string{},
 		MessageContent: "",
 		Owner: &models.CreateActiveInteractionCommandOwner{
 			Type:       models.ActorTypeBot,
@@ -116,6 +130,7 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 				Type:       airelay.ActorType(interaction.Owner.Type),
 				Identifier: interaction.Owner.Identifier,
 			},
+			SkillSets:          skillSets.SkillSets,
 			Interaction:        interaction,
 			ActiveInteraction:  activeInteraction,
 			StreamingChannelID: streamingChannelID,
@@ -143,6 +158,7 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 		InputInteraction: &conversation.CreateConversationMessageResponseInteraction{
 			ID:              interaction.ID,
 			FileIDs:         interaction.FileIDs,
+			SkillSetIDs:     interaction.SkillSetIDs,
 			StreamChannelID: streamingChannelID,
 
 			MarkedAsExcludedAt: interaction.MarkedAsExcludedAt,
@@ -167,6 +183,7 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 		ResponseInteraction: &conversation.CreateConversationMessageResponseInteraction{
 			ID:              activeInteraction.ID,
 			FileIDs:         activeInteraction.FileIDs,
+			SkillSetIDs:     activeInteraction.SkillSetIDs,
 			StreamChannelID: streamingChannelID,
 
 			MarkedAsExcludedAt: activeInteraction.MarkedAsExcludedAt,
@@ -190,97 +207,4 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 		},
 		StreamChannelID: streamingChannelID,
 	}, nil
-}
-
-type createConversationMessageReplyCommand struct {
-	Conversation *models.Conversation
-	Owner        *airelay.Actor
-
-	Interaction       *models.Interaction
-	ActiveInteraction *models.Interaction
-
-	StreamingChannelID string
-	UseStreaming       bool
-}
-
-func (a *App) createConversationMessageReply(
-	ctx context.Context,
-	cmd *createConversationMessageReplyCommand,
-) error {
-	conversationInteractions, err := a.InteractionRepository.GetAllByConversationID(ctx, cmd.Conversation.ID)
-	if err != nil {
-		return err
-	}
-
-	messages := make([]*airelay.InvokeConversationMessageRequestMessage, 0, len(conversationInteractions))
-
-	for _, interaction := range conversationInteractions {
-		if interaction.CompletedAt == nil || interaction.MarkedAsExcludedAt != nil {
-			continue
-		}
-
-		messages = append(messages, &airelay.InvokeConversationMessageRequestMessage{
-			Owner: &airelay.Actor{
-				Type:       airelay.ActorType(interaction.Owner.Type),
-				Identifier: interaction.Owner.Identifier,
-			},
-			FileIDs: []string{}, // TODO(afr): Handle files
-			Content: interaction.MessageContent,
-		})
-	}
-
-	aiRelayOptions := &models.AIRelayOptions{
-		ProviderID: cmd.Conversation.AIRelayOptions.ProviderID,
-		ModelID:    cmd.Conversation.AIRelayOptions.ModelID,
-	}
-	if cmd.Interaction.AIRelayOptions != nil {
-		aiRelayOptions = &models.AIRelayOptions{
-			ProviderID: cmd.Interaction.AIRelayOptions.ProviderID,
-			ModelID:    cmd.Interaction.AIRelayOptions.ModelID,
-		}
-	}
-
-	var messageContent string
-	if cmd.UseStreaming {
-		response, err := a.AIRelayService.InvokeStreamingConversationMessage(ctx, &airelay.InvokeStreamingConversationMessageRequest{
-			StreamingChannelID: cmd.StreamingChannelID,
-			Owner:              cmd.Owner,
-			Messages:           messages,
-			AIRelayOptions: &airelay.InvokeConversationMessageRequestAIRelayOptions{
-				ProviderID: aiRelayOptions.ProviderID,
-				ModelID:    aiRelayOptions.ModelID,
-			},
-		})
-		if err != nil {
-			json, _ := json.Marshal(err)
-			clog.Get(ctx).WithError(err).WithField("json", string(json)).Error("failed to invoke streaming conversation message")
-
-			return err
-		}
-
-		messageContent = response.MessageContent
-	} else {
-		response, err := a.AIRelayService.InvokeConversationMessage(ctx, &airelay.InvokeConversationMessageRequest{
-			Owner:    cmd.Owner,
-			Messages: messages,
-			AIRelayOptions: &airelay.InvokeConversationMessageRequestAIRelayOptions{
-				ProviderID: aiRelayOptions.ProviderID,
-				ModelID:    aiRelayOptions.ModelID,
-			},
-		})
-		if err != nil {
-			json, _ := json.Marshal(err)
-			clog.Get(ctx).WithError(err).WithField("json", string(json)).Error("failed to invoke conversation message")
-
-			return err
-		}
-
-		messageContent = response.MessageContent
-	}
-
-	if err := a.InteractionRepository.MarkActiveAsComplete(ctx, cmd.ActiveInteraction.ID, messageContent); err != nil {
-		return err
-	}
-
-	return nil
 }
