@@ -43,7 +43,7 @@ func (a *App) generateConversationTitle(
 			cmd.Interaction.MessageContent,
 		),
 		Owner:   cmd.Owner,
-		FileIDs: []string{},
+		FileIDs: []string{}, // Titles should not support files
 	}}
 
 	if cmd.UseStreaming {

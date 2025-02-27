@@ -11,6 +11,7 @@ type FileRepository interface {
 	CreateUpload(ctx context.Context, req *models.CreateUploadCommand) (string, error)
 	ConfirmUpload(ctx context.Context, fileID string) (*models.File, error)
 	Get(ctx context.Context, fileID string) (*models.File, error)
+	GetMany(ctx context.Context, ids []string) ([]*models.File, error)
 }
 
 type FileObjectService interface {

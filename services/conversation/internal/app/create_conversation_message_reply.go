@@ -44,7 +44,7 @@ func (a *App) createConversationMessageReply(
 					Type:       airelay.ActorType(skillSet.Owner.Type),
 					Identifier: skillSet.Owner.Identifier,
 				},
-				FileIDs: []string{}, // Skill sets current can't have files
+				FileIDs: []string{}, // Skill sets currently can't have files
 				Content: fmt.Sprintf(
 					"Use the following instructions to guide your responses or to learn more context about the subject: %s",
 					skillSet.Prompt,
@@ -63,7 +63,7 @@ func (a *App) createConversationMessageReply(
 				Type:       airelay.ActorType(interaction.Owner.Type),
 				Identifier: interaction.Owner.Identifier,
 			},
-			FileIDs: []string{}, // TODO(afr): Handle files
+			FileIDs: interaction.FileIDs,
 			Content: interaction.MessageContent,
 		})
 	}

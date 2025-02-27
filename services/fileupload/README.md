@@ -85,6 +85,49 @@ interface Response {
 }
 ```
 
+#### `get_many_files`
+
+Gets many files by ID.
+
+If `include_access_url` is set to `true`, then the `presigned_access_url` will be included in the response.
+
+If `access_url_expiry_seconds` is set to a number, then the `presigned_access_url` will expire after that many seconds. If it is set to `null`, then the URL will have a default expiry time of 15 minutes.
+
+If `allow_deleted` is `true` then deleted files will be included. If `false`, then if a deleted file is requested an error will be returned.
+
+If `owner` is provided it will filter the results to only include file owned by the specified user.
+
+**Contract**
+
+```typescript
+interface Request {
+	file_ids: string[];
+	owner: {
+		type: 'user';
+		identifier: string;
+	} | null;
+
+	allow_deleted: boolean | null;
+	include_access_url: boolean;
+	access_url_expiry_seconds: number | null;
+}
+
+interface Response {
+	files: {
+		id: string;
+		name: string;
+		size: number;
+		mime_type: string;
+		owner: {
+			type: 'user';
+			identifier: string;
+		};
+
+		presigned_access_url: string | null;
+	}[];
+}
+```
+
 
 ## Uploading to an upload url
 

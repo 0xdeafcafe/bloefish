@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/0xdeafcafe/bloefish/libraries/cher"
 	"github.com/0xdeafcafe/bloefish/libraries/ksuid"
 	"github.com/0xdeafcafe/bloefish/services/fileupload/internal/domain/models"
 	"github.com/0xdeafcafe/bloefish/services/fileupload/internal/domain/ports"
@@ -101,6 +102,46 @@ func (m *mgoFile) Get(ctx context.Context, fileID string) (*models.File, error) 
 	}
 
 	return file.ToDomainModel(), nil
+}
+
+func (m *mgoFile) GetMany(ctx context.Context, ids []string) ([]*models.File, error) {
+	cursor, err := m.c.Find(ctx, bson.M{
+		"_id": bson.M{"$in": ids},
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var files []*persistedFile
+	if err := cursor.All(ctx, &files); err != nil {
+		return nil, err
+	}
+
+	if len(files) != len(ids) {
+		foundIDs := make(map[string]bool)
+		for _, file := range files {
+			foundIDs[file.ID] = true
+		}
+
+		missingIDs := make([]string, 0)
+		for _, id := range ids {
+			if !foundIDs[id] {
+				missingIDs = append(missingIDs, id)
+			}
+		}
+
+		return nil, cher.New("files_not_found", cher.M{
+			"missing_file_ids": missingIDs,
+		})
+	}
+
+	filesDomain := make([]*models.File, len(files))
+	for i, file := range files {
+		filesDomain[i] = file.ToDomainModel()
+	}
+
+	return filesDomain, nil
 }
 
 func (p *persistedFile) ToDomainModel() *models.File {

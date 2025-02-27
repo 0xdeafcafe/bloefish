@@ -49,6 +49,7 @@ func New(ctx context.Context, app *app.App) *RPC {
 	svr.Register("create_upload", "2025-02-12", schema("create_upload"), rpc.CreateUpload)
 	svr.Register("confirm_upload", "2025-02-12", schema("confirm_upload"), rpc.ConfirmUpload)
 	svr.Register("get_file", "2025-02-12", schema("get_file"), rpc.GetFile)
+	svr.Register("get_many_files", "2025-02-12", schema("get_many_files"), rpc.GetManyFiles)
 
 	mux := chi.NewRouter()
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))

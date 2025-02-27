@@ -15,18 +15,41 @@ import (
 )
 
 func (a *App) InvokeStreamingConversationMessage(ctx context.Context, req *airelay.InvokeStreamingConversationMessageRequest) (*airelay.InvokeStreamingConversationMessageResponse, error) {
+	fileIDs := make([]string, 0, len(req.Messages))
+	for _, msg := range req.Messages {
+		fileIDs = append(fileIDs, msg.FileIDs...)
+	}
+
+	downloadedFiles, err := a.downloadFiles(ctx, req.Owner, fileIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	messages := make([]relay.Message, len(req.Messages))
 	for i, msg := range req.Messages {
+		fileContent := ""
+
+		if len(msg.FileIDs) > 0 {
+			file := downloadedFiles[msg.FileIDs[0]]
+			if file == nil {
+				return nil, cher.New("file_not_found", cher.M{
+					"file_id": msg.FileIDs[0],
+				})
+			}
+
+			fileContent = fmt.Sprintf("\n\nFile name: %s\nFile content:\n%s", file.Name, string(file.Content))
+		}
+
 		switch msg.Owner.Type {
 		case airelay.ActorTypeBot:
 			messages[i] = relay.Message{
 				Role:    relay.RoleAssistant,
-				Content: msg.Content,
+				Content: msg.Content + fileContent,
 			}
 		case airelay.ActorTypeUser:
 			messages[i] = relay.Message{
 				Role:    relay.RoleUser,
-				Content: msg.Content,
+				Content: msg.Content + fileContent,
 			}
 		}
 	}

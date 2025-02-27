@@ -32,3 +32,7 @@ func (r *RPCClient) ConfirmUpload(ctx context.Context, req *ConfirmUploadRequest
 func (r *RPCClient) GetFile(ctx context.Context, req *GetFileRequest) (resp *GetFileResponse, err error) {
 	return resp, r.client.Do(ctx, "get_file", "2025-02-12", req, &resp)
 }
+
+func (r *RPCClient) GetManyFiles(ctx context.Context, req *GetManyFilesRequest) (resp *GetManyFilesResponse, err error) {
+	return resp, r.client.Do(ctx, "get_many_files", "2025-02-12", req, &resp)
+}
