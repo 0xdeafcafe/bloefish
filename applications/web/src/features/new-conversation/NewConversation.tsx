@@ -10,6 +10,7 @@ import { ChatInput } from '../chat-input/ChatInput';
 import { Helmet } from 'react-helmet-async';
 import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
 import type { AiRelayOptions } from '~/api/bloefish/shared.types';
+import { Panel } from '~/components/atoms/Panel';
 
 const starterPrompts: string[] = [
 	'What is the meaning of life?',
@@ -55,12 +56,7 @@ export const NewConversation: React.FC = () => {
 	}
 
 	return (
-		<Box
-			position={'relative'}
-			width={'full'}
-			height={'full'}
-			overflow={'hidden'}
-		>
+		<Panel.Body>
 			<Helmet>
 				<title>{'Welcome | Bloefish'}</title>
 			</Helmet>
@@ -193,7 +189,7 @@ export const NewConversation: React.FC = () => {
 					/>
 				</Box>
 			</Flex>
-		</Box>
+		</Panel.Body>
 	)
 };
 

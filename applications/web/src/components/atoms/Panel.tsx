@@ -3,21 +3,16 @@ import { motion } from "motion/react";
 import type React from "react";
 
 const Root: React.FC<React.PropsWithChildren> = ({ children }) => (
-	<MotionCardRoot
+	<Card.Root
 		flex={'1'}
 		variant={'outline'}
 		boxShadow={'md'}
 		p={0}
 		// I'm not happy about this, but i'm also too fucking annoyed to spend any more time on this
 		maxH={'calc(100vh - 42px - 12px)'}
-
-		initial={{ scale: 0.95, opacity: 0, y: 10 }}
-		animate={{ scale: 1, opacity: 1, y: 0 }}
-		exit={{ scale: 0.95, opacity: 0, y: 10 }}
-		transition={{ duration: 0.3 }}
 	>
 		{children}
-	</MotionCardRoot>
+	</Card.Root>
 );
 
 const Header: React.FC<React.PropsWithChildren> = ({ children }) => (
@@ -40,13 +35,18 @@ const Header: React.FC<React.PropsWithChildren> = ({ children }) => (
 );
 
 const Body: React.FC<React.PropsWithChildren> = ({ children }) => (
-	<Card.Body
+	<MotionCardBody
 		p={0}
 		height={'full'}
 		overflowY={'auto'}
+
+		initial={{ scale: 0.95, opacity: 0, y: 10 }}
+		animate={{ scale: 1, opacity: 1, y: 0 }}
+		exit={{ scale: 0.95, opacity: 0, y: 10 }}
+		transition={{ duration: 0.1 }}
 	>
 		{children}
-	</Card.Body>
+	</MotionCardBody>
 );
 
 export const Panel = {
@@ -55,4 +55,4 @@ export const Panel = {
 	Body,
 };
 
-const MotionCardRoot = motion.create(Card.Root);
+const MotionCardBody = motion.create(Card.Body);
