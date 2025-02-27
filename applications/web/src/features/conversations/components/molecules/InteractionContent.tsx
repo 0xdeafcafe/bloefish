@@ -5,10 +5,9 @@ import { useTheme } from 'next-themes';
 import { InteractionErrors } from './InteractionErrors';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { InteractionFooter } from './InteractionFooter';
-import type { AiRelayOptions } from '~/api/bloefish/shared.types';
 import { aiRelayApi } from '~/api/bloefish/ai-relay';
-import type { AiProvider } from '~/api/bloefish/ai-relay.types';
 import { FormatDuration } from '~/components/atoms/FormatDuration';
+import { friendlyAiRelayOptions } from '~/utils/ai-providers';
 
 interface InteractionContentProps {
 	interaction: Interaction;
@@ -65,7 +64,7 @@ export const InteractionContent: React.FC<InteractionContentProps> = ({
 								px={2}
 								py={1}
 							>
-								{renderEnrichedModelDeets(interaction.aiRelayOptions, supportedModels?.providers)}
+								{friendlyAiRelayOptions(interaction.aiRelayOptions, supportedModels?.providers)}
 							</Badge>
 							
 							<Badge
@@ -92,12 +91,3 @@ export const InteractionContent: React.FC<InteractionContentProps> = ({
 		</Stack>
 	)
 };
-
-function renderEnrichedModelDeets(aiRelayOptions: AiRelayOptions, providers: AiProvider[] | undefined) {
-	const provider = providers?.find((p) => p.id === aiRelayOptions.providerId);
-	const model = provider?.models.find((m) => m.id === aiRelayOptions.modelId);
-
-	if (!provider || !model) return `${aiRelayOptions.providerId} (${aiRelayOptions.modelId})`;
-
-	return `${provider.name} (${model.name})`;
-}

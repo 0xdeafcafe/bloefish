@@ -56,7 +56,7 @@ export const Preferences: React.FC = () => {
 									{'Profile details'}
 								</Fieldset.Legend>
 								<Fieldset.HelperText>
-									{'Who are you? You can lie, we won\'t check.'}
+									{'Who are you? You can lie, nobody will notice.'}
 								</Fieldset.HelperText>
 							</Stack>
 
@@ -67,10 +67,6 @@ export const Preferences: React.FC = () => {
 
 								<Field label="Bio">
 									<Textarea name="bio" disabled autoresize placeholder={'Write a bit about yourself, your interests, etc.'} />
-								</Field>
-
-								<Field label="Name">
-									<Input name="name" disabled value={'Alexander Forbes-Reed'} />
 								</Field>
 
 								<Button disabled type={'submit'} variant={'surface'} alignSelf={'flex-start'}>
@@ -87,67 +83,10 @@ export const Preferences: React.FC = () => {
 						>
 							<Stack flex={1}>
 								<Fieldset.Legend fontSize={'xl'}>
-									{'Display'}
-								</Fieldset.Legend>
-								<Fieldset.HelperText>
-									{"Make your eyes hate you less (or more, we don't judge)"}
-								</Fieldset.HelperText>
-							</Stack>
-
-							<Fieldset.Content flex={1} mt={0}>
-								<Field label={'Theme'}>
-									<NativeSelectRoot>
-										<NativeSelectField
-											name={'theme'}
-											disabled
-											defaultValue={'System'}
-											items={[
-												'Light',
-												'Dark',
-												'System',
-											]}
-										/>
-									</NativeSelectRoot>
-								</Field>
-
-								<Field label={'Reduced motion'}>
-									<Switch.Root disabled>
-										<Switch.HiddenInput />
-										<Switch.Control>
-											<Switch.Thumb />
-										</Switch.Control>
-										<Switch.Label>
-											{'Normal'}
-										</Switch.Label>
-									</Switch.Root>
-								</Field>
-
-								<Field label={'Background animations'}>
-									<Switch.Root checked disabled>
-										<Switch.HiddenInput />
-										<Switch.Control>
-											<Switch.Thumb />
-										</Switch.Control>
-										<Switch.Label>
-											{'Enabled'}
-										</Switch.Label>
-									</Switch.Root>
-								</Field>
-							</Fieldset.Content>
-						</Fieldset.Root>
-
-						<Fieldset.Root
-							size="lg"
-							display={'flex'}
-							flexDirection={'row'}
-							gap={10}
-						>
-							<Stack flex={1}>
-								<Fieldset.Legend fontSize={'xl'}>
 									{'Assistant preferences'}
 								</Fieldset.Legend>
 								<Fieldset.HelperText>
-									{'Tell your AI assistant how to behave (it\'ll probably ignoring you anyway)'}
+									{'Tell your AI assistant how to behave (it\'ll probably ignore you anyway)'}
 								</Fieldset.HelperText>
 							</Stack>
 
@@ -212,6 +151,63 @@ export const Preferences: React.FC = () => {
 								<Button disabled type={'submit'} variant={'surface'} alignSelf={'flex-start'}>
 									{'Update'}
 								</Button>
+							</Fieldset.Content>
+						</Fieldset.Root>
+
+						<Fieldset.Root
+							size="lg"
+							display={'flex'}
+							flexDirection={'row'}
+							gap={10}
+						>
+							<Stack flex={1}>
+								<Fieldset.Legend fontSize={'xl'}>
+									{'Display'}
+								</Fieldset.Legend>
+								<Fieldset.HelperText>
+									{"Make your eyes hate you less (or more, we don't judge)"}
+								</Fieldset.HelperText>
+							</Stack>
+
+							<Fieldset.Content flex={1} mt={0}>
+								<Field label={'Theme'}>
+									<NativeSelectRoot>
+										<NativeSelectField
+											name={'theme'}
+											disabled
+											defaultValue={'System'}
+											items={[
+												'Light',
+												'Dark',
+												'System',
+											]}
+										/>
+									</NativeSelectRoot>
+								</Field>
+
+								<Field label={'Reduced motion'}>
+									<Switch.Root disabled>
+										<Switch.HiddenInput />
+										<Switch.Control>
+											<Switch.Thumb />
+										</Switch.Control>
+										<Switch.Label>
+											{'Normal'}
+										</Switch.Label>
+									</Switch.Root>
+								</Field>
+
+								<Field label={'Background animations'}>
+									<Switch.Root checked disabled>
+										<Switch.HiddenInput />
+										<Switch.Control>
+											<Switch.Thumb />
+										</Switch.Control>
+										<Switch.Label>
+											{'Enabled'}
+										</Switch.Label>
+									</Switch.Root>
+								</Field>
 							</Fieldset.Content>
 						</Fieldset.Root>
 					</Stack>

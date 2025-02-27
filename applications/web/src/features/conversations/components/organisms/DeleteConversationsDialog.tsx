@@ -1,5 +1,5 @@
 import { Button, Icon, Input, Text, VStack } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { DialogActionTrigger, DialogBody, DialogCloseTrigger, DialogContent, DialogFooter, DialogHeader, DialogRoot, DialogTitle, DialogTrigger } from '~/components/ui/dialog';
 import { conversationApi } from '~/api/bloefish/conversation';
 import { LuTrash2 } from 'react-icons/lu';
@@ -52,12 +52,8 @@ export const DeleteConversationsDialog: React.FC<DeleteConversationsDialogProps>
 		}
 	};
 
-	useEffect(() => {
-		initialFocusRef.current?.focus();
-	}, []);
-
 	return (
-		<DialogRoot role={'alertdialog'}>
+		<DialogRoot role={'alertdialog'} initialFocusEl={() => initialFocusRef.current}>
 			<DialogTrigger asChild>
 				<Button
 					variant={'outline'}

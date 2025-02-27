@@ -1,4 +1,4 @@
-import { Breadcrumb, Button, ButtonGroup, Center, EmptyState, Icon, Link as ChakraLink, Spinner, Table, VStack } from '@chakra-ui/react';
+import { Text, Button, Center, EmptyState, Link as ChakraLink, Icon, Spinner, VStack, Card, Grid, GridItem, Stack, CheckboxCard, Badge, Skeleton, HStack } from '@chakra-ui/react';
 import { useAppSelector } from '~/store';
 import { Helmet } from 'react-helmet-async';
 import { conversationApi } from '~/api/bloefish/conversation';
@@ -7,20 +7,21 @@ import type { Conversation } from './store/types';
 import { LuFishSymbol, LuSquareArrowOutUpRight, LuSquareStack, LuX } from 'react-icons/lu';
 
 import { Panel } from '~/components/atoms/Panel';
-import { Checkbox } from '~/components/ui/checkbox';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ActionBarContent, ActionBarRoot, ActionBarSelectionTrigger, ActionBarSeparator } from '~/components/ui/action-bar';
 import { Link, useNavigate } from 'react-router';
 import { DeleteConversationsDialog } from './components/organisms/DeleteConversationsDialog';
-import { Skeleton } from '~/components/ui/skeleton';
-import { FormatDuration } from '~/components/atoms/FormatDuration';
 import { toaster } from '~/components/ui/toaster';
 import React from 'react';
+import { aiRelayApi } from '~/api/bloefish/ai-relay';
+import { friendlyAiRelayOptions } from '~/utils/ai-providers';
+import { FormatDuration } from '~/components/atoms/FormatDuration';
 
 export const ConversationsList: React.FC = () => {
 	const navigate = useNavigate();
-	const { data: userData } = userApi.useGetOrCreateDefaultUserQuery();
 	const conversations = useAppSelector(s => s.conversations);
+	const { data: userData } = userApi.useGetOrCreateDefaultUserQuery();
+	const { data: supportedModels } = aiRelayApi.useListSupportedQuery();
 	const truthyConversations = Object.values(conversations).filter(Boolean) as Conversation[];
 	const sortedConversations = truthyConversations.sort((a, b) => {
 		return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -28,7 +29,6 @@ export const ConversationsList: React.FC = () => {
 
 	const [selection, setSelection] = useState<string[]>([]);
 	const hasSelection = selection.length > 0;
-	const indeterminate = hasSelection && selection.length < truthyConversations.length;
 
 	const { isFetching: convoFetching, isLoading: convoLoading } = conversationApi.useListConversationsWithInteractionsQuery({
 		owner: {
@@ -40,7 +40,9 @@ export const ConversationsList: React.FC = () => {
 	if (convoFetching || convoLoading) {
 		return (
 			<Container>
-				<Spinner />
+				<Center h={'full'}>
+					<Spinner />
+				</Center>
 			</Container>
 		);
 	}
@@ -71,99 +73,92 @@ export const ConversationsList: React.FC = () => {
 
 	return (
 		<Container>
-			<Table.Root striped interactive stickyHeader size={'md'} width={'100%'}>
-				<Table.Header>
-					<Table.Row>
-						<Table.ColumnHeader>
-							<Checkbox
-								top="1"
-								aria-label="Select all conversations"
-								size={'sm'}
-								checked={indeterminate ? 'indeterminate' : selection.length > 0}
-								onCheckedChange={(changes) => setSelection(changes.checked
-									? truthyConversations.map((conversation) => conversation.id)
-									: [],
-								)}
-							/>
-						</Table.ColumnHeader>
-						<Table.ColumnHeader>
-							{'Title'}
-						</Table.ColumnHeader>
-						<Table.ColumnHeader>
-							{'Created at'}
-						</Table.ColumnHeader>
-						<Table.ColumnHeader>
-							{'Last updated at'}
-						</Table.ColumnHeader>
-						<Table.ColumnHeader>
-							{'Actions'}
-						</Table.ColumnHeader>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{sortedConversations.map(conversation => (
-						<Table.Row key={conversation.id}>
-							<Table.Cell>
-								<Checkbox
-									top="1"
-									aria-label="Select conversation"
-									checked={selection.includes(conversation.id)}
-									size={'sm'}
-									onCheckedChange={(changes) => setSelection((prev) =>
-										changes.checked
-											? [...prev, conversation.id]
-											: selection.filter((name) => name !== conversation.id),
-									)}
-								/>
-							</Table.Cell>
-							<ChakraLink asChild variant={'plain'} display={'contents'}>
-								<Link to={`/conversations/${conversation.id}`}>
-									<Table.Cell alignContent={'center'}>
-										{conversation.title ?? (
-											<Skeleton variant={'shine'} w={32} height={4} />
+			<Stack gap={6}>
+				{sortedConversations.map(conversation => (
+					<CheckboxCard.Root
+						key={conversation.id}
+						checked={selection.includes(conversation.id)}
+						onChange={e => {
+							if (e.target instanceof HTMLInputElement) {
+								if (e.target.checked) {
+									setSelection([...selection, conversation.id]);
+								} else {
+									setSelection(selection.filter(id => id !== conversation.id));
+								}
+							}
+						}}
+					>
+						<Grid templateColumns={'auto 1fr auto'} p={2} gap={2}>
+							<GridItem>
+								<CheckboxCard.HiddenInput />
+								<CheckboxCard.Control>
+									<CheckboxCard.Indicator />
+								</CheckboxCard.Control>
+							</GridItem>
+							<GridItem>
+								<CheckboxCard.Content>
+									<CheckboxCard.Label>
+										{conversation.title ? (
+											<ChakraLink asChild variant={'plain'} display={'contents'}>
+												<Link to={`/conversations/${conversation.id}`}>
+													<Text textStyle={'md'}>{conversation.title}</Text>
+												</Link>
+											</ChakraLink>
+										) : (
+											<Skeleton width={'150px'} />
 										)}
-									</Table.Cell>
-									<Table.Cell>
-										<FormatDuration
-											start={conversation.createdAt}
+									</CheckboxCard.Label>
+									<CheckboxCard.Description>
+										<HStack>
+											<Badge size={'xs'} colorPalette={'blue'}>
+												{Object.keys(conversation.interactions).length} messages
+											</Badge>
+											<Badge size={'xs'} colorPalette={'purple'}>
+												{friendlyAiRelayOptions(conversation.aiRelayOptions, supportedModels?.providers)}
+											</Badge>
+											<Badge size={'xs'} colorPalette={'gray'}>
+												{'Created: '}
+												<FormatDuration start={conversation.createdAt} />
+											</Badge>
+											<Badge size={'xs'} colorPalette={'gray'}>
+												{'Last updated: '}
+												<FormatDuration start={conversation.createdAt} />
+											</Badge>
+										</HStack>
+									</CheckboxCard.Description>
+								</CheckboxCard.Content>
+							</GridItem>
+							<GridItem>
+								<CheckboxCard.Content>
+									<Center h={'full'} gap={2}>
+										<Button asChild colorPalette={'gray'} size={'2xs'} variant={'outline'}>
+											<Link to={`/conversations/${conversation.id}`}>
+												<Icon size={'xs'}>
+													<LuSquareArrowOutUpRight />
+												</Icon>
+												{'View'}
+											</Link>
+										</Button>
+										<DeleteConversationsDialog
+											conversationIds={[conversation.id]}
+											onDeleteSuccess={() => {
+												toaster.create({
+													type: 'error',
+													title: 'Conversation deleted',
+													description: 'The conversation has been deleted successfully.',
+												});
+											}}
+											deleteButtonSize={'2xs'}
+											deleteButtonIconSize={'xs'}
+											deleteButtonText={'Delete'}
 										/>
-									</Table.Cell>
-									<Table.Cell>
-										<FormatDuration
-											start={Object.values(conversation.interactions).at(0)?.updatedAt ?? conversation.updatedAt}
-										/>
-									</Table.Cell>
-								</Link>
-							</ChakraLink>
-							<Table.Cell>
-								<ButtonGroup size={'2xs'} variant={'outline'}>
-									<Button asChild colorPalette="gray">
-										<Link to={`/conversations/${conversation.id}`}>
-											<Icon size={'xs'}>
-												<LuSquareArrowOutUpRight />
-											</Icon>
-											{'View'}
-										</Link>
-									</Button>
-									<DeleteConversationsDialog
-										conversationIds={[conversation.id]}
-										onDeleteSuccess={() => {
-											toaster.create({
-												type: 'error',
-												title: 'Conversation deleted',
-												description: 'The conversation has been deleted successfully.',
-											});
-										}}
-										deleteButtonSize={'2xs'}
-										deleteButtonIconSize={'xs'}
-										deleteButtonText={'Delete'}
-									/>
-								</ButtonGroup>
-							</Table.Cell>
-						</Table.Row>
-					))}
-				</Table.Body>
-			</Table.Root>
+									</Center>
+								</CheckboxCard.Content>
+							</GridItem>
+						</Grid>
+					</CheckboxCard.Root>
+				))}
+			</Stack>
 
 			<ActionBarRoot open={hasSelection}>
 				<ActionBarContent>
@@ -215,26 +210,54 @@ export const ConversationsList: React.FC = () => {
 	);
 };
 
-const Container: React.FC<React.PropsWithChildren> = ({ children }) => (
-	<React.Fragment>
-		<Helmet>
-			<title>{'Conversations | Bloefish'}</title>
-		</Helmet>
+const Container: React.FC<React.PropsWithChildren> = ({ children }) => {
+	const [showBorder, setShowBorder] = useState(false);
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-		<Panel.Header>
-			<Breadcrumb.Root>
-				<Breadcrumb.List>
-					<Breadcrumb.Item>
-						<Breadcrumb.CurrentLink>
-							{'Conversations'}
-						</Breadcrumb.CurrentLink>
-					</Breadcrumb.Item>
-				</Breadcrumb.List>
-			</Breadcrumb.Root>
-		</Panel.Header>
+	return (
+		<React.Fragment>
+			<Helmet>
+				<title>{'Conversations | Bloefish'}</title>
+			</Helmet>
 
-		<Panel.Body>
-			{children}
-		</Panel.Body>
-	</React.Fragment>
-);
+			<Panel.Body>
+				<Grid
+					templateRows={'auto auto 1fr'}
+					maxH={'100%'}
+					overflow={'hidden'}
+				>
+					<GridItem p={6}>
+						<Stack gap={2}>
+							<Card.Root
+								overflow={'hidden'}
+								background={'bg.emphasized'}
+								backgroundSize={'100vw 500px'}
+							>
+								<Card.Body p={6}>
+									<Text textStyle={'4xl'} fontWeight={'bolder'} textShadow={'2xl'}>{'Conversations'}</Text>
+									<Text textStyle={'sm'} textShadow={'md'}>
+										{'weird chats below'}
+									</Text>
+								</Card.Body>
+							</Card.Root>
+						</Stack>
+					</GridItem>
+	
+					<GridItem
+						overflow={'auto'}
+						p={6}
+						ref={scrollContainerRef}
+						onScroll={() => {
+							const scrollTop = scrollContainerRef.current?.scrollTop ?? 0;
+							setShowBorder(scrollTop > 24);
+						}}
+						borderTopWidth={showBorder ? '1px' : '0'}
+						borderTopColor={'border.emphasized'}
+					>
+						{children}
+					</GridItem>
+				</Grid>
+			</Panel.Body>
+		</React.Fragment>
+	);
+}
