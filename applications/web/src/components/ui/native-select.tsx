@@ -28,6 +28,7 @@ interface NativeSelectItem {
 
 interface NativeSelectField extends Select.FieldProps {
   items?: Array<string | NativeSelectItem>
+  disabled?: boolean;
 }
 
 export const NativeSelectField = React.forwardRef<

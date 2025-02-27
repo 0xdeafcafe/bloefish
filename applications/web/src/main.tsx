@@ -16,6 +16,7 @@ import { ConversationsList } from './features/conversations/ConversationsList';
 import { OmniBar } from './features/omnibar/OmniBar';
 import { Toaster } from './components/ui/toaster';
 import { SkillSetList } from './features/skill-sets/SkillSetList';
+import { Preferences } from './features/preferences/Preferences';
 
 const root = createRoot(document.getElementById('root')!);
 
@@ -37,6 +38,8 @@ root.render(
 											<Route path="/conversations" element={<ConversationsList />} />
 
 											<Route path="/skill-sets" element={<SkillSetList />} />
+
+											<Route path="/preferences" element={<Preferences />} />
 
 											<Route path="*" element={<NotFound />} />
 										</Routes>
