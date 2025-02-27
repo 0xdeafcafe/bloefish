@@ -6,8 +6,10 @@ import { LuBot, LuSend, LuChevronDown, LuGraduationCap, LuPackage } from 'react-
 import { aiRelayApi } from '~/api/bloefish/ai-relay';
 import type { AiModel, AiProvider } from '~/api/bloefish/ai-relay.types';
 import type { AiRelayOptions } from '~/api/bloefish/shared.types';
+import { skillSetApi } from '~/api/bloefish/skill-set';
+import { userApi } from '~/api/bloefish/user';
 import { Button } from '~/components/ui/button';
-import { MenuContent, MenuItemCommand, MenuRadioItem, MenuRadioItemGroup, MenuRoot, MenuTrigger } from '~/components/ui/menu';
+import { MenuCheckboxItem, MenuContent, MenuItemCommand, MenuItemGroup, MenuRadioItem, MenuRadioItemGroup, MenuRoot, MenuTrigger } from '~/components/ui/menu';
 import { Tooltip } from '~/components/ui/tooltip';
 import { useLocalStorageState } from '~/hooks/use-local-storage-state';
 
@@ -26,6 +28,7 @@ interface ChatInputProps {
 	value: string;
 	onChange: (value: string) => void;
 	onAiRelayOptionsChange: (model: AiRelayOptions | null) => void;
+	onSkillSetIdsChange: (skillSetIds: string[]) => void;
 	onInvoke: () => void;
 }
 
@@ -34,9 +37,21 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 	value,
 	onChange,
 	onAiRelayOptionsChange,
+	onSkillSetIdsChange,
 	onInvoke,
 }) => {
+	const { data: currentUser } = userApi.useGetOrCreateDefaultUserQuery();
 	const { data: providers } = aiRelayApi.useListSupportedQuery()
+	const {
+		data: availableSkillSets,
+		isSuccess: hasAvailableSkillSets,
+		isFetching: isFetchingSkillSets,
+	} = skillSetApi.useListSkillSetsByOwnerQuery({
+		owner: {
+			type: 'user',
+			identifier: currentUser!.user.id,
+		},
+	});
 
 	const theme = useTheme();
 	const [focused, setFocused] = useState(false);
@@ -44,6 +59,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
 	const [availableModels, setAvailableModels] = useState<AvailableModel[]>();
 	const [selectedModel, setSelectedModel] = useLocalStorageState<AvailableModel>('chat_input.selected_model');
+
+	const [selectedSkillSets, setSelectedSkillSets] = useState<string[]>([]);
 
 	const [enterMode, setEnterMode] = useState<EnterMode>('send');
 	const [questionLength, setQuestionLength] = useState(0);
@@ -57,6 +74,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 			modelId: selectedModel.model.id,
 		} : null);
 	}, [selectedModel]);
+
+	useEffect(() => {
+		onSkillSetIdsChange(selectedSkillSets);
+	}, [selectedSkillSets]);
 
 	useEffect(() => {
 		if (!providers) return;
@@ -158,16 +179,43 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 				</HStack>
 				<Flex justify={'space-between'} gap={4}>
 					<Flex gap={2}>
-						<Tooltip content={'Select a skill set to include in this message'}>
-							<Button
-								size={'2xs'}
-								disabled
-								variant={'outline'}
-							>
-								<LuGraduationCap />
-								<LuChevronDown />
-							</Button>
-						</Tooltip>
+						<MenuRoot onExitComplete={() => inputRef.current?.focus()} >
+							<MenuTrigger asChild>
+								{/* <Tooltip content={'Select a skill set to include in this message'}> */}
+								<Button
+									disabled={!hasAvailableSkillSets}
+									loading={isFetchingSkillSets}
+									size={'2xs'}
+									variant={'outline'}
+								>
+									<LuGraduationCap />
+									{selectedSkillSets.length > 0 && `(${selectedSkillSets.length})`}
+									<LuChevronDown />
+								</Button>
+								{/* </Tooltip> */}
+							</MenuTrigger>
+							<MenuContent>
+								<MenuItemGroup title={'Skill sets'}>
+									{availableSkillSets?.skillSets?.map(ss => (
+										<MenuCheckboxItem
+											key={ss.id}
+											value={ss.id}
+											checked={selectedSkillSets.includes(ss.id)}
+											onCheckedChange={(checked) => {
+												if (checked) {
+													setSelectedSkillSets([...selectedSkillSets, ss.id]);
+												} else {
+													setSelectedSkillSets(selectedSkillSets.filter((id) => id !== ss.id));
+												}
+											}}
+										>
+											{ss.name}
+										</MenuCheckboxItem>
+									))}
+								</MenuItemGroup>
+							</MenuContent>
+						</MenuRoot>
+
 						<Tooltip content={'Select a file to include in this message'}>
 							<Button
 								size={'2xs'}

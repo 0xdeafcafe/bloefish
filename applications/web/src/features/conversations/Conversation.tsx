@@ -30,7 +30,10 @@ export const Conversation: React.FC = () => {
 	}, { skip: true });
 
 	const [idempotencyKey, generateNewIdempotencyKey] = useIdempotencyKey();
+
 	const [aiRelayOptions, setAiRelayOptions] = useState<AiRelayOptions | null>(null);
+	const [skillSetIds, setSkillSetIds] = useState<string[]>([]);
+
 	const [question, setQuestion] = useState('');
 	const [working, setWorking] = useState(false);
 
@@ -90,6 +93,7 @@ export const Conversation: React.FC = () => {
 				idempotencyKey: idempotencyKey,
 				messageContent: question,
 				aiRelayOptions: aiRelayOptions,
+				skillSetIds: skillSetIds,
 			})).unwrap();
 
 			generateNewIdempotencyKey();
@@ -207,6 +211,7 @@ export const Conversation: React.FC = () => {
 								value={question}
 								onChange={setQuestion}
 								onAiRelayOptionsChange={setAiRelayOptions}
+								onSkillSetIdsChange={setSkillSetIds}
 								onInvoke={askQuestion}
 							/>
 						</Center>

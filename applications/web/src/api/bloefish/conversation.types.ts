@@ -3,6 +3,7 @@ import type { Actor, AiRelayOptions, BloefishError } from './shared.types';
 export interface Interaction {
 	id: string;
 	fileIds: string[];
+	skillSetIds: string[];
 	includedInAiContext: boolean;
 	streamChannelId: string;
 
@@ -54,6 +55,7 @@ export interface CreateConversationMessageRequest {
 	idempotencyKey: string;
 	messageContent: string;
 	fileIds: string[];
+	skillSetIds: string[];
 	owner: Actor;
 	aiRelayOptions: AiRelayOptions;
 	options: CreateConversationMessageRequestOptions;

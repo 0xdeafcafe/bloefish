@@ -10,6 +10,7 @@ interface ContinueConversation {
 	idempotencyKey: string;
 	messageContent: string;
 	aiRelayOptions: AiRelayOptions;
+	skillSetIds: string[];
 }
 
 interface ContinueConversationReturned {
@@ -42,6 +43,7 @@ export const continueConversationChain = createAsyncThunk<
 				conversationId: params.conversationId,
 				messageContent: params.messageContent,
 				fileIds: [],
+				skillSetIds: params.skillSetIds,
 				owner,
 				aiRelayOptions: params.aiRelayOptions,
 				options: {

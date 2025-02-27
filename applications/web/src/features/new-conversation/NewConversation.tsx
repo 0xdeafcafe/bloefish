@@ -32,6 +32,7 @@ export const NewConversation: React.FC = () => {
 
 	const [question, setQuestion] = useState('');
 	const [aiRelayOptions, setAiRelayOptions] = useState<AiRelayOptions | null>(null);
+	const [skillSetIds, setSkillSetIds] = useState<string[]>([]);
 
 	async function askQuestion(questionOverride?: string) {
 		if (working) return;
@@ -44,6 +45,7 @@ export const NewConversation: React.FC = () => {
 				idempotencyKey: idempotencyKey,
 				messageContent: questionOverride ?? question,
 				aiRelayOptions: aiRelayOptions,
+				skillSetIds: skillSetIds,
 				navigate,
 			})).unwrap();
 			generateNewIdempotencyKey();
@@ -185,6 +187,7 @@ export const NewConversation: React.FC = () => {
 						disabled={working}
 						onChange={setQuestion}
 						onAiRelayOptionsChange={setAiRelayOptions}
+						onSkillSetIdsChange={setSkillSetIds}
 						onInvoke={askQuestion}
 						value={question}
 					/>

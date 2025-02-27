@@ -10,6 +10,7 @@ interface StartConversation {
 	idempotencyKey: string;
 	messageContent: string;
 	aiRelayOptions: AiRelayOptions;
+	skillSetIds: string[];
 	navigate: ReturnType<typeof useNavigate>;
 }
 
@@ -63,6 +64,7 @@ export const startConversationChain = createAsyncThunk<
 				fileIds: [],
 				owner,
 				aiRelayOptions: params.aiRelayOptions,
+				skillSetIds: params.skillSetIds,
 				options: {
 					useStreaming: true,
 				},
