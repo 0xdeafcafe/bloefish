@@ -30,7 +30,7 @@ func (r *RPCClient) GetSkillSet(ctx context.Context, req *GetSkillSetRequest) (r
 }
 
 func (r *RPCClient) GetManySkillSets(ctx context.Context, req *GetManySkillSetsRequest) (resp *GetManySkillSetsResponse, err error) {
-	return resp, r.client.Do(ctx, "get_many_skill_sets", "2025-02-12", req, nil)
+	return resp, r.client.Do(ctx, "get_many_skill_sets", "2025-02-12", req, &resp)
 }
 
 func (r *RPCClient) ListSkillSetsByOwner(ctx context.Context, req *ListSkillSetsByOwnerRequest) (resp *ListSkillSetsByOwnerResponse, err error) {

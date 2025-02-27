@@ -7,6 +7,7 @@
 		"idempotency_key",
 		"message_content",
 		"file_ids",
+		"skill_set_ids",
 		"owner",
 		"ai_relay_options",
 		"options"
@@ -29,6 +30,14 @@
 		},
 
 		"file_ids": {
+			"type": "array",
+			"items": {
+				"type": "string",
+				"minLength": 1
+			}
+		},
+
+		"skill_set_ids": {
 			"type": "array",
 			"items": {
 				"type": "string",

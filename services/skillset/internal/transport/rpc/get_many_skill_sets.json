@@ -3,13 +3,13 @@
 	"additionalProperties": false,
 
 	"required": [
-		"skill_set_id",
+		"skill_set_ids",
 		"owner",
 		"allow_deleted"
 	],
 
 	"properties": {
-		"skill_set_id": {
+		"skill_set_ids": {
 			"type": "array",
 			"items": {
 				"type": "string",

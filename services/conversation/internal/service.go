@@ -30,7 +30,7 @@ type Config struct {
 func defaultConfig() Config {
 	return Config{
 		Server: config.Server{
-			Addr: ":4001",
+			Addr: ":4002",
 		},
 
 		Telemetry: telemetry.Config{

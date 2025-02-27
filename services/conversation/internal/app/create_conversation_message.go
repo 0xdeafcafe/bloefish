@@ -107,7 +107,7 @@ func (a *App) CreateConversationMessage(ctx context.Context, req *conversation.C
 		IdempotencyKey: fmt.Sprintf("%s-response", req.IdempotencyKey),
 		ConversationID: convo.ID,
 		FileIDs:        []string{},
-		SkillSetIDs:    []string{},
+		SkillSetIDs:    req.SkillSetIDs,
 		MessageContent: "",
 		Owner: &models.CreateActiveInteractionCommandOwner{
 			Type:       models.ActorTypeBot,
