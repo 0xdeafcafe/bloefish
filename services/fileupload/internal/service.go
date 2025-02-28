@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
+
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/config"
 	"github.com/0xdeafcafe/bloefish/libraries/telemetry"
@@ -11,8 +14,6 @@ import (
 	"github.com/0xdeafcafe/bloefish/services/fileupload/internal/app/repositories"
 	"github.com/0xdeafcafe/bloefish/services/fileupload/internal/app/services"
 	"github.com/0xdeafcafe/bloefish/services/fileupload/internal/transport/rpc"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 type Config struct {
