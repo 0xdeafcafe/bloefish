@@ -29,7 +29,6 @@ export const InteractionContent: React.FC<InteractionContentProps> = ({
 				<Card.Root
 					position={'relative'}
 					borderRadius={'lg'}
-					zIndex={11}
 					blur={'10px'}
 					width={'fit-content'}
 					maxW={'100%'}

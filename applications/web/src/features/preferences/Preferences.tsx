@@ -1,48 +1,26 @@
-import { Card, Container, Fieldset, Grid, GridItem, Input, Stack, Switch, Text, Textarea } from '@chakra-ui/react';
-import React, { useRef, useState } from 'react';
+import { Container, Fieldset, Grid, GridItem, Input, Stack, Switch, Textarea } from '@chakra-ui/react';
+import React from 'react';
+import { BorderedScrollContainer } from '~/components/atoms/BorderedScrollContainer';
+import { HeaderCard } from '~/components/atoms/HeaderCard';
 import { Button } from '~/components/ui/button';
 import { Field } from '~/components/ui/field';
 import { NativeSelectField, NativeSelectRoot } from '~/components/ui/native-select';
 
-export const Preferences: React.FC = () => {
-	const scrollContainerRef = useRef<HTMLDivElement>(null);
-	const [showBorder, setShowBorder] = useState(false);
+export const Preferences: React.FC = () => (
+	<Grid
+		templateRows={'auto auto 1fr'}
+		maxH={'100%'}
+		overflow={'hidden'}
+	>
+		<GridItem p={6}>
+			<HeaderCard
+				title={'Preferences'}
+				description={'Make it yours, or if you have terrible taste maybe it\'s best to leave it as it is honestly.'}
+			/>
+		</GridItem>
 
-	return (
-		<Grid
-			templateRows={'auto auto 1fr'}
-			maxH={'100%'}
-			overflow={'hidden'}
-		>
-			<GridItem p={6}>
-				<Stack gap={2}>
-					<Card.Root
-						overflow={'hidden'}
-						background={'bg.emphasized'}
-						backgroundSize={'100vw 500px'}
-					>
-						<Card.Body p={6}>
-							<Text textStyle={'4xl'} fontWeight={'bolder'} textShadow={'2xl'}>{'Preferences'}</Text>
-							<Text textStyle={'sm'} textShadow={'md'}>
-								{'Make it yours, or if you have terrible taste maybe '}
-								{'it\'s best to leave it as it is honestly.'}
-							</Text>
-						</Card.Body>
-					</Card.Root>
-				</Stack>
-			</GridItem>
-
-			<GridItem 
-				overflow={'auto'}
-				p={6}
-				ref={scrollContainerRef}
-				onScroll={() => {
-					const scrollTop = scrollContainerRef.current?.scrollTop ?? 0;
-					setShowBorder(scrollTop > 24);
-				}}
-				borderTopWidth={showBorder ? '1px' : '0'}
-				borderTopColor={'border.emphasized'}
-			>
+		<GridItem asChild>
+			<BorderedScrollContainer p={6} triggerOffset={24}>
 				<Container maxW={'4xl'}>
 					<Stack gap={16}>
 						<Fieldset.Root
@@ -212,7 +190,7 @@ export const Preferences: React.FC = () => {
 						</Fieldset.Root>
 					</Stack>
 				</Container>
-			</GridItem>
-		</Grid>
-	);
-};
+			</BorderedScrollContainer>
+		</GridItem>
+	</Grid>
+);

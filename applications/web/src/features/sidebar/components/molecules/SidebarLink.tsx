@@ -33,7 +33,6 @@ export const SidebarLink: React.FC<SidebarButtonProps> = ({
 				borderRadius={'md'}
 				onClick={onClick}
 				cursor={'pointer'}
-				zIndex={10000}
 				_hover={{
 					background: 'bg.emphasized',
 					borderColor: 'border.hover',

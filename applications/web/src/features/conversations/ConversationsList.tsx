@@ -1,4 +1,4 @@
-import { Text, Button, Center, EmptyState, Link as ChakraLink, Icon, Spinner, VStack, Card, Grid, GridItem, Stack, CheckboxCard, Badge, Skeleton, HStack } from '@chakra-ui/react';
+import { Text, Button, Center, EmptyState, Link as ChakraLink, Icon, Spinner, VStack, Grid, GridItem, Stack, CheckboxCard, Badge, Skeleton, HStack } from '@chakra-ui/react';
 import { useAppSelector } from '~/store';
 import { Helmet } from 'react-helmet-async';
 import { conversationApi } from '~/api/bloefish/conversation';
@@ -7,7 +7,7 @@ import type { Conversation } from './store/types';
 import { LuFishSymbol, LuSquareArrowOutUpRight, LuSquareStack, LuX } from 'react-icons/lu';
 
 import { Panel } from '~/components/atoms/Panel';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { ActionBarContent, ActionBarRoot, ActionBarSelectionTrigger, ActionBarSeparator } from '~/components/ui/action-bar';
 import { Link, useNavigate } from 'react-router';
 import { DeleteConversationsDialog } from './components/organisms/DeleteConversationsDialog';
@@ -16,6 +16,8 @@ import React from 'react';
 import { aiRelayApi } from '~/api/bloefish/ai-relay';
 import { friendlyAiRelayOptions } from '~/utils/ai-providers';
 import { FormatDuration } from '~/components/atoms/FormatDuration';
+import { HeaderCard } from '~/components/atoms/HeaderCard';
+import { BorderedScrollContainer } from '~/components/atoms/BorderedScrollContainer';
 
 export const ConversationsList: React.FC = () => {
 	const navigate = useNavigate();
@@ -110,17 +112,17 @@ export const ConversationsList: React.FC = () => {
 									</CheckboxCard.Label>
 									<CheckboxCard.Description>
 										<HStack>
-											<Badge size={'xs'} colorPalette={'blue'}>
+											<Badge size={'xs'} colorPalette={'blue'} variant={'surface'}>
 												{Object.keys(conversation.interactions).length} messages
 											</Badge>
-											<Badge size={'xs'} colorPalette={'purple'}>
+											<Badge size={'xs'} colorPalette={'pink'} variant={'surface'}>
 												{friendlyAiRelayOptions(conversation.aiRelayOptions, supportedModels?.providers)}
 											</Badge>
-											<Badge size={'xs'} colorPalette={'gray'}>
+											<Badge size={'xs'} colorPalette={'gray'} variant={'surface'}>
 												{'Created: '}
 												<FormatDuration start={conversation.createdAt} />
 											</Badge>
-											<Badge size={'xs'} colorPalette={'gray'}>
+											<Badge size={'xs'} colorPalette={'gray'} variant={'surface'}>
 												{'Last updated: '}
 												<FormatDuration start={conversation.createdAt} />
 											</Badge>
@@ -210,54 +212,28 @@ export const ConversationsList: React.FC = () => {
 	);
 };
 
-const Container: React.FC<React.PropsWithChildren> = ({ children }) => {
-	const [showBorder, setShowBorder] = useState(false);
-	const scrollContainerRef = useRef<HTMLDivElement>(null);
+const Container: React.FC<React.PropsWithChildren> = ({ children }) => (
+	<React.Fragment>
+		<Helmet>
+			<title>{'Conversations | Bloefish'}</title>
+		</Helmet>
 
-	return (
-		<React.Fragment>
-			<Helmet>
-				<title>{'Conversations | Bloefish'}</title>
-			</Helmet>
+		<Panel.Body>
+			<Grid
+				templateRows={'auto auto 1fr'}
+				maxH={'100%'}
+				overflow={'hidden'}
+			>
+				<GridItem p={6}>
+					<HeaderCard title={'Conversations'} description={'View and manage your conversations'} />
+				</GridItem>
 
-			<Panel.Body>
-				<Grid
-					templateRows={'auto auto 1fr'}
-					maxH={'100%'}
-					overflow={'hidden'}
-				>
-					<GridItem p={6}>
-						<Stack gap={2}>
-							<Card.Root
-								overflow={'hidden'}
-								background={'bg.emphasized'}
-								backgroundSize={'100vw 500px'}
-							>
-								<Card.Body p={6}>
-									<Text textStyle={'4xl'} fontWeight={'bolder'} textShadow={'2xl'}>{'Conversations'}</Text>
-									<Text textStyle={'sm'} textShadow={'md'}>
-										{'weird chats below'}
-									</Text>
-								</Card.Body>
-							</Card.Root>
-						</Stack>
-					</GridItem>
-	
-					<GridItem
-						overflow={'auto'}
-						p={6}
-						ref={scrollContainerRef}
-						onScroll={() => {
-							const scrollTop = scrollContainerRef.current?.scrollTop ?? 0;
-							setShowBorder(scrollTop > 24);
-						}}
-						borderTopWidth={showBorder ? '1px' : '0'}
-						borderTopColor={'border.emphasized'}
-					>
+				<GridItem asChild>
+					<BorderedScrollContainer p={6} triggerOffset={24}>
 						{children}
-					</GridItem>
-				</Grid>
-			</Panel.Body>
-		</React.Fragment>
-	);
-}
+					</BorderedScrollContainer>
+				</GridItem>
+			</Grid>
+		</Panel.Body>
+	</React.Fragment>
+);

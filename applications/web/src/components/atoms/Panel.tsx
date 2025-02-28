@@ -36,6 +36,7 @@ const Header: React.FC<React.PropsWithChildren> = ({ children }) => (
 
 const Body: React.FC<React.PropsWithChildren> = ({ children }) => (
 	<MotionCardBody
+		position={'relative'}
 		p={0}
 		height={'full'}
 		overflowY={'auto'}

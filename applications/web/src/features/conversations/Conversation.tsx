@@ -1,7 +1,7 @@
-import { Box, Center, Container, Flex, Grid, GridItem, HStack, Spinner, Stack, ButtonGroup, IconButton, Breadcrumb, Skeleton } from '@chakra-ui/react';
-import { LuMailQuestion, LuSlash, LuTrash2 } from 'react-icons/lu';
+import { Box, Center, Container, Flex, Grid, GridItem, HStack, Spinner, Stack } from '@chakra-ui/react';
+import { LuMailQuestion } from 'react-icons/lu';
 import { useAppDispatch, useAppSelector } from '~/store';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { NotFound } from '~/pages/NotFound';
 import { ChatInput } from '../chat-input/ChatInput';
 import { useMemo, useState } from 'react';
@@ -11,11 +11,11 @@ import { Helmet } from 'react-helmet-async';
 import { conversationApi } from '~/api/bloefish/conversation';
 import { userApi } from '~/api/bloefish/user';
 import { ConversationInteraction } from './components/organisms/ConversationInteraction';
-import { Tooltip } from '~/components/ui/tooltip';
 import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
 import { Panel } from '~/components/atoms/Panel';
 import type { AiRelayOptions } from '~/api/bloefish/shared.types';
 import React from 'react';
+import { HeaderCard } from '~/components/atoms/HeaderCard';
 
 export const Conversation: React.FC = () => {
 	const { conversationId } = useParams();
@@ -109,41 +109,6 @@ export const Conversation: React.FC = () => {
 				<title>{`${conversation.title || 'New conversation'} | Bloefish`}</title>
 			</Helmet>
 
-			<Panel.Header>
-				<Flex gap={2} align={'center'}>
-					<Breadcrumb.Root>
-						<Breadcrumb.List>
-							<Breadcrumb.Item>
-								<Breadcrumb.Link asChild>
-									<Link to={'/conversations'}>
-										{'Conversations'}
-									</Link>
-								</Breadcrumb.Link>
-							</Breadcrumb.Item>
-							<Breadcrumb.Separator>
-								<LuSlash />
-							</Breadcrumb.Separator>
-							<Breadcrumb.Item>
-								<Breadcrumb.CurrentLink>
-									{Boolean(conversation.title) ? conversation.title : <Skeleton variant={'shine'} w={32} height={4} />}
-								</Breadcrumb.CurrentLink>
-							</Breadcrumb.Item>
-						</Breadcrumb.List>
-					</Breadcrumb.Root>
-				</Flex>
-				<ButtonGroup variant={'outline'} size={'xs'}>
-					<Tooltip content={'Delete conversation'}>
-						<IconButton
-							aria-label={'Delete conversation'}
-							colorPalette={'red'}
-							disabled
-						>
-							<LuTrash2 />
-						</IconButton>
-					</Tooltip>
-				</ButtonGroup>
-			</Panel.Header>
-
 			<Panel.Body>
 				<Grid
 					flex={1}
@@ -161,6 +126,11 @@ export const Conversation: React.FC = () => {
 					>
 						<Container maxW={'6xl'} minW={'sm'} py={10} pb={40} w={'full'}>
 							<Stack gap={6} mx={10}>
+								<HeaderCard
+									title={conversation.title || 'New conversation'}
+									description={''}
+								/>
+
 								{sortedInteractions.map(i => <ConversationInteraction key={i.id} interaction={i} />)}
 							</Stack>
 						</Container>
