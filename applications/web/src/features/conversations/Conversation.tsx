@@ -13,9 +13,9 @@ import { userApi } from '~/api/bloefish/user';
 import { ConversationInteraction } from './components/organisms/ConversationInteraction';
 import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
 import { Panel } from '~/components/atoms/Panel';
-import type { AiRelayOptions } from '~/api/bloefish/shared.types';
 import React from 'react';
 import { HeaderCard } from '~/components/atoms/HeaderCard';
+import { initializeChatInput } from '../chat-input/store';
 
 export const Conversation: React.FC = () => {
 	const { conversationId } = useParams();
@@ -30,11 +30,6 @@ export const Conversation: React.FC = () => {
 	}, { skip: true });
 
 	const [idempotencyKey, generateNewIdempotencyKey] = useIdempotencyKey();
-
-	const [aiRelayOptions, setAiRelayOptions] = useState<AiRelayOptions | null>(null);
-	const [skillSetIds, setSkillSetIds] = useState<string[]>([]);
-
-	const [question, setQuestion] = useState('');
 	const [working, setWorking] = useState(false);
 
 	const sortedInteractions = useMemo(() => {
@@ -80,27 +75,6 @@ export const Conversation: React.FC = () => {
 				</Panel.Body>
 			</React.Fragment>
 		);
-	}
-
-	async function askQuestion() {
-		if (working || !conversation || !aiRelayOptions) return;
-
-		setWorking(true);
-
-		try {
-			await dispatch(continueConversationChain({
-				conversationId: conversation.id,
-				idempotencyKey: idempotencyKey,
-				messageContent: question,
-				aiRelayOptions: aiRelayOptions,
-				skillSetIds: skillSetIds,
-			})).unwrap();
-
-			generateNewIdempotencyKey();
-			setQuestion('');
-		} finally {
-			setWorking(false);
-		}
 	}
 
 	return (
@@ -178,11 +152,28 @@ export const Conversation: React.FC = () => {
 						>
 							<ChatInput
 								disabled={working}
-								value={question}
-								onChange={setQuestion}
-								onAiRelayOptionsChange={setAiRelayOptions}
-								onSkillSetIdsChange={setSkillSetIds}
-								onInvoke={askQuestion}
+								identifier={conversation.id}
+								onInvoke={async e => {
+									if (working || !conversation) return;
+
+									setWorking(true);
+
+									try {
+										await dispatch(continueConversationChain({
+											conversationId: conversation.id,
+											idempotencyKey: idempotencyKey,
+											messageContent: e.prompt,
+											aiRelayOptions: e.aiRelayOptions,
+											skillSetIds: e.skillSetIds,
+											fileIds: e.fileIds,
+										})).unwrap();
+
+										generateNewIdempotencyKey();
+										dispatch(initializeChatInput({ identifier: conversation.id }));
+									} finally {
+										setWorking(false);
+									}
+								}}
 							/>
 						</Center>
 					</GridItem>

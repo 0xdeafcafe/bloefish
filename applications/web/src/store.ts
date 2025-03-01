@@ -3,6 +3,7 @@ import { apiMiddleware, apiReducers } from './api';
 import { useDispatch, useSelector } from 'react-redux';
 import { conversationsReducer } from './features/conversations/store';
 import { omniBarReducer } from './features/omnibar/store';
+import { chatInputReducer } from './features/chat-input/store';
 
 export type RootState = ReturnType<typeof store.getState>;
 
@@ -10,10 +11,11 @@ export const store = configureStore({
 	reducer: combineReducers({
 		...apiReducers,
 		conversations: conversationsReducer,
+		chatInput: chatInputReducer,
 		omniBar: omniBarReducer,
 	}),
 	devTools: true,
-	middleware: (getDefaultMiddleware) => 
+	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware().concat(
 			apiMiddleware,
 		),

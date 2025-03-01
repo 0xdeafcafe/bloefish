@@ -11,6 +11,7 @@ interface StartConversation {
 	messageContent: string;
 	aiRelayOptions: AiRelayOptions;
 	skillSetIds: string[];
+	fileIds: string[];
 	navigate: ReturnType<typeof useNavigate>;
 }
 
@@ -45,6 +46,8 @@ export const startConversationChain = createAsyncThunk<
 				aiRelayOptions: params.aiRelayOptions,
 			})).unwrap();
 
+			// setValue(`chat_input.selected_model.${`conversation-${conversation.id}`}`, params.aiRelayOptions);
+
 			dispatch(startConversation({
 				conversationId: conversation.id,
 				owner,
@@ -61,7 +64,7 @@ export const startConversationChain = createAsyncThunk<
 				idempotencyKey: params.idempotencyKey,
 				conversationId: conversation.id,
 				messageContent: params.messageContent,
-				fileIds: [],
+				fileIds: params.fileIds,
 				owner,
 				aiRelayOptions: params.aiRelayOptions,
 				skillSetIds: params.skillSetIds,

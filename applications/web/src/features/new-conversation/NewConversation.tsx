@@ -11,6 +11,8 @@ import { Helmet } from 'react-helmet-async';
 import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
 import type { AiRelayOptions } from '~/api/bloefish/shared.types';
 import { Panel } from '~/components/atoms/Panel';
+import { initializeChatInput } from '../chat-input/store';
+import { useChatInput } from '../chat-input/hooks/use-chat-input';
 
 const starterPrompts: string[] = [
 	'What is the meaning of life?',
@@ -24,6 +26,13 @@ const starterPrompts: string[] = [
 	'How many calories does my girlfriend burn jumping to conclusion?',
 ];
 
+interface AskQuestionCommand {
+	prompt: string;
+	aiRelayOptions: AiRelayOptions;
+	skillSetIds: string[];
+	fileIDs: string[];
+}
+
 export const NewConversation: React.FC = () => {
 	const [timeOfDay, timeOfDayEmphasis, timeOfDayEmoji] = generateTimeOfDayText();
 	const [idempotencyKey, generateNewIdempotencyKey] = useIdempotencyKey();
@@ -31,25 +40,24 @@ export const NewConversation: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const [working, setWorking] = useState(false);
 
-	const [question, setQuestion] = useState('');
-	const [aiRelayOptions, setAiRelayOptions] = useState<AiRelayOptions | null>(null);
-	const [skillSetIds, setSkillSetIds] = useState<string[]>([]);
+	const { destinationModel } = useChatInput('new-conversation');
 
-	async function askQuestion(questionOverride?: string) {
+	async function askQuestion(args: AskQuestionCommand) {
 		if (working) return;
-		if (!aiRelayOptions) return;
 
 		setWorking(true);
 
 		try {
 			await dispatch(startConversationChain({
 				idempotencyKey: idempotencyKey,
-				messageContent: questionOverride ?? question,
-				aiRelayOptions: aiRelayOptions,
-				skillSetIds: skillSetIds,
+				messageContent: args.prompt,
+				aiRelayOptions: args.aiRelayOptions,
+				skillSetIds: args.skillSetIds,
+				fileIds: args.fileIDs,
 				navigate,
 			})).unwrap();
 			generateNewIdempotencyKey();
+			dispatch(initializeChatInput({ identifier: 'new-conversation' }));
 		} finally {
 			setWorking(false);
 		}
@@ -60,6 +68,7 @@ export const NewConversation: React.FC = () => {
 			<Helmet>
 				<title>{'Welcome | Bloefish'}</title>
 			</Helmet>
+
 			<HStack
 				position={'absolute'}
 				bottom={0} left={0} right={0}
@@ -100,7 +109,7 @@ export const NewConversation: React.FC = () => {
 				direction={'column'}
 				align={'center'}
 				gap={6}
-				pb={6}
+				py={6}
 				maxWidth={'3xl'}
 				margin={'0 auto'}
 			>
@@ -168,8 +177,17 @@ export const NewConversation: React.FC = () => {
 								key={prompt}
 								borderRadius={'full'}
 								onClicked={prompt => {
-									setQuestion(prompt);
-									askQuestion(prompt);
+									if (!destinationModel) return;
+
+									askQuestion({
+										aiRelayOptions: {
+											modelId: destinationModel.model.id,
+											providerId: destinationModel.provider.id,
+										},
+										prompt,
+										skillSetIds: [],
+										fileIDs: [],
+									});
 								}}
 							>
 								{prompt}
@@ -178,14 +196,18 @@ export const NewConversation: React.FC = () => {
 					</Flex>
 				</Flex>
 
-				<Box w={'full'} px={6}>
+				<Box w={'full'} px={6} pb={6}>
 					<ChatInput
 						disabled={working}
-						onChange={setQuestion}
-						onAiRelayOptionsChange={setAiRelayOptions}
-						onSkillSetIdsChange={setSkillSetIds}
-						onInvoke={askQuestion}
-						value={question}
+						identifier={'new-conversation'}
+						onInvoke={e => {
+							askQuestion({
+								aiRelayOptions: e.aiRelayOptions,
+								prompt: e.prompt,
+								skillSetIds: e.skillSetIds,
+								fileIDs: [],
+							});
+						}}
 					/>
 				</Box>
 			</Flex>

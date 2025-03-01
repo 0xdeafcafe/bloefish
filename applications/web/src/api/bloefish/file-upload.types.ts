@@ -3,15 +3,15 @@ import type { Actor } from './shared.types';
 export interface CreateUploadRequest {
 	name: string;
 	size: number;
-	mime_type: string;
+	mimeType: string;
 	owner: Actor;
 }
 
 export interface CreateUploadResponse {
 	id: string;
-	upload_url: string;
+	uploadUrl: string;
 }
 
 export interface ConfirmUploadRequest {
-	file_id: string;
+	fileId: string;
 }

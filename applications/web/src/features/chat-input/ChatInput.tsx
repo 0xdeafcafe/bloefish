@@ -1,120 +1,75 @@
-import { Card, Flex, HStack, Icon, IconButton, Kbd, Status, Textarea } from '@chakra-ui/react';
+import { Card, Flex, HStack, Icon, IconButton, Kbd, Textarea } from '@chakra-ui/react';
 import { useTheme } from 'next-themes';
 import React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { LuBot, LuSend, LuChevronDown, LuGraduationCap, LuPackage } from 'react-icons/lu';
-import { aiRelayApi } from '~/api/bloefish/ai-relay';
-import type { AiModel, AiProvider } from '~/api/bloefish/ai-relay.types';
+import { LuBot, LuSend, LuChevronDown, LuPackage } from 'react-icons/lu';
 import type { AiRelayOptions } from '~/api/bloefish/shared.types';
-import { skillSetApi } from '~/api/bloefish/skill-set';
-import { userApi } from '~/api/bloefish/user';
 import { Button } from '~/components/ui/button';
-import { MenuCheckboxItem, MenuContent, MenuItemCommand, MenuItemGroup, MenuRadioItem, MenuRadioItemGroup, MenuRoot, MenuTrigger } from '~/components/ui/menu';
 import { Tooltip } from '~/components/ui/tooltip';
-import { useLocalStorageState } from '~/hooks/use-local-storage-state';
+import { useChatInput } from './hooks/use-chat-input';
+import { useAppDispatch } from '~/store';
+import { updatePrompt } from './store';
+import { StatusIndicator } from './components/atoms/StatusIndicator';
+import { AiProviderPicker } from './components/molecules/AiProviderPicker';
+import { SkillSetPicker } from './components/molecules/SkillSetPicker';
+import { FilePicker } from './components/molecules/FilePicker';
 
-interface AvailableModel {
-	provider: AiProvider;
-	model: AiModel;
+export interface InvokedEvent {
+	prompt: string;
+	fileIds: string[];
+	skillSetIds: string[];
+	aiRelayOptions: AiRelayOptions;
 }
 
-const maxPromptLength = 5000;
-
-type LengthStatus = 'green' | 'red' | 'yellow';
 type EnterMode = 'newline' | 'send';
 
 interface ChatInputProps {
 	disabled: boolean;
-	value: string;
-	onChange: (value: string) => void;
-	onAiRelayOptionsChange: (model: AiRelayOptions | null) => void;
-	onSkillSetIdsChange: (skillSetIds: string[]) => void;
-	onInvoke: () => void;
+	identifier: string;
+	onInvoke: (event: InvokedEvent) => void;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
 	disabled,
-	value,
-	onChange,
-	onAiRelayOptionsChange,
-	onSkillSetIdsChange,
+	identifier,
 	onInvoke,
 }) => {
-	const { data: currentUser } = userApi.useGetOrCreateDefaultUserQuery();
-	const { data: providers } = aiRelayApi.useListSupportedQuery()
+	const dispatch = useAppDispatch();
 	const {
-		data: availableSkillSets,
-		isSuccess: hasAvailableSkillSets,
-		isFetching: isFetchingSkillSets,
-	} = skillSetApi.useListSkillSetsByOwnerQuery({
-		owner: {
-			type: 'user',
-			identifier: currentUser!.user.id,
-		},
-	});
+		prompt,
+		ready,
+		destinationModel,
+		skillSetIds,
+		fileIds,
+	} = useChatInput(identifier);
 
 	const theme = useTheme();
 	const [focused, setFocused] = useState(false);
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 
-	const [availableModels, setAvailableModels] = useState<AvailableModel[]>();
-	const [selectedModel, setSelectedModel] = useLocalStorageState<AvailableModel>('chat_input.selected_model');
-
-	const [selectedSkillSets, setSelectedSkillSets] = useState<string[]>([]);
-
 	const [enterMode, setEnterMode] = useState<EnterMode>('send');
-	const [questionLength, setQuestionLength] = useState(0);
-	const [lengthStatusColor, setLengthStatusColor] = useState<LengthStatus>('green');
 
-	const modelSelectLoading = !availableModels || availableModels.length === 0;
+	function invoke() {
+		if (disabled || !ready || !destinationModel) return;
 
-	useEffect(() => {
-		onAiRelayOptionsChange(selectedModel ? {
-			providerId: selectedModel.provider.id,
-			modelId: selectedModel.model.id,
-		} : null);
-	}, [selectedModel]);
-
-	useEffect(() => {
-		onSkillSetIdsChange(selectedSkillSets);
-	}, [selectedSkillSets]);
-
-	useEffect(() => {
-		if (!providers) return;
-
-		const availableModels = coerceAvailableModels(providers.providers);
-
-		if (providers)
-			setAvailableModels(availableModels);
-
-		if (!selectedModel && availableModels.length > 0) {
-			setSelectedModel(availableModels[0]);
-		} else if (selectedModel && !availableModels.find(model => model.provider.id === selectedModel.provider.id && model.model.id === selectedModel.model.id)) {
-			setSelectedModel(availableModels[0]);
-		}
-	}, [providers]);
+		onInvoke({
+			prompt,
+			skillSetIds,
+			fileIds,
+			aiRelayOptions: {
+				modelId: destinationModel.model.id,
+				providerId: destinationModel.provider.id,
+			},
+		});
+	}
 
 	useEffect(() => {
-		if (value.includes('\n')) {
+		if (prompt.includes('\n')) {
 			setEnterMode('newline');
 		} else {
 			setEnterMode('send')
 		}
-
-		if (value.length > maxPromptLength - 500) {
-			setLengthStatusColor('red');
-		} else if (value.length > maxPromptLength - 1000) {
-			setLengthStatusColor('yellow');
-		} else {
-			setLengthStatusColor('green');
-		}
-
-		if (value.length > maxPromptLength) {
-			onChange(value.slice(0, maxPromptLength));
-		}
-
-		setQuestionLength(value.length);
-	}, [value]);
+	}, [prompt]);
 
 	useEffect(() => {
 		if (inputRef.current)
@@ -159,64 +114,32 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 						placeholder={'What are you too lazy to do today?'}
 						variant={'outline'}
 						_focus={{ border: 'transparent', outline: 'transparent' }}
-						value={value}
-						onChange={(e) => onChange(e.target.value)}
+						value={prompt}
+						onChange={e => dispatch(updatePrompt({
+							identifier,
+							prompt: e.target.value,
+						}))}
 						ref={inputRef}
 						onFocus={() => setFocused(true)}
 						onBlur={() => setFocused(false)}
-						onKeyDown={(e) => {
+						onKeyDown={e => {
 							if (e.key === 'Enter' && e.metaKey && enterMode === 'newline') {
 								e.preventDefault();
-								onInvoke();
+								invoke();
 							}
 
 							if (e.key === 'Enter' && !e.shiftKey && enterMode === 'send') {
 								e.preventDefault();
-								onInvoke();
+								invoke();
 							}
 						}}
 					/>
 				</HStack>
 				<Flex justify={'space-between'} gap={4}>
 					<Flex gap={2}>
-						<MenuRoot onExitComplete={() => inputRef.current?.focus()} >
-							<MenuTrigger asChild>
-								{/* <Tooltip content={'Select a skill set to include in this message'}> */}
-								<Button
-									disabled={!hasAvailableSkillSets}
-									loading={isFetchingSkillSets}
-									size={'2xs'}
-									variant={'outline'}
-								>
-									<LuGraduationCap />
-									{selectedSkillSets.length > 0 && `(${selectedSkillSets.length})`}
-									<LuChevronDown />
-								</Button>
-								{/* </Tooltip> */}
-							</MenuTrigger>
-							<MenuContent>
-								<MenuItemGroup title={'Skill sets'}>
-									{availableSkillSets?.skillSets?.map(ss => (
-										<MenuCheckboxItem
-											key={ss.id}
-											value={ss.id}
-											checked={selectedSkillSets.includes(ss.id)}
-											onCheckedChange={(checked) => {
-												if (checked) {
-													setSelectedSkillSets([...selectedSkillSets, ss.id]);
-												} else {
-													setSelectedSkillSets(selectedSkillSets.filter((id) => id !== ss.id));
-												}
-											}}
-										>
-											{ss.name}
-										</MenuCheckboxItem>
-									))}
-								</MenuItemGroup>
-							</MenuContent>
-						</MenuRoot>
-
-						<Tooltip content={'Select a file to include in this message'}>
+						<SkillSetPicker identifier={identifier} inputRef={inputRef} disabled={disabled} />
+						<FilePicker identifier={identifier} inputRef={inputRef} disabled={disabled} />
+						<Tooltip content={'Select an asset to include in this message'}>
 							<Button
 								size={'2xs'}
 								disabled
@@ -228,51 +151,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 						</Tooltip>
 					</Flex>
 					<Flex justify={'flex-end'} align={'center'} gap={2}>
-						<Status.Root colorPalette={lengthStatusColor} userSelect={'none'} fontSize={'xs'} color={'GrayText'}>
-							{questionLength === maxPromptLength ? '😱 ' : <Status.Indicator />}
-							{`${questionLength}/${maxPromptLength}`}
-						</Status.Root>
-
-						<MenuRoot onExitComplete={() => inputRef.current?.focus()} >
-							<MenuTrigger asChild>
-								<Button
-									size={'2xs'}
-									loading={modelSelectLoading}
-									disabled={disabled || modelSelectLoading}
-									variant={'outline'}
-								>
-									<LuBot />
-									{' '}
-									{selectedModel && `${selectedModel.provider.name} (${selectedModel.model.name})`}
-									{' '}
-									<LuChevronDown />
-								</Button>
-							</MenuTrigger>
-							<MenuContent>
-								<MenuRadioItemGroup
-									value={selectedModel ? `${selectedModel.provider.id}:${selectedModel.model.id}` : ''}
-									onValueChange={(e) => {
-										const model = availableModels?.find((model) => `${model.provider.id}:${model.model.id}` === e.value);
-
-										if (model) setSelectedModel(model);
-									}}
-								>
-									{availableModels?.map((model, index) => (
-										<MenuRadioItem
-											value={`${model.provider.id}:${model.model.id}`}
-											key={`${model.provider.id}:${model.model.id}`}
-											onClick={() => (model)}
-										>
-											{`${model.provider.name} (${model.model.name}) `}
-
-											{index < 9 && (
-												<MenuItemCommand>{index + 1}</MenuItemCommand>
-											)}
-										</MenuRadioItem>
-									))}
-								</MenuRadioItemGroup>
-							</MenuContent>
-						</MenuRoot>
+						<StatusIndicator identifier={identifier} />
+						<AiProviderPicker identifier={identifier} inputRef={inputRef} disabled={disabled} />
 
 						<Tooltip content={(
 							<React.Fragment>
@@ -284,10 +164,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 						)}>
 							<IconButton
 								aria-label={'Send message'}
-								disabled={disabled || modelSelectLoading}
+								disabled={disabled || !ready}
 								variant={'ghost'}
 								size={'2xs'}
-								onClick={() => onInvoke()}
+								onClick={invoke}
 							>
 								<LuSend />
 							</IconButton>
@@ -298,14 +178,3 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 		</Card.Root>
 	);
 };
-
-function coerceAvailableModels(providers: AiProvider[]): AvailableModel[] {
-	return providers.map((provider) => {
-		return provider.models.map((model) => {
-			return {
-				provider,
-				model,
-			};
-		});
-	}).flat();
-}
