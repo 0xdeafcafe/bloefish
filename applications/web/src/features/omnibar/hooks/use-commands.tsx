@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { LuFolderOpen, LuMessageCirclePlus } from 'react-icons/lu';
+import { LuFolderOpen, LuGraduationCap, LuMessageCirclePlus, LuSettings2 } from 'react-icons/lu';
 
 export interface Command {
 	name: string;
@@ -20,5 +20,13 @@ export function useCommands(): Command[] {
 		name: 'View conversations',
 		onInvoke: () => navigate('/'),
 		icon: <LuFolderOpen />,
+	}, {
+		name: 'View skill sets',
+		onInvoke: () => navigate('/skill-sets'),
+		icon: <LuGraduationCap />,
+	}, {
+		name: 'View preferences',
+		onInvoke: () => navigate('/preferences'),
+		icon: <LuSettings2 />,
 	}];
 }
