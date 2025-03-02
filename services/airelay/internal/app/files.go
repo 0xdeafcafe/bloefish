@@ -74,5 +74,9 @@ func (a *App) downloadFiles(ctx context.Context, owner *airelay.Actor, fileIDs [
 		})
 	}
 
-	return nil, nil
+	if err := egGroup.Wait(); err != nil {
+		return nil, err
+	}
+
+	return downloadedFiles, nil
 }

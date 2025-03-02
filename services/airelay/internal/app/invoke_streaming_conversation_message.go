@@ -15,7 +15,7 @@ import (
 )
 
 func (a *App) InvokeStreamingConversationMessage(ctx context.Context, req *airelay.InvokeStreamingConversationMessageRequest) (*airelay.InvokeStreamingConversationMessageResponse, error) {
-	fileIDs := make([]string, 0, len(req.Messages))
+	fileIDs := []string{}
 	for _, msg := range req.Messages {
 		fileIDs = append(fileIDs, msg.FileIDs...)
 	}
@@ -30,14 +30,16 @@ func (a *App) InvokeStreamingConversationMessage(ctx context.Context, req *airel
 		fileContent := ""
 
 		if len(msg.FileIDs) > 0 {
-			file := downloadedFiles[msg.FileIDs[0]]
-			if file == nil {
-				return nil, cher.New("file_not_found", cher.M{
-					"file_id": msg.FileIDs[0],
-				})
-			}
+			for _, fileID := range msg.FileIDs {
+				file := downloadedFiles[fileID]
+				if file == nil {
+					return nil, cher.New("file_not_found", cher.M{
+						"file_id": fileID,
+					})
+				}
 
-			fileContent = fmt.Sprintf("\n\nFile name: %s\nFile content:\n%s", file.Name, string(file.Content))
+				fileContent += fmt.Sprintf("\n\nFile name: %s\nFile content:\n%s", file.Name, string(file.Content))
+			}
 		}
 
 		switch msg.Owner.Type {
