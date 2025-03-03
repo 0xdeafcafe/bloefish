@@ -41,7 +41,7 @@ func defaultConfig() Config {
 
 func Run(ctx context.Context) error {
 	cfg := defaultConfig()
-	config.MustHydrateFromEnvironment(ctx, &cfg)
+	config.MustHydrate(ctx, &cfg)
 
 	shutdown := cfg.Telemetry.MustSetup(ctx)
 	defer func() {
