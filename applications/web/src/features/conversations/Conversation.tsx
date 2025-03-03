@@ -1,5 +1,5 @@
-import { Box, Center, Container, Flex, Grid, GridItem, HStack, Spinner, Stack } from '@chakra-ui/react';
-import { LuMailQuestion } from 'react-icons/lu';
+import { Box, Card, Center, Container, Flex, Grid, GridItem, HStack, IconButton, Skeleton, Spinner, Stack, Text } from '@chakra-ui/react';
+import { LuEllipsisVertical, LuMailQuestion } from 'react-icons/lu';
 import { useAppDispatch, useAppSelector } from '~/store';
 import { useParams } from 'react-router';
 import { NotFound } from '~/pages/NotFound';
@@ -14,8 +14,8 @@ import { ConversationInteraction } from './components/organisms/ConversationInte
 import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
 import { Panel } from '~/components/atoms/Panel';
 import React from 'react';
-import { HeaderCard } from '~/components/atoms/HeaderCard';
 import { initializeChatInput } from '../chat-input/store';
+import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from '~/components/ui/menu';
 
 export const Conversation: React.FC = () => {
 	const { conversationId } = useParams();
@@ -98,13 +98,64 @@ export const Conversation: React.FC = () => {
 						minHeight={0}
 						boxShadow={'md'}
 					>
-						<Container maxW={'6xl'} minW={'sm'} py={10} pb={40} w={'full'}>
-							<Stack gap={6} mx={10}>
-								<HeaderCard
-									title={conversation.title || 'New conversation'}
-									description={''}
-								/>
+						<Box 
+							position={'sticky'}
+							zIndex={10}
+							pb={4}
+							top={0}
+						>
+							<Box
+								zIndex={10}
+								h={10}
+								top={-10}
+								left={0}
+								right={0}
+								background={'bg.panel'}
+							/>
 
+							<Container maxW={'6xl'} minW={'sm'} w={'full'}>
+								<Card.Root
+									variant={'elevated'}
+									overflow={'hidden'}
+									background={'bg.muted/30'}
+									backdropFilter={'blur(20px)'}
+									backgroundSize={'100vw 500px'}
+								>
+									<Card.Body p={6}>
+										<Flex justify={'space-between'}>
+											<Text textStyle={'xl'} fontWeight={'semibold'} textShadow={'2xl'}>
+												{conversation.title ? conversation.title : (
+													<Skeleton width={'50%'} />
+												)}
+											</Text>
+											<MenuRoot>
+												<MenuTrigger asChild>
+													<IconButton size={'xs'} variant={'outline'}>
+														<LuEllipsisVertical />
+													</IconButton>
+												</MenuTrigger>
+												<MenuContent>
+													<MenuItem disabled value={'export'}>
+														{'Export'}
+													</MenuItem>
+													<MenuItem
+														disabled
+														value={'delete'}
+														color={'fg.error'}
+														_hover={{ bg: 'bg.error', color: 'fg.error' }}
+													>
+														{'Delete...'}
+													</MenuItem>
+												</MenuContent>
+											</MenuRoot>
+										</Flex>
+									</Card.Body>
+								</Card.Root>
+							</Container>
+						</Box>
+						
+						<Container maxW={'6xl'} minW={'sm'} w={'full'} py={4} pt={10} pb={40}>
+							<Stack gap={6} mx={10}>
 								{sortedInteractions.map(i => <ConversationInteraction key={i.id} interaction={i} />)}
 							</Stack>
 						</Container>
