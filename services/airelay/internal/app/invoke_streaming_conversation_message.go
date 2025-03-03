@@ -33,8 +33,10 @@ func (a *App) InvokeStreamingConversationMessage(ctx context.Context, req *airel
 			for _, fileID := range msg.FileIDs {
 				file := downloadedFiles[fileID]
 				if file == nil {
-					return nil, cher.New("file_not_found", cher.M{
-						"file_id": fileID,
+					return nil, cher.New("file_missing_from_downloads", cher.M{
+						"file_id":         fileID,
+						"downloads_count": len(downloadedFiles),
+						"message_index":   i,
 					})
 				}
 
@@ -61,13 +63,12 @@ func (a *App) InvokeStreamingConversationMessage(ctx context.Context, req *airel
 		Content: systemInstructionMessage,
 	}}, messages...)
 
-	chatStream, err := a.Relay.NewChatStream(ctx, relay.ChatStreamParams{
-		ProviderID: req.AIRelayOptions.ProviderID,
-		ModelID:    req.AIRelayOptions.ModelID,
-		Messages:   messages,
+	chatStream, err := a.Relay.With(req.AIRelayOptions.ProviderID).NewChatStream(ctx, relay.ChatStreamParams{
+		ModelID:  req.AIRelayOptions.ModelID,
+		Messages: messages,
 	})
 	if err != nil {
-		if errors.Is(err, relay.ErrUnsupportedProvider) {
+		if errors.Is(err, relay.ErrRequiredProviderMissing) {
 			return nil, cher.New("unsupported_ai_provider", cher.M{
 				"provider_id": req.AIRelayOptions.ProviderID,
 			})

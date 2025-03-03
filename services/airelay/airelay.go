@@ -21,19 +21,14 @@ type Actor struct {
 }
 
 type ListSupportedResponse struct {
-	Providers []*ListSupportedResponseProvider `json:"providers"`
+	Models []*ListSupportedResponseModel `json:"models"`
 }
 
-type ListSupportedResponseProvider struct {
-	ID     string                                `json:"id"`
-	Name   string                                `json:"name"`
-	Models []*ListSupportedResponseProviderModel `json:"models"`
-}
-
-type ListSupportedResponseProviderModel struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+type ListSupportedResponseModel struct {
+	ProviderID   string `json:"provider_id"`
+	ProviderName string `json:"provider_name"`
+	ModelID      string `json:"model_id"`
+	ModelName    string `json:"model_name"`
 }
 
 type InvokeConversationMessageRequest struct {

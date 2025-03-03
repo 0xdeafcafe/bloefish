@@ -17,6 +17,7 @@ type client struct {
 
 type Client interface {
 	NewStreamingChat(ctx context.Context, params NewStreamingChatParams) (*StreamingChatIterator, error)
+	ListLocalModels(ctx context.Context) ([]*LocalModel, error)
 }
 
 func NewClient(opts ...ClientOption) Client {

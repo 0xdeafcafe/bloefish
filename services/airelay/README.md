@@ -30,14 +30,11 @@ Lists the supported AI providers and models.
 type Request = null;
 
 interface Response {
-	providers: {
-		id: string;
-		name: string;
-		models: {
-			id: string;
-			name: string;
-			description: string;
-		}[];
+	models: {
+		provider_id: string;
+		provider_name: string;
+		model_id: string;
+		model_name: string;
 	}[];
 }
 ```

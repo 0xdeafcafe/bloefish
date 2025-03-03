@@ -3,19 +3,20 @@ package internal
 import (
 	"context"
 
-	"github.com/openai/openai-go"
-	oai_option "github.com/openai/openai-go/option"
-
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/config"
-	"github.com/0xdeafcafe/bloefish/libraries/ollama"
 	"github.com/0xdeafcafe/bloefish/libraries/telemetry"
 	"github.com/0xdeafcafe/bloefish/services/airelay/internal/app"
 	"github.com/0xdeafcafe/bloefish/services/airelay/internal/libraries/relay"
+	"github.com/0xdeafcafe/bloefish/services/airelay/internal/libraries/relay/providers/ollama"
+	"github.com/0xdeafcafe/bloefish/services/airelay/internal/libraries/relay/providers/openai"
 	"github.com/0xdeafcafe/bloefish/services/airelay/internal/transport/rpc"
 	"github.com/0xdeafcafe/bloefish/services/conversation"
 	"github.com/0xdeafcafe/bloefish/services/fileupload"
 	"github.com/0xdeafcafe/bloefish/services/stream"
+
+	oaiClient "github.com/openai/openai-go"
+	openaiOption "github.com/openai/openai-go/option"
 )
 
 type Config struct {
@@ -80,7 +81,7 @@ func defaultConfig() Config {
 
 func Run(ctx context.Context) error {
 	cfg := defaultConfig()
-	config.MustHydrateFromEnvironment(ctx, &cfg)
+	config.MustHydrate(ctx, &cfg)
 
 	shutdown := cfg.Telemetry.MustSetup(ctx)
 	defer func() {
@@ -93,42 +94,31 @@ func Run(ctx context.Context) error {
 
 	app := &app.App{
 		Relay: relay.NewClient(
-			relay.WithOllamaClient(ollama.NewClient(
-				ollama.WithEndpointURL(cfg.AIProviders.Ollama.Endpoint),
-			)),
-			relay.WithOpenAIClient(openai.NewClient(
-				oai_option.WithAPIKey(cfg.AIProviders.OpenAI.APIKey),
-			)),
-			relay.WithProviderModels([]relay.Provider{{
-				ID:   "open_ai",
-				Name: "Open AI",
-				Models: []relay.Model{{
-					ID:   openai.ChatModelGPT4,
+			relay.WithProvider(openai.NewProvider(
+				oaiClient.NewClient(
+					openaiOption.WithAPIKey(cfg.AIProviders.OpenAI.APIKey),
+				),
+				openai.WithModels([]openai.Model{{
+					ID:   string(oaiClient.ChatModelGPT4),
 					Name: "GPT 4",
 				}, {
-					ID:   openai.ChatModelGPT4Turbo,
+					ID:   string(oaiClient.ChatModelGPT4Turbo),
 					Name: "GPT 4 turbo",
 				}, {
-					ID:   openai.ChatModelGPT4o,
+					ID:   string(oaiClient.ChatModelGPT4o),
 					Name: "GPT 4o",
 				}, {
-					ID:   openai.ChatModelGPT4oMini,
+					ID:   string(oaiClient.ChatModelGPT4oMini),
 					Name: "GPT 4o mini",
 				}, {
-					ID:   openai.ChatModelGPT3_5Turbo,
+					ID:   string(oaiClient.ChatModelGPT3_5Turbo),
 					Name: "GPT 3.5 turbo",
 				}, {
-					ID:   openai.ChatModelO1Mini,
+					ID:   string(oaiClient.ChatModelO1Mini),
 					Name: "o1 mini",
-				}},
-			}, {
-				ID:   "ollama",
-				Name: "Ollama",
-				Models: []relay.Model{{
-					ID:   "phi3:mini",
-					Name: "Phi3 mini",
-				}},
-			}}),
+				}}),
+			)),
+			relay.WithProvider(ollama.NewProvider()),
 		),
 
 		ConversationService: conversation.NewRPCClient(ctx, cfg.ConversationService),

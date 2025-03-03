@@ -1,9 +1,5 @@
 package relay
 
-import "errors"
-
-var ErrUnsupportedProvider = errors.New("unsupported provider")
-
 type Role string
 
 const (
@@ -11,18 +7,6 @@ const (
 	RoleUser      Role = "user"
 	RoleAssistant Role = "assistant"
 )
-
-type Provider struct {
-	ID     string
-	Name   string
-	Models []Model
-}
-
-type Model struct {
-	ID          string
-	Name        string
-	Description string
-}
 
 type Message struct {
 	Role    Role
@@ -48,4 +32,21 @@ func NewChatUserMessage(content string) Message {
 		Role:    RoleUser,
 		Content: content,
 	}
+}
+
+type ChatStreamParams struct {
+	ModelID  string
+	Messages []Message
+}
+
+type ChatStreamEvent struct {
+	Content string
+	Done    bool
+}
+
+type ChatStreamIterator interface {
+	Next() bool
+	Current() *ChatStreamEvent
+	Content() string
+	Err() error
 }

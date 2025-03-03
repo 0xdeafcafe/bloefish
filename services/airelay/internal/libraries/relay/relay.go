@@ -1,20 +1,14 @@
 package relay
 
-import (
-	"github.com/0xdeafcafe/bloefish/libraries/ollama"
-	"github.com/openai/openai-go"
-)
+import "context"
 
 type Client struct {
-	ollamaClient ollama.Client
-	openAIClient *openai.Client
-
-	providers []Provider
+	providers map[ProviderID]Provider
 }
 
 func NewClient(opts ...ClientOption) *Client {
 	c := &Client{
-		ollamaClient: ollama.NewClient(),
+		providers: make(map[ProviderID]Provider),
 	}
 
 	for _, opt := range opts {
@@ -24,6 +18,25 @@ func NewClient(opts ...ClientOption) *Client {
 	return c
 }
 
-func (c *Client) Providers() []Provider {
-	return c.providers
+func (c *Client) With(providerID string) Provider {
+	provider := c.providers[ProviderID(providerID)]
+	if provider == nil {
+		return newUnknownProvider()
+	}
+
+	return provider
+}
+
+func (c *Client) ListAllModels(ctx context.Context) ([]Model, error) {
+	var models []Model
+	for _, provider := range c.providers {
+		providerModels, err := provider.ListModels(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		models = append(models, providerModels...)
+	}
+
+	return models, nil
 }

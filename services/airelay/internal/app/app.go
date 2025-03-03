@@ -38,26 +38,23 @@ type App struct {
 }
 
 func (a *App) ListSupported(ctx context.Context) (*airelay.ListSupportedResponse, error) {
-	relayProviders := a.Relay.Providers()
+	models, err := a.Relay.ListAllModels(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-	providers := make([]*airelay.ListSupportedResponseProvider, len(relayProviders))
-	for i, p := range relayProviders {
-		providers[i] = &airelay.ListSupportedResponseProvider{
-			ID:     p.ID,
-			Name:   p.Name,
-			Models: make([]*airelay.ListSupportedResponseProviderModel, len(p.Models)),
-		}
+	resp := &airelay.ListSupportedResponse{
+		Models: make([]*airelay.ListSupportedResponseModel, len(models)),
+	}
 
-		for j, m := range p.Models {
-			providers[i].Models[j] = &airelay.ListSupportedResponseProviderModel{
-				ID:          m.ID,
-				Name:        m.Name,
-				Description: m.Description,
-			}
+	for i, model := range models {
+		resp.Models[i] = &airelay.ListSupportedResponseModel{
+			ProviderID:   string(model.ProviderID),
+			ProviderName: a.Relay.With(string(model.ProviderID)).GetMetadata().Name,
+			ModelID:      model.ModelID,
+			ModelName:    model.ModelName,
 		}
 	}
 
-	return &airelay.ListSupportedResponse{
-		Providers: providers,
-	}, nil
+	return resp, nil
 }
