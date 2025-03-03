@@ -1,15 +1,13 @@
-export interface AiProvider {
-	id: string;
-	name: string;
-	models: AiModel[];
+export interface AiModel {
+	providerId: string;
+	modelId: string;
 }
 
-export interface AiModel {
-	id: string;
-	name: string;
-	description: string;
+export interface EnrichedAiModel extends AiModel {
+	providerName: string;
+	modelName: string;
 }
 
 export interface ListSupportedResponse {
-	providers: AiProvider[];
+	models: EnrichedAiModel[];
 }

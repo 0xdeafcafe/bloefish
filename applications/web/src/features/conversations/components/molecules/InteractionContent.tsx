@@ -63,7 +63,7 @@ export const InteractionContent: React.FC<InteractionContentProps> = ({
 								px={2}
 								py={1}
 							>
-								{friendlyAiRelayOptions(interaction.aiRelayOptions, supportedModels?.providers)}
+								{friendlyAiRelayOptions(interaction.aiRelayOptions, supportedModels?.models)}
 							</Badge>
 							
 							<Badge

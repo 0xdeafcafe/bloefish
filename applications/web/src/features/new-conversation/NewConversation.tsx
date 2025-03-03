@@ -181,8 +181,8 @@ export const NewConversation: React.FC = () => {
 
 									askQuestion({
 										aiRelayOptions: {
-											modelId: destinationModel.model.id,
-											providerId: destinationModel.provider.id,
+											modelId: destinationModel.modelId,
+											providerId: destinationModel.providerId,
 										},
 										prompt,
 										skillSetIds: [],

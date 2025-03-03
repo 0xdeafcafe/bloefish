@@ -1,11 +1,11 @@
-import { useAppSelector } from "~/store";
-import type { EnrichedDestinationModel } from "../store/types";
+import { useAppSelector } from '~/store';
+import type { EnrichedAiModel } from '~/api/bloefish/ai-relay.types';
 
 interface ReturnType {
 	prompt: string;
 	skillSetIds: string[];
 	fileIds: string[];
-	destinationModel: EnrichedDestinationModel | undefined;
+	destinationModel: EnrichedAiModel | undefined;
 	ready: boolean;
 }
 

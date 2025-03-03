@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { LuBot, LuChevronDown } from 'react-icons/lu';
 import { aiRelayApi } from '~/api/bloefish/ai-relay';
-import type { AiProvider } from '~/api/bloefish/ai-relay.types';
 import { Button } from '~/components/ui/button';
 import { MenuContent, MenuRadioItem, MenuRadioItemGroup, MenuRoot, MenuTrigger } from '~/components/ui/menu';
 import { useAppDispatch } from '~/store';
 import { updateDestinationModel } from '../../store';
 import { useChatInput } from '../../hooks/use-chat-input';
-import type { EnrichedDestinationModel } from '../../store/types';
+import type { EnrichedAiModel } from '~/api/bloefish/ai-relay.types';
 
 interface AiProviderPickerProps {
 	disabled: boolean;
@@ -24,15 +23,15 @@ export const AiProviderPicker: React.FC<AiProviderPickerProps> = ({
 	const { destinationModel } = useChatInput(identifier);
 	const dispatch = useAppDispatch();
 
-	const [availableModels, setAvailableModels] = useState<EnrichedDestinationModel[]>();
+	const [availableModels, setAvailableModels] = useState<EnrichedAiModel[]>();
 	const loading = !availableModels || availableModels.length === 0;
 
 	useEffect(() => {
 		if (!providers) return;
 
-		const availableModels = coerceAvailableModels(providers.providers);
+		const availableModels = providers.models;
 
-		if (providers)
+		if (availableModels)
 			setAvailableModels(availableModels);
 
 		if (!destinationModel && availableModels.length > 0) {
@@ -40,7 +39,7 @@ export const AiProviderPicker: React.FC<AiProviderPickerProps> = ({
 				identifier,
 				destinationModel: availableModels[0],
 			}));
-		} else if (destinationModel && !availableModels.find(model => model.provider.id === destinationModel.provider.id && model.model.id === destinationModel.model.id)) {
+		} else if (destinationModel && !availableModels.find(model => model.providerId === destinationModel.providerId && model.modelId === destinationModel.modelId)) {
 			dispatch(updateDestinationModel({
 				identifier,
 				destinationModel: availableModels[0],
@@ -59,16 +58,16 @@ export const AiProviderPicker: React.FC<AiProviderPickerProps> = ({
 				>
 					<LuBot />
 					{' '}
-					{destinationModel && `${destinationModel.provider.name} (${destinationModel.model.name})`}
+					{destinationModel && `${destinationModel.providerName} (${destinationModel.modelName})`}
 					{' '}
 					<LuChevronDown />
 				</Button>
 			</MenuTrigger>
 			<MenuContent>
 				<MenuRadioItemGroup
-					value={destinationModel ? `${destinationModel.provider.id}:${destinationModel.model.id}` : ''}
+					value={destinationModel ? `${destinationModel.providerId}:${destinationModel.modelId}` : ''}
 					onValueChange={(e) => {
-						const model = availableModels?.find((model) => `${model.provider.id}:${model.model.id}` === e.value);
+						const model = availableModels?.find((model) => `${model.providerId}:${model.modelId}` === e.value);
 
 						if (model) {
 							dispatch(updateDestinationModel({
@@ -80,26 +79,15 @@ export const AiProviderPicker: React.FC<AiProviderPickerProps> = ({
 				>
 					{availableModels?.map(model => (
 						<MenuRadioItem
-							value={`${model.provider.id}:${model.model.id}`}
-							key={`${model.provider.id}:${model.model.id}`}
+							value={`${model.providerId}:${model.modelId}`}
+							key={`${model.providerId}:${model.modelId}`}
 							onClick={() => (model)}
 						>
-							{`${model.provider.name} (${model.model.name})`}
+							{`${model.providerName} (${model.modelName})`}
 						</MenuRadioItem>
 					))}
 				</MenuRadioItemGroup>
 			</MenuContent>
 		</MenuRoot>
 	);
-}
-
-function coerceAvailableModels(providers: AiProvider[]): EnrichedDestinationModel[] {
-	return providers.map((provider) => {
-		return provider.models.map((model) => {
-			return {
-				provider,
-				model,
-			};
-		});
-	}).flat();
 }

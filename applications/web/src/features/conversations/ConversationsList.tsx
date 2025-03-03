@@ -116,7 +116,7 @@ export const ConversationsList: React.FC = () => {
 												{Object.keys(conversation.interactions).length} messages
 											</Badge>
 											<Badge size={'xs'} colorPalette={'pink'} variant={'surface'}>
-												{friendlyAiRelayOptions(conversation.aiRelayOptions, supportedModels?.providers)}
+												{friendlyAiRelayOptions(conversation.aiRelayOptions, supportedModels?.models)}
 											</Badge>
 											<Badge size={'xs'} colorPalette={'gray'} variant={'surface'}>
 												{'Created: '}

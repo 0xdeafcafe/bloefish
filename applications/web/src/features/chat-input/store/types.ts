@@ -1,4 +1,4 @@
-import type { AiModel, AiProvider } from '~/api/bloefish/ai-relay.types';
+import type { EnrichedAiModel } from '~/api/bloefish/ai-relay.types';
 
 export type UploadStatus = 'pending' | 'uploading' | 'confirming' | 'ready' | 'error';
 
@@ -16,7 +16,7 @@ export interface ChatInputPlugin {
 export interface ChatInputState {
 	prompt: string;
 	skillSetIds: string[];
-	destinationModel?: EnrichedDestinationModel;
+	destinationModel?: EnrichedAiModel;
 	files: Record<string, FileUploadState>;
 }
 
@@ -34,16 +34,11 @@ export interface UpdatePromptPayload extends ChatInputPlugin {
 }
 
 export interface UpdateAiRelayOptionsPayload extends ChatInputPlugin {
-	destinationModel: EnrichedDestinationModel;
+	destinationModel: EnrichedAiModel;
 }
 
 export interface UpdateSkillSetIdsPayload extends ChatInputPlugin {
 	skillSetIds: string[];
-}
-
-export interface EnrichedDestinationModel {
-	provider: AiProvider;
-	model: AiModel;
 }
 
 export interface AddFileUploadPayload extends ChatInputPlugin {

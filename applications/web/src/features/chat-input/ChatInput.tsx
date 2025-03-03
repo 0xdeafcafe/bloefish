@@ -57,8 +57,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 			skillSetIds,
 			fileIds,
 			aiRelayOptions: {
-				modelId: destinationModel.model.id,
-				providerId: destinationModel.provider.id,
+				modelId: destinationModel.modelId,
+				providerId: destinationModel.providerId,
 			},
 		});
 	}
