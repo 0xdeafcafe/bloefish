@@ -82,6 +82,8 @@ func (a *App) createConversationMessageReply(
 	var messageContent string
 	if cmd.UseStreaming {
 		response, err := a.AIRelayService.InvokeStreamingConversationMessage(ctx, &airelay.InvokeStreamingConversationMessageRequest{
+			ConversationID:     cmd.Conversation.ID,
+			MessageID:          cmd.ActiveInteraction.ID,
 			StreamingChannelID: cmd.StreamingChannelID,
 			Owner:              cmd.Owner,
 			Messages:           messages,
@@ -100,8 +102,10 @@ func (a *App) createConversationMessageReply(
 		messageContent = response.MessageContent
 	} else {
 		response, err := a.AIRelayService.InvokeConversationMessage(ctx, &airelay.InvokeConversationMessageRequest{
-			Owner:    cmd.Owner,
-			Messages: messages,
+			ConversationID: cmd.Conversation.ID,
+			MessageID:      cmd.ActiveInteraction.ID,
+			Owner:          cmd.Owner,
+			Messages:       messages,
 			AIRelayOptions: &airelay.InvokeConversationMessageRequestAIRelayOptions{
 				ProviderID: aiRelayOptions.ProviderID,
 				ModelID:    aiRelayOptions.ModelID,

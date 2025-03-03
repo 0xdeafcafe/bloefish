@@ -48,6 +48,8 @@ func (a *App) generateConversationTitle(
 
 	if cmd.UseStreaming {
 		response, err := a.AIRelayService.InvokeStreamingConversationMessage(ctx, &airelay.InvokeStreamingConversationMessageRequest{
+			ConversationID:     cmd.Conversation.ID,
+			MessageID:          "title",
 			StreamingChannelID: cmd.StreamingChannelID,
 			Owner:              cmd.Owner,
 			Messages:           messages,
@@ -66,8 +68,10 @@ func (a *App) generateConversationTitle(
 		messageContent = response.MessageContent
 	} else {
 		response, err := a.AIRelayService.InvokeConversationMessage(ctx, &airelay.InvokeConversationMessageRequest{
-			Owner:    cmd.Owner,
-			Messages: messages,
+			ConversationID: cmd.Conversation.ID,
+			MessageID:      "title",
+			Owner:          cmd.Owner,
+			Messages:       messages,
 			AIRelayOptions: &airelay.InvokeConversationMessageRequestAIRelayOptions{
 				ProviderID: aiRelayOptions.ProviderID,
 				ModelID:    aiRelayOptions.ModelID,
