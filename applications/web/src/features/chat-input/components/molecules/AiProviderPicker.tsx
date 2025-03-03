@@ -11,13 +11,11 @@ import type { EnrichedAiModel } from '~/api/bloefish/ai-relay.types';
 interface AiProviderPickerProps {
 	disabled: boolean;
 	identifier: string;
-	inputRef: React.RefObject<HTMLTextAreaElement | null>;
 }
 
 export const AiProviderPicker: React.FC<AiProviderPickerProps> = ({
 	disabled,
 	identifier,
-	inputRef,
 }) => {
 	const { data: providers } = aiRelayApi.useListSupportedQuery();
 	const { destinationModel } = useChatInput(identifier);
@@ -48,7 +46,7 @@ export const AiProviderPicker: React.FC<AiProviderPickerProps> = ({
 	}, [providers]);
 
 	return (
-		<MenuRoot onExitComplete={() => inputRef.current?.focus()} >
+		<MenuRoot>
 			<MenuTrigger asChild>
 				<Button
 					size={'2xs'}

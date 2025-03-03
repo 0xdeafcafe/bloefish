@@ -10,13 +10,11 @@ import { skillSetApi } from '~/api/bloefish/skill-set';
 interface SkillSetPickerProps {
 	disabled: boolean;
 	identifier: string;
-	inputRef: React.RefObject<HTMLTextAreaElement | null>;
 }
 
 export const SkillSetPicker: React.FC<SkillSetPickerProps> = ({
 	disabled,
 	identifier,
-	inputRef,
 }) => {
 	const { data: currentUser } = userApi.useGetOrCreateDefaultUserQuery();
 	const {
@@ -34,7 +32,7 @@ export const SkillSetPicker: React.FC<SkillSetPickerProps> = ({
 	const dispatch = useAppDispatch();
 
 	return (
-		<MenuRoot onExitComplete={() => inputRef.current?.focus()} >
+		<MenuRoot positioning={{ placement: 'top' }}>
 			<MenuTrigger asChild>
 				<Button
 					disabled={disabled || !hasAvailableSkillSets}

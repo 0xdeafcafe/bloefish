@@ -10,7 +10,6 @@ import { Tooltip } from '~/components/ui/tooltip';
 interface FilePickerProps {
 	disabled: boolean;
 	identifier: string;
-	inputRef: React.RefObject<HTMLTextAreaElement | null>;
 }
 
 export const FilePicker: React.FC<FilePickerProps> = ({

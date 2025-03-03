@@ -137,8 +137,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 				</HStack>
 				<Flex justify={'space-between'} gap={4}>
 					<Flex gap={2}>
-						<SkillSetPicker identifier={identifier} inputRef={inputRef} disabled={disabled} />
-						<FilePicker identifier={identifier} inputRef={inputRef} disabled={disabled} />
+						<SkillSetPicker identifier={identifier} disabled={disabled} />
+						<FilePicker identifier={identifier} disabled={disabled} />
 						<Tooltip content={'Select an asset to include in this message'}>
 							<Button
 								size={'2xs'}
@@ -152,7 +152,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 					</Flex>
 					<Flex justify={'flex-end'} align={'center'} gap={2}>
 						<StatusIndicator identifier={identifier} />
-						<AiProviderPicker identifier={identifier} inputRef={inputRef} disabled={disabled} />
+						<AiProviderPicker identifier={identifier} disabled={disabled} />
 
 						<Tooltip content={(
 							<React.Fragment>
