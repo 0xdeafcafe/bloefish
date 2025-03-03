@@ -122,10 +122,10 @@ export const Conversation: React.FC = () => {
 									backgroundSize={'100vw 500px'}
 								>
 									<Card.Body p={6}>
-										<Flex justify={'space-between'}>
-											<Text textStyle={'xl'} fontWeight={'semibold'} textShadow={'2xl'}>
+										<Flex justify={'space-between'} gap={12}>
+											<Text textStyle={'xl'} fontWeight={'semibold'} textShadow={'2xl'} w={'full'}>
 												{conversation.title ? conversation.title : (
-													<Skeleton width={'50%'} />
+													<Skeleton width={'full'} h={'100%'} />
 												)}
 											</Text>
 											<MenuRoot>
