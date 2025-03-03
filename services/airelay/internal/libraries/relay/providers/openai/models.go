@@ -16,7 +16,7 @@ func (p *Provider) ListModels(ctx context.Context) ([]relay.Model, error) {
 	for _, model := range p.models {
 		result = append(result, relay.Model{
 			ProviderID: p.GetMetadata().ProviderID,
-			ModelID:    model.Name,
+			ModelID:    model.ID,
 			ModelName:  model.Name,
 		})
 	}
