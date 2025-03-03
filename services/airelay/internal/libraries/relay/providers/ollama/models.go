@@ -7,7 +7,7 @@ import (
 )
 
 func (p *Provider) ListModels(ctx context.Context) ([]relay.Model, error) {
-	models, err := p.client.ListLocalModels(ctx)
+	models, err := p.client.ListRunningModels(ctx)
 	if err != nil {
 		return nil, err
 	}

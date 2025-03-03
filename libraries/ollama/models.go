@@ -5,30 +5,29 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 )
 
 type LocalModels struct {
-	Models []*LocalModel `json:"models"`
+	Models []*RunningModel `json:"models"`
 }
 
-type LocalModel struct {
-	Name       string             `json:"name"`
-	ModifiedAt time.Time          `json:"modified_at"`
-	Size       int64              `json:"size"`
-	Digest     string             `json:"digest"`
-	Details    *LocalModelDetails `json:"details"`
+type RunningModel struct {
+	Name    string               `json:"name"`
+	Model   string               `json:"model"`
+	Size    int64                `json:"size"`
+	Digest  string               `json:"digest"`
+	Details *RunningModelDetails `json:"details"`
 }
 
-type LocalModelDetails struct {
+type RunningModelDetails struct {
 	Format            string `json:"format"`
 	Family            string `json:"family"`
 	ParameterSize     string `json:"parameter_size"`
 	QuantizationLevel string `json:"quantization_level"`
 }
 
-func (c *client) ListLocalModels(ctx context.Context) ([]*LocalModel, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.endpointURL+"/api/models", nil)
+func (c *client) ListRunningModels(ctx context.Context) ([]*RunningModel, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.endpointURL+"/api/tags", nil)
 	if err != nil {
 		return nil, err
 	}
