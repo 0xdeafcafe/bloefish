@@ -47,6 +47,8 @@ This will invoke a call to an AI model, passing in a full conversation, wait for
 
 ```typescript
 interface Request {
+	conversation_id: string;
+	message_id: string;
 	owner: {
 		type: 'user';
 		identifier: string;
@@ -78,6 +80,8 @@ This will invoke a call to an AI model, passing in a full conversation, and stre
 
 ```typescript
 interface Request {
+	conversation_id: string;
+	message_id: string;
 	streaming_channel_id: string;
 	owner: {
 		type: 'user';

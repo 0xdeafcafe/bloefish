@@ -3,6 +3,8 @@
 	"additionalProperties": false,
 
 	"required": [
+		"conversation_id",
+		"message_id",
 		"streaming_channel_id",
 		"owner",
 		"messages",
@@ -10,6 +12,16 @@
 	],
 
 	"properties": {
+		"conversation_id": {
+			"type": "string",
+			"minLength": 1
+		},
+
+		"message_id": {
+			"type": "string",
+			"minLength": 1
+		},
+
 		"streaming_channel_id": {
 			"type": "string",
 			"minLength": 1

@@ -3,12 +3,24 @@
 	"additionalProperties": false,
 
 	"required": [
+		"conversation_id",
+		"message_id",
 		"owner",
 		"messages",
 		"ai_relay_options"
 	],
 
 	"properties": {
+		"conversation_id": {
+			"type": "string",
+			"minLength": 1
+		},
+
+		"message_id": {
+			"type": "string",
+			"minLength": 1
+		},
+
 		"owner": {
 			"type": "object",
 			"additionalProperties": false,
@@ -76,6 +88,7 @@
 					"type": "string",
 					"minLength": 1
 				},
+
 				"model_id": {
 					"type": "string",
 					"minLength": 1

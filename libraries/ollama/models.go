@@ -28,7 +28,7 @@ type LocalModelDetails struct {
 }
 
 func (c *client) ListLocalModels(ctx context.Context) ([]*LocalModel, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.endpointURL+"/models", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.endpointURL+"/api/models", nil)
 	if err != nil {
 		return nil, err
 	}

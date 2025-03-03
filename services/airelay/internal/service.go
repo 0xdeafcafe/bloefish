@@ -3,6 +3,10 @@ package internal
 import (
 	"context"
 
+	ollamaClient "github.com/0xdeafcafe/bloefish/libraries/ollama"
+	oaiClient "github.com/openai/openai-go"
+	openaiOption "github.com/openai/openai-go/option"
+
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/config"
 	"github.com/0xdeafcafe/bloefish/libraries/telemetry"
@@ -14,9 +18,6 @@ import (
 	"github.com/0xdeafcafe/bloefish/services/conversation"
 	"github.com/0xdeafcafe/bloefish/services/fileupload"
 	"github.com/0xdeafcafe/bloefish/services/stream"
-
-	oaiClient "github.com/openai/openai-go"
-	openaiOption "github.com/openai/openai-go/option"
 )
 
 type Config struct {
@@ -118,7 +119,11 @@ func Run(ctx context.Context) error {
 					Name: "o1 mini",
 				}}),
 			)),
-			relay.WithProvider(ollama.NewProvider()),
+			relay.WithProvider(ollama.NewProvider(
+				ollamaClient.NewClient(
+					ollamaClient.WithEndpointURL(cfg.AIProviders.Ollama.Endpoint),
+				),
+			)),
 		),
 
 		ConversationService: conversation.NewRPCClient(ctx, cfg.ConversationService),

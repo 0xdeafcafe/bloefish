@@ -32,6 +32,8 @@ type ListSupportedResponseModel struct {
 }
 
 type InvokeConversationMessageRequest struct {
+	ConversationID string                                          `json:"conversation_id"`
+	MessageID      string                                          `json:"message_id"`
 	Owner          *Actor                                          `json:"owner"`
 	Messages       []*InvokeConversationMessageRequestMessage      `json:"messages"`
 	AIRelayOptions *InvokeConversationMessageRequestAIRelayOptions `json:"ai_relay_options"`
@@ -52,6 +54,8 @@ type InvokeConversationMessageResponse struct {
 	MessageContent string `json:"message_content"`
 }
 type InvokeStreamingConversationMessageRequest struct {
+	ConversationID     string                                          `json:"conversation_id"`
+	MessageID          string                                          `json:"message_id"`
 	StreamingChannelID string                                          `json:"streaming_channel_id"`
 	Owner              *Actor                                          `json:"owner"`
 	Messages           []*InvokeConversationMessageRequestMessage      `json:"messages"`

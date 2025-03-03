@@ -5,9 +5,11 @@ import (
 	"github.com/0xdeafcafe/bloefish/services/airelay/internal/libraries/relay"
 )
 
-func NewProvider() relay.Provider {
+func NewProvider(
+	ollamaClient ollamaClient.Client,
+) relay.Provider {
 	return &Provider{
-		client: ollamaClient.NewClient(),
+		client: ollamaClient,
 	}
 }
 
