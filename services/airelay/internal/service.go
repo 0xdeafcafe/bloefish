@@ -9,6 +9,7 @@ import (
 
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/config"
+	"github.com/0xdeafcafe/bloefish/libraries/langwatch"
 	"github.com/0xdeafcafe/bloefish/libraries/telemetry"
 	"github.com/0xdeafcafe/bloefish/services/airelay/internal/app"
 	"github.com/0xdeafcafe/bloefish/services/airelay/internal/libraries/relay"
@@ -30,6 +31,8 @@ type Config struct {
 	StreamService       config.UnauthenticatedService `env:"STREAM_SERVICE"`
 
 	AIProviders AIProviders `env:"AI_PROVIDERS"`
+
+	Langwatch LangwatchConfig `env:"LANGWATCH"`
 }
 
 type AIProviders struct {
@@ -40,6 +43,10 @@ type AIProviders struct {
 type OpenAIConfig struct {
 	APIKey         string `env:"API_KEY"`
 	OrganizationID string `env:"ORGANIZATION_ID"`
+}
+
+type LangwatchConfig struct {
+	APIKey string `env:"API_KEY"`
 }
 
 type OllamaConfig struct {
@@ -123,6 +130,9 @@ func Run(ctx context.Context) error {
 				ollamaClient.NewClient(
 					ollamaClient.WithEndpointURL(cfg.AIProviders.Ollama.Endpoint),
 				),
+			)),
+			relay.WithLangwatch(langwatch.NewClient(
+				langwatch.WithAPIKey(cfg.Langwatch.APIKey),
 			)),
 		),
 

@@ -35,8 +35,11 @@ func NewChatUserMessage(content string) Message {
 }
 
 type ChatStreamParams struct {
-	ModelID  string
-	Messages []Message
+	ThreadID      string
+	ThreadOwnerID string
+	MessageID     string
+	ModelID       string
+	Messages      []Message
 }
 
 type ChatStreamEvent struct {
