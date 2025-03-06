@@ -3,6 +3,9 @@
 ![go](https://github.com/0xdeafcafe/bloefish/actions/workflows/go.yml/badge.svg)
 ![js](https://github.com/0xdeafcafe/bloefish/actions/workflows/js.yml/badge.svg)
 
+## Kinda important notice
+
+The `master` branch should not be expected to be stable until this notice is removed. If it breaks, just keep hopping back commits, one of them will work, eventually.
 
 ## Introduction
 
