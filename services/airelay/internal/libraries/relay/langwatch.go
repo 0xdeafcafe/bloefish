@@ -35,7 +35,7 @@ func (p *langwatchProviderDecorator) NewChatStream(ctx context.Context, params C
 		langwatch.Attribute(langwatch.AttributeNameUserID, params.ThreadOwnerID),
 	))
 
-	ctx, span := trace.StartLLMSpan(ctx, langwatch.StartLLMSpanParams{
+	ctx, span := trace.StartLLMSpan(ctx, params.MessageID, langwatch.StartLLMSpanParams{
 		Vendor: string(p.inner.GetMetadata().ProviderID),
 		Model:  params.ModelID,
 		Input: langwatch.StartLLMSpanChatMessageInput{
