@@ -1,4 +1,4 @@
-# bloefish
+# 🐡 Bloefish
 
 ![go](https://github.com/0xdeafcafe/bloefish/actions/workflows/go.yml/badge.svg)
 ![js](https://github.com/0xdeafcafe/bloefish/actions/workflows/js.yml/badge.svg)
@@ -13,24 +13,28 @@ Bloefish is a local AI framework, aiming to provide a simple way to interact wit
 AI models and providers, via a few simple to use touch points.
 
 <p align="center">
-	<img src="./assets/screenshot.webp">
+	<picture>
+		<source media="(prefers-color-scheme: dark)" srcset="assets/screenshot-dark.webp" type="image/webp">
+		<source media="(prefers-color-scheme: light)" srcset="assets/screenshot-light.webp" type="image/webp">
+		<img alt="Preview of the Bloefish new conversation screen" src="assets/screenshot-dark.webp">
+	</picture>
 </p>
 
 ## Services
 
-| Service        | Port   | Description                                                         | Readme                            |
-| -------------- | ------ | ------------------------------------------------------------------- | --------------------------------- |
-| `ai_relay`     | `4003` | Handles relaying requests to various AI models and providers.       | [View](./services/airelay/README.md) |
+| Service        | Port   | Description                                                         | Readme                                    |
+| -------------- | ------ | ------------------------------------------------------------------- | ----------------------------------------- |
+| `ai_relay`     | `4003` | Handles relaying requests to various AI models and providers.       | [View](./services/airelay/README.md)      |
 | `conversation` | `4002` | Handles the creation and management of interactions (messages).     | [View](./services/conversation/README.md) |
-| `file_upload`   | `4005` | Handles management and uploading of files.                           | [View](./services/fileupload/README.md) |
-| `skill_set`    | `4006` | Handles creating and management of skill sets.                      | [View](./services/skillset/README.md) |
-| `stream`       | `4004` | Handles streaming.                                                  | [View](./services/stream/README.md) |
-| `user`         | `4001` | Handles the creation and management of users.                       | [View](./services/user/README.md) |
+| `file_upload`   | `4005` | Handles management and uploading of files.                           | [View](./services/fileupload/README.md)    |
+| `skill_set`    | `4006` | Handles creating and management of skill sets.                      | [View](./services/skillset/README.md)     |
+| `stream`       | `4004` | Handles streaming.                                                  | [View](./services/stream/README.md)       |
+| `user`         | `4001` | Handles the creation and management of users.                       | [View](./services/user/README.md)         |
 
 ## Applications
 
-| Application | Port   | Description                                                         | Readme                            |
-| ----------- | ------ | ------------------------------------------------------------------- | --------------------------------- |
+| Application | Port   | Description                                                         | Readme                               |
+| ----------- | ------ | ------------------------------------------------------------------- | -----------------------------------  |
 | `web`       | `5000` | A web application for interacting with Bloefish's backend.           | [View](./applications/web/README.md) |
 | `cli`	      | `N/A`  | A command line interface for interacting with Bloefish's backend.    | [View](./applications/cli/README.md) |
 
@@ -70,10 +74,3 @@ $ make build
 $ make start
 $ open http://app.bloefish.local:4169/
 ```
-
-## Current annoyances
-
-- Each service needs a hosts entry
-	- `echo "127.0.0.1 svc_xxx.bloefish.local" | sudo tee -a /etc/hosts`
-- The storage utility (minio), needs a special hosts entry
-	- `echo "127.0.0.1 storageminio" | sudo tee -a /etc/hosts`

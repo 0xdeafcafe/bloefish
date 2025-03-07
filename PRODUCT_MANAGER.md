@@ -1,4 +1,4 @@
-# This file replaces the need for a product manager or overpriced turing complete todo app
+# Product Manager
 
 ## Done
 
@@ -24,16 +24,16 @@
 - Redesign provider system in relay
 - New conversation header UI
 
-## 
+## Doing
 
 - Langwatch tracing
 
 ## Plans
 
-- Support think tokens
-
 - Create preferences for title generation/default model
 - Improve model handling
+
+- Support think tags
 
 - Export conversations
 
