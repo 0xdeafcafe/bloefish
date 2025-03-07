@@ -128,5 +128,5 @@ func (s *spanLLM) AddError(ctx context.Context, err error) {
 }
 
 func (s *spanLLM) End(ctx context.Context) {
-	s.client.Collect(ctx)
+	s.client.Collect(ctx, nil)
 }

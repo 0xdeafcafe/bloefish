@@ -16,9 +16,10 @@ func (c *noopClient) CreateTrace(ctx context.Context, theadID string, _ ...Trace
 	return ctx, t
 }
 
-func (t *noopTrace) StartLLMSpan(ctx context.Context, _ StartLLMSpanParams) (context.Context, SpanLLM) {
+func (t *noopTrace) StartLLMSpan(ctx context.Context, spanID string, params StartLLMSpanParams) (context.Context, SpanLLM) {
 	return ctx, &noopSpanLLM{}
 }
 
-func (s *noopSpanLLM) AddOutput(ctx context.Context) {}
-func (s *noopSpanLLM) End(ctx context.Context)       {}
+func (s *noopSpanLLM) AddOutput(ctx context.Context, output string) {}
+func (s *noopSpanLLM) AddError(ctx context.Context, err error)      {}
+func (s *noopSpanLLM) End(ctx context.Context)                      {}
