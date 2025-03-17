@@ -122,7 +122,13 @@ func Run(ctx context.Context) error {
 					Name: "GPT 3.5 turbo",
 				}, {
 					ID:   string(oaiClient.ChatModelO1Mini),
+					Name: "o1",
+				}, {
+					ID:   string(oaiClient.ChatModelO1Mini),
 					Name: "o1 mini",
+				}, {
+					ID:   string(oaiClient.ChatModelO3Mini),
+					Name: "o3 mini",
 				}}),
 			)),
 			relay.WithProvider(ollama.NewProvider(

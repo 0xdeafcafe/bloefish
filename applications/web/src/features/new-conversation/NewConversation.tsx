@@ -23,7 +23,7 @@ const starterPrompts: string[] = [
 	'Write a React counter component',
 	'How do I use the Go Mongo Driver?',
 	'How many r\'s are there in Strawberry?',
-	'How many calories does my girlfriend burn jumping to conclusion?',
+	'How many calories does my girlfriend burn jumping to conclusions?',
 ];
 
 interface AskQuestionCommand {
