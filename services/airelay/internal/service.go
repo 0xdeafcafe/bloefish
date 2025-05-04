@@ -9,7 +9,6 @@ import (
 
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/config"
-	"github.com/0xdeafcafe/bloefish/libraries/langwatch"
 	"github.com/0xdeafcafe/bloefish/libraries/telemetry"
 	"github.com/0xdeafcafe/bloefish/services/airelay/internal/app"
 	"github.com/0xdeafcafe/bloefish/services/airelay/internal/libraries/relay"
@@ -130,9 +129,6 @@ func Run(ctx context.Context) error {
 				ollamaClient.NewClient(
 					ollamaClient.WithEndpointURL(cfg.AIProviders.Ollama.Endpoint),
 				),
-			)),
-			relay.WithLangwatch(langwatch.NewClient(
-				langwatch.WithAPIKey(cfg.Langwatch.APIKey),
 			)),
 		),
 
