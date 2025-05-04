@@ -838,6 +838,43 @@ services/
     // ... rest of main.go
     ```
 
+When adding a new service like `svc_example`, you also need to update the main `docker-compose.yml` file in the root of the monorepo. Add an entry for the new service, similar to the existing ones:
+
+```yaml
+  svc_example:
+    build:
+      context: ./services/example # Point to the service directory
+      dockerfile: Dockerfile # Assuming a standard Dockerfile name
+    container_name: svc_example
+    env_file:
+      - .env # Load environment variables from the root .env file
+    ports:
+      - "${SVC_EXAMPLE_PORT:-4010}:4010" # Map the service's internal port (e.g., 4010)
+    networks:
+      - bloefish_network # Connect to the shared network
+    # Optional: Add healthcheck based on service implementation (e.g., HTTP endpoint)
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:4010/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 15s
+    restart: unless-stopped
+```
+
+**Key points:**
+
+*   Replace `svc_example` with your actual service name (e.g., `svc_billing`).
+*   Adjust the `context` path in the `build` section to point to your service's directory (e.g., `./services/billing`).
+*   Ensure the internal port number (`4010` in the example) matches the one configured in your service's `internal/service.go` (`defaultConfig`). Update the port mapping accordingly (e.g., `"${SVC_BILLING_PORT:-4011}:4011"`).
+*   Update the `.env` file in the monorepo root to include any necessary environment variables for the new service, including `SVC_EXAMPLE_PORT` (or `SVC_BILLING_PORT` etc.) if you want it to be configurable.
+
+Remember to rebuild and restart your Docker Compose environment after making these changes:
+
+```bash
+docker-compose down && docker-compose up -d --build
+```
+
 ## Dependencies
 
 *   Run `go mod tidy` after adding new imports.
