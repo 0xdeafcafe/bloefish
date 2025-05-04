@@ -27,7 +27,11 @@ export const AiProviderPicker: React.FC<AiProviderPickerProps> = ({
 	useEffect(() => {
 		if (!providers) return;
 
-		const availableModels = providers.models;
+		const availableModels = providers.models ? [...providers.models].sort((a, b) => {
+			const aKey = `${a.providerId}-${a.modelId}`;
+			const bKey = `${b.providerId}-${b.modelId}`;
+			return aKey.localeCompare(bKey);
+		}) : [];
 
 		if (availableModels)
 			setAvailableModels(availableModels);
