@@ -56,7 +56,7 @@ func (p *Provider) NewChatStream(ctx context.Context, params relay.ChatStreamPar
 		content := msg.Content
 		switch msg.Role {
 		case relay.RoleSystem:
-			messages[i] = openai.AssistantMessage(content)
+			messages[i] = openai.SystemMessage(content)
 		case relay.RoleUser:
 			messages[i] = openai.UserMessage(content)
 		case relay.RoleAssistant:
