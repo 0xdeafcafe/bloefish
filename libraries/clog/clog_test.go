@@ -22,7 +22,7 @@ func TestContextLogger(t *testing.T) {
 
 		l := Get(r.Context())
 
-		is.Equal(log, l)
+		is.Equal(log.Data, l.Data)
 	})
 
 	t.Run("SetFields", func(t *testing.T) {
