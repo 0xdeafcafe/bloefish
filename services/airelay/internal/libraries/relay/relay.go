@@ -2,19 +2,15 @@ package relay
 
 import (
 	"context"
-
-	"github.com/0xdeafcafe/bloefish/libraries/langwatch"
 )
 
 type Client struct {
 	providers map[ProviderID]Provider
-	langwatch langwatch.Client
 }
 
 func NewClient(opts ...ClientOption) *Client {
 	c := &Client{
 		providers: make(map[ProviderID]Provider),
-		langwatch: langwatch.NewNoopClient(),
 	}
 
 	for _, opt := range opts {
@@ -30,8 +26,7 @@ func (c *Client) With(providerID string) Provider {
 		return newUnknownProvider()
 	}
 
-	// Wrap the provider with langwatch capabilities
-	return newLangwatchProvider(provider, c.langwatch)
+	return provider
 }
 
 func (c *Client) ListAllModels(ctx context.Context) ([]Model, error) {
