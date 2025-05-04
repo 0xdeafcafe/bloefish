@@ -3,6 +3,7 @@ package telemetry
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
@@ -22,8 +23,9 @@ import (
 )
 
 type Config struct {
-	Enable      bool   `env:"ENABLED"`
-	EndpointURL string `env:"ENDPOINT_URL"`
+	Enable              bool   `env:"ENABLED"`
+	EndpointURL         string `env:"ENDPOINT_URL"`
+	AuthorizationBearer string `env:"AUTHORIZATION_BEARER"`
 }
 
 func (c Config) MustSetup(ctx context.Context) (shutdown func(context.Context) error) {
@@ -113,7 +115,17 @@ func (c Config) newPropagator() propagation.TextMapPropagator {
 }
 
 func (c Config) newTracerProvider(ctx context.Context, res *resource.Resource) (*trace.TracerProvider, error) {
-	traceExporter, err := otlptracehttp.New(ctx, otlptracehttp.WithEndpointURL(c.EndpointURL))
+	opts := []otlptracehttp.Option{
+		otlptracehttp.WithEndpointURL(c.EndpointURL),
+	}
+
+	if c.AuthorizationBearer != "" {
+		opts = append(opts, otlptracehttp.WithHeaders(map[string]string{
+			"Authorization": fmt.Sprintf("Bearer %s", c.AuthorizationBearer),
+		}))
+	}
+
+	traceExporter, err := otlptracehttp.New(ctx, opts...)
 	if err != nil {
 		return nil, err
 	}
