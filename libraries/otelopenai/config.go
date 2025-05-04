@@ -11,6 +11,8 @@ type config struct {
 	propagators                   propagation.TextMapPropagator
 	traceIDResponseHeaderKey      string
 	traceSampledResponseHeaderKey string
+	recordInput                   bool
+	recordOutput                  bool
 }
 
 // Option specifies instrumentation configuration options.
@@ -54,5 +56,24 @@ func WithTraceIDResponseHeader(key string) Option {
 func WithTraceSampledResponseHeader(key string) Option {
 	return optionFunc(func(c *config) {
 		c.traceSampledResponseHeaderKey = key
+	})
+}
+
+// WithCaptureInput enables recording the full request body content
+// under the `langwatch.input.value` attribute.
+// Be cautious with sensitive data.
+func WithCaptureInput() Option {
+	return optionFunc(func(c *config) {
+		c.recordInput = true
+	})
+}
+
+// WithCaptureOutput enables recording the full response body content
+// (or accumulated stream content, if middleware could parse it)
+// under the `langwatch.output.value` attribute.
+// Be cautious with sensitive data.
+func WithCaptureOutput() Option {
+	return optionFunc(func(c *config) {
+		c.recordOutput = true
 	})
 }
