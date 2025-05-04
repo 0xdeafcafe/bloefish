@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/openai/openai-go"
 
@@ -77,16 +78,34 @@ func (a *App) InvokeStreamingConversationMessage(ctx context.Context, req *airel
 		return nil, err
 	}
 
+	iterationCount := 0
+	var contentBuffer strings.Builder
+
 	for chatStream.Next() {
+		iterationCount++
 		event := chatStream.Current()
 
 		if event.Content != "" {
+			contentBuffer.WriteString(event.Content)
+		}
+
+		if iterationCount%10 == 0 && contentBuffer.Len() > 0 {
 			if err := a.StreamService.SendMessageFragment(ctx, &stream.SendMessageFragmentRequest{
 				ChannelID:      req.StreamingChannelID,
-				MessageContent: event.Content,
+				MessageContent: contentBuffer.String(),
 			}); err != nil {
-				return nil, fmt.Errorf("failed to send message fragment: %w", err)
+				return nil, fmt.Errorf("failed to send message fragment chunk: %w", err)
 			}
+			contentBuffer.Reset()
+		}
+	}
+
+	if contentBuffer.Len() > 0 {
+		if err := a.StreamService.SendMessageFragment(ctx, &stream.SendMessageFragmentRequest{
+			ChannelID:      req.StreamingChannelID,
+			MessageContent: contentBuffer.String(),
+		}); err != nil {
+			return nil, fmt.Errorf("failed to send final message fragment: %w", err)
 		}
 	}
 
