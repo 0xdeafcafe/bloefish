@@ -1,0 +1,846 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Backend Service Creation Template
+
+This document outlines the standard structure and steps for creating a new backend service within the Bloefish monorepo. It's based on the patterns observed in existing services like `svc_conversation`.
+
+## Directory Structure
+
+A new service, let's call it `svc_example`, should reside in `services/example/` and follow this structure:
+
+```
+services/
+└── example/
+    ├── cmd/                  # Service entry point
+    │   └── main.go
+    ├── internal/             # Internal implementation details
+    │   ├── app/              # Business logic layer
+    │   │   ├── repositories/ # Repository implementations (e.g., MongoDB)
+    │   │   │   └── mgo_example.go
+    │   │   ├── app.go        # App struct definition and dependencies
+    │   │   └── create_example.go # App method implementations (one per file)
+    │   ├── domain/           # Core domain models and interfaces
+    │   │   ├── models/       # Domain model structs
+    │   │   │   └── example.go
+    │   │   └── ports/        # Repository interfaces
+    │   │       └── ports.go
+    │   ├── transport/        # Transport layer (e.g., RPC)
+    │   │   └── rpc/
+    │   │       ├── create_example.go      # RPC handler implementations (one per file)
+    │   │       ├── create_example.json    # JSON schemas for request validation
+    │   │       └── rpc.go                 # RPC server setup and registration
+    │   └── service.go        # Configuration loading, DI, service startup
+    ├── example.go            # Public service interface and type definitions
+    ├── rpcclient.go          # RPC client implementation for the service
+    └── README.md             # Service documentation (including RPC contracts)
+```
+
+## Key Files and Conventions with Examples
+
+1.  **`services/example/example.go`**: Public interface and types.
+    *   Defines the `Service` interface.
+    *   Defines request/response structs with `json` tags.
+    *   Uses `time.Time` for timestamps.
+
+    ```go
+    package example
+
+    import (
+    	"context"
+    	"time"
+
+    	"github.com/0xdeafcafe/bloefish/libraries/cher"
+    )
+
+    // Actor represents the entity performing an action.
+    type Actor struct {
+    	Type       string `json:"type"` // e.g., "user"
+    	Identifier string `json:"identifier"` // e.g., user ID
+    }
+
+    // Service defines the public contract for the example service.
+    type Service interface {
+    	CreateExample(ctx context.Context, req *CreateExampleRequest) (*CreateExampleResponse, error)
+    	GetExample(ctx context.Context, req *GetExampleRequest) (*GetExampleResponse, error)
+    	// ... other methods
+    }
+
+    // CreateExampleRequest is the input for creating an example.
+    type CreateExampleRequest struct {
+    	IdempotencyKey string `json:"idempotency_key"`
+    	Owner          *Actor `json:"owner"`
+    	Name           string `json:"name"`
+    	Value          int    `json:"value"`
+    }
+
+    // CreateExampleResponse is the output after creating an example.
+    type CreateExampleResponse struct {
+    	ID        string    `json:"id"` // KSUID
+    	Owner     *Actor    `json:"owner"`
+    	Name      string    `json:"name"`
+    	Value     int       `json:"value"`
+    	CreatedAt time.Time `json:"created_at"`
+    	UpdatedAt time.Time `json:"updated_at"`
+    }
+
+    // GetExampleRequest is the input for retrieving an example.
+    type GetExampleRequest struct {
+    	ExampleID string `json:"example_id"`
+    }
+
+    // GetExampleResponse is the output when retrieving an example.
+    type GetExampleResponse struct {
+    	ID        string    `json:"id"`
+    	Owner     *Actor    `json:"owner"`
+    	Name      string    `json:"name"`
+    	Value     int       `json:"value"`
+    	CreatedAt time.Time `json:"created_at"`
+    	UpdatedAt time.Time `json:"updated_at"`
+    	DeletedAt *time.Time `json:"deleted_at"`
+    }
+
+    // ... other request/response structs
+    ```
+
+2.  **`services/example/rpcclient.go`**: RPC client implementation.
+    *   Implements the `Service` interface using `crpc.Client`.
+    *   Provides a `NewRPCClient` constructor.
+    *   Uses specific version strings (e.g., "2025-03-15").
+
+    ```go
+    package example
+
+    import (
+    	"context"
+    	"net/http"
+
+    	"github.com/0xdeafcafe/bloefish/libraries/config"
+    	"github.com/0xdeafcafe/bloefish/libraries/crpc"
+    	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+    )
+
+    const rpcVersion = "2025-03-15" // Define the current RPC version
+
+    type RPCClient struct {
+    	client *crpc.Client
+    }
+
+    // NewRPCClient creates a new client for the example service.
+    func NewRPCClient(ctx context.Context, cfg config.UnauthenticatedService) Service {
+    	return &RPCClient{
+    		client: crpc.NewClient(ctx, cfg.BaseURL, &http.Client{
+    			Transport: otelhttp.NewTransport(http.DefaultTransport),
+    		}),
+    	}
+    }
+
+    func (r *RPCClient) CreateExample(ctx context.Context, req *CreateExampleRequest) (resp *CreateExampleResponse, err error) {
+    	return resp, r.client.Do(ctx, "create_example", rpcVersion, req, &resp)
+    }
+
+    func (r *RPCClient) GetExample(ctx context.Context, req *GetExampleRequest) (resp *GetExampleResponse, err error) {
+    	return resp, r.client.Do(ctx, "get_example", rpcVersion, req, &resp)
+    }
+
+    // ... other client method implementations
+    ```
+
+3.  **`services/example/README.md`**: Documentation.
+    *   Includes service description, base URL, RPC version, and endpoint contracts in Typescript.
+
+    ```markdown
+    # svc_example
+
+    ## Description
+
+    This service manages example resources.
+
+    ## Base URL
+
+    `http://svc_example.bloefish.local:40XX/`
+
+    ## RPC transport
+
+    ### Base URL
+
+    `http://svc_example.bloefish.local:40XX/rpc/<version>/<endpoint>`
+
+    ### Versions
+
+    - `2025-03-15` - Initial version
+
+    ### Endpoints
+
+    #### `create_example`
+
+    Creates a new example.
+
+    **Contract**
+
+    ```typescript
+    interface Request {
+    	idempotency_key: string;
+    	owner: {
+    		type: 'user';
+    		identifier: string;
+    	};
+    	name: string;
+    	value: number;
+    }
+
+    interface Response {
+    	id: string; // KSUID
+    	owner: {
+    		type: 'user';
+    		identifier: string;
+    	};
+    	name: string;
+    	value: number;
+    	created_at: string; // ISO 8601
+    	updated_at: string; // ISO 8601
+    }
+    ```
+
+    #### `get_example`
+
+    Retrieves an existing example by its ID.
+
+    **Contract**
+
+    ```typescript
+    interface Request {
+        example_id: string;
+    }
+
+    interface Response {
+        id: string;
+        owner: {
+            type: 'user';
+            identifier: string;
+        };
+        name: string;
+        value: number;
+        created_at: string; // ISO 8601
+        updated_at: string; // ISO 8601
+        deleted_at: string | null; // ISO 8601
+    }
+    ```
+    ```
+
+4.  **`services/example/cmd/main.go`**: Entry point.
+    *   Minimal code, calls `internal.Run`.
+
+    ```go
+    package main
+
+    import (
+    	"context"
+    	"os"
+
+    	"github.com/0xdeafcafe/bloefish/libraries/clog"
+    	"github.com/0xdeafcafe/bloefish/services/example/internal"
+    )
+
+    func main() {
+    	// Create a root context or potentially pass one with cancellation.
+    	ctx := context.Background()
+
+    	// Call the internal Run function. The Root function in main.go
+    	// handles setting up the service context info.
+    	if err := internal.Run(ctx); err != nil {
+    		// Use the logger from the context if available, otherwise default.
+    		clog.Get(ctx).WithError(err).Error("service exited unexpectedly")
+    		os.Exit(1)
+    	}
+    	os.Exit(0)
+    }
+    ```
+
+5.  **`services/example/internal/service.go`**: Configuration and Startup.
+    *   Defines `Config` with `env` tags.
+    *   Includes `defaultConfig`.
+    *   `Run` function performs setup, DI, and starts the server.
+
+    ```go
+    package internal
+
+    import (
+    	"context"
+
+    	"github.com/0xdeafcafe/bloefish/libraries/clog"
+    	"github.com/0xdeafcafe/bloefish/libraries/config"
+    	"github.com/0xdeafcafe/bloefish/libraries/telemetry"
+    	"github.com/0xdeafcafe/bloefish/services/example/internal/app"
+    	"github.com/0xdeafcafe/bloefish/services/example/internal/app/repositories"
+    	"github.com/0xdeafcafe/bloefish/services/example/internal/transport/rpc"
+    	// Import other dependent service clients if needed
+    	// "github.com/0xdeafcafe/bloefish/services/user"
+    )
+
+    type Config struct {
+    	Server    config.Server    `env:"SERVER"`
+    	Telemetry telemetry.Config `env:"TELEMETRY"`
+    	Logging   clog.Config      `env:"LOGGING"`
+    	Mongo     config.MongoDB   `env:"MONGO"`
+
+    	// Add other service dependencies here
+    	// UserService config.UnauthenticatedService `env:"USER_SERVICE"`
+    }
+
+    func defaultConfig() Config {
+    	return Config{
+    		Server: config.Server{
+    			Addr: ":4010", // Assign a unique port
+    		},
+    		Telemetry: telemetry.Config{
+    			Enable: true,
+    		},
+    		Logging: clog.Config{
+    			Format: clog.TextFormat,
+    			Debug:  true,
+    		},
+    		Mongo: config.MongoDB{
+    			URI:          "mongodb://localhost:27017",
+    			DatabaseName: "bloefish_svc_example", // Unique DB name
+    		},
+    		// Set default URLs for other services
+    		// UserService: config.UnauthenticatedService{
+    		// 	BaseURL: "http://localhost:4001/rpc",
+    		// },
+    	}
+    }
+
+    // Run initializes and starts the service.
+    func Run(ctx context.Context) error {
+    	cfg := defaultConfig()
+    	config.MustHydrate(ctx, &cfg) // Load config from environment
+
+    	// Setup telemetry
+    	shutdown := cfg.Telemetry.MustSetup(ctx)
+    	defer func() {
+    		if err := shutdown(ctx); err != nil {
+    			clog.Get(ctx).WithError(err).Error("failed to shutdown telemetry")
+    		}
+    	}()
+
+    	// Setup logging
+    	ctx = clog.Set(ctx, cfg.Logging.Configure(ctx))
+
+    	// Connect dependencies
+    	_, mongoDatabase := cfg.Mongo.MustConnect(ctx)
+    	// userServiceClient := user.NewRPCClient(ctx, cfg.UserService)
+
+    	// Dependency Injection
+    	app := &app.App{
+    		ExampleRepository: repositories.NewMgoExample(mongoDatabase),
+    		// Inject other service clients
+    		// UserService: userServiceClient,
+    	}
+
+    	// Setup transport
+    	rpcServer := rpc.New(ctx, app)
+
+    	// Start server
+    	return rpcServer.Run(ctx, cfg.Server)
+    }
+    ```
+
+6.  **`services/example/internal/domain/models/example.go`**: Domain Model.
+    *   Represents the core `Example` entity.
+    *   Uses `ksuid.ID` for the primary identifier.
+    *   Defines command structs for operations.
+
+    ```go
+    package models
+
+    import (
+    	"time"
+
+    	"github.com/0xdeafcafe/bloefish/libraries/ksuid"
+    )
+
+    // Example represents the core domain entity.
+    type Example struct {
+    	ID             ksuid.ID   // Use ksuid.ID type for the identifier
+    	IdempotencyKey string
+    	Owner          *Actor // Reuse Actor type if applicable
+    	Name           string
+    	Value          int
+    	CreatedAt      time.Time
+    	UpdatedAt      time.Time
+    	DeletedAt      *time.Time
+    }
+
+    // CreateExampleCommand holds data needed to create an Example.
+    type CreateExampleCommand struct {
+    	IdempotencyKey string
+    	Owner          *Actor
+    	Name           string
+    	Value          int
+    }
+
+    // Actor represents the owner within the domain model context.
+    // Can be shared or defined per-domain based on complexity.
+    type Actor struct {
+    	Type       string // e.g., "user"
+    	Identifier string // e.g., user ID
+    }
+    ```
+
+7.  **`services/example/internal/domain/ports/ports.go`**: Repository Interface.
+    *   Defines the contract for data persistence operations.
+
+    ```go
+    package ports
+
+    import (
+    	"context"
+
+    	"github.com/0xdeafcafe/bloefish/libraries/ksuid"
+    	"github.com/0xdeafcafe/bloefish/services/example/internal/domain/models"
+    )
+
+    // ExampleRepository defines the persistence operations for Examples.
+    type ExampleRepository interface {
+    	Create(ctx context.Context, cmd *models.CreateExampleCommand) (*models.Example, error)
+    	GetByID(ctx context.Context, id ksuid.ID) (*models.Example, error)
+    	// FindByIdempotencyKey(ctx context.Context, key string, owner *models.Actor) (*models.Example, error)
+    	// ListByOwner(ctx context.Context, owner *models.Actor) ([]*models.Example, error)
+    	// Delete(ctx context.Context, id ksuid.ID) error
+    }
+    ```
+
+8.  **`services/example/internal/app/app.go`**: Application Struct.
+    *   Holds repository interfaces and other service clients.
+
+    ```go
+    package app
+
+    import (
+    	"github.com/0xdeafcafe/bloefish/services/example/internal/domain/ports"
+    	// Import other service interfaces if needed
+    	// "github.com/0xdeafcafe/bloefish/services/user"
+    )
+
+    // App encapsulates the application's business logic and dependencies.
+    type App struct {
+    	ExampleRepository ports.ExampleRepository
+    	// Inject other dependencies like service clients
+    	// UserService user.Service
+    }
+    ```
+
+9.  **`services/example/internal/app/create_example.go`**: Business Logic Implementation.
+    *   Implements `CreateExample` on the `App` struct.
+    *   Uses repository, translates types, handles errors (`cher`).
+    *   Assumes basic validation (e.g., non-empty strings) is done by JSON schema.
+
+    ```go
+    package app
+
+    import (
+    	"context"
+    	"fmt"
+
+    	"github.com/0xdeafcafe/bloefish/libraries/cher"
+    	"github.com/0xdeafcafe/bloefish/services/example" // Import public types
+    	"github.com/0xdeafcafe/bloefish/services/example/internal/domain/models"
+    )
+
+    // CreateExample handles the business logic for creating an example.
+    func (a *App) CreateExample(ctx context.Context, req *example.CreateExampleRequest) (*example.CreateExampleResponse, error) {
+    	// --- Input Validation (Complex/Business Logic related) ---
+    	// Basic validation like non-empty name is handled by JSON schema.
+    	// Validate owner presence here as it's required logic.
+    	if req.Owner == nil || req.Owner.Identifier == "" || req.Owner.Type == "" {
+    		return nil, cher.New(cher.BadRequest, cher.M{"field": "owner", "reason": "must be provided"})
+    	}
+    	// Optional: Validate against other services (e.g., check if user exists)
+    	// _, err := a.UserService.GetUser(ctx, &user.GetUserRequest{UserID: req.Owner.Identifier})
+    	// if err != nil {
+    	//     // Wrap or coerce external errors
+    	//     return nil, cher.New("user_not_found", cher.M{"user_id": req.Owner.Identifier}, cher.Coerce(err))
+    	// }
+
+    	// --- Prepare Domain Command ---
+    	cmd := &models.CreateExampleCommand{
+    		IdempotencyKey: req.IdempotencyKey,
+    		Owner: &models.Actor{ // Translate public Actor to domain Actor
+    			Type:       req.Owner.Type,
+    			Identifier: req.Owner.Identifier,
+    		},
+    		Name:  req.Name,
+    		Value: req.Value,
+    	}
+
+    	// --- Execute Domain Logic (via Repository) ---
+    	// The repository handles idempotency checks based on the key+owner.
+    	createdExample, err := a.ExampleRepository.Create(ctx, cmd)
+    	if err != nil {
+    		// Don't leak internal errors directly; wrap them if needed for context.
+    		// cher.New handles wrapping automatically if the cause is already a cher.E
+    		return nil, cher.New("create_example_failed", nil, err)
+    	}
+
+    	// --- Prepare Response ---
+    	resp := &example.CreateExampleResponse{
+    		ID: createdExample.ID, // ID is already a string
+    		Owner: &example.Actor{ // Translate domain Actor back to public Actor
+    			Type:       createdExample.Owner.Type,
+    			Identifier: createdExample.Owner.Identifier,
+    		},
+    		Name:      createdExample.Name,
+    		Value:     createdExample.Value,
+    		CreatedAt: createdExample.CreatedAt,
+    		UpdatedAt: createdExample.UpdatedAt,
+    	}
+
+    	return resp, nil
+    }
+    ```
+
+10. **`services/example/internal/app/repositories/mgo_example.go`**: MongoDB Repository.
+    *   Implements `ExampleRepository`.
+    *   Uses `mongo` driver, `bson` tags, `ksuid`.
+    *   Includes `ToDomainModel`. Handles upsert for idempotency.
+
+    ```go
+    package repositories
+
+    import (
+    	"context"
+    	"errors"
+    	"time"
+
+    	"github.com/0xdeafcafe/bloefish/libraries/cher"
+    	"github.com/0xdeafcafe/bloefish/libraries/ksuid"
+    	"github.com/0xdeafcafe/bloefish/services/example/internal/domain/models"
+    	"github.com/0xdeafcafe/bloefish/services/example/internal/domain/ports"
+    	"go.mongodb.org/mongo-driver/bson"
+    	"go.mongodb.org/mongo-driver/mongo"
+    	"go.mongodb.org/mongo-driver/mongo/options"
+    )
+
+    // persistedExample is the BSON representation stored in MongoDB.
+    type persistedExample struct {
+    	ID             string `bson:"_id"` // Store KSUID as string
+    	IdempotencyKey string `bson:"idempotency_key"`
+    	Owner          struct {
+    		Type       string `bson:"type"`
+    		Identifier string `bson:"identifier"`
+    	} `bson:"owner"`
+    	Name      string     `bson:"name"`
+    	Value     int        `bson:"value"`
+    	CreatedAt time.Time  `bson:"created_at"`
+    	UpdatedAt time.Time  `bson:"updated_at"`
+    	DeletedAt *time.Time `bson:"deleted_at,omitempty"`
+    }
+
+    type mgoExampleRepository struct {
+    	c *mongo.Collection
+    }
+
+    // NewMgoExample creates a new MongoDB repository for Examples.
+    func NewMgoExample(db *mongo.Database) ports.ExampleRepository {
+    	// Consider adding index creation here if not managed elsewhere
+    	// _, _ = db.Collection("examples").Indexes().CreateOne(context.Background(), mongo.IndexModel{
+    	// 	Keys: bson.D{{"idempotency_key", 1}, {"owner.identifier", 1}},
+    	// 	Options: options.Index().SetUnique(true),
+    	// })
+    	return &mgoExampleRepository{c: db.Collection("examples")}
+    }
+
+    // Create handles creating or retrieving an Example based on idempotency key.
+    func (r *mgoExampleRepository) Create(ctx context.Context, cmd *models.CreateExampleCommand) (*models.Example, error) {
+    	now := time.Now()
+    	newID := ksuid.Generate(ctx, "example") // Generate KSUID with prefix
+
+    	filter := bson.M{
+    		"idempotency_key":  cmd.IdempotencyKey,
+    		"owner.type":       cmd.Owner.Type,
+    		"owner.identifier": cmd.Owner.Identifier,
+    	}
+    	update := bson.M{
+    		"$setOnInsert": bson.M{
+    			"_id": newID.String(), // Store as string
+    			"idempotency_key": cmd.IdempotencyKey,
+    			"owner": bson.M{
+    				"type":       cmd.Owner.Type,
+    				"identifier": cmd.Owner.Identifier,
+    			},
+    			"name":       cmd.Name,
+    			"value":      cmd.Value,
+    			"created_at": now,
+    			"updated_at": now, // Set updated_at on creation too
+    			"deleted_at": nil,
+    		},
+    	}
+    	opts := options.FindOneAndUpdate().
+    		SetUpsert(true).                  // Create if not exists
+    		SetReturnDocument(options.After) // Return the doc after update/insert
+
+    	result := r.c.FindOneAndUpdate(ctx, filter, update, opts)
+    	if err := result.Err(); err != nil {
+    		// Handle potential errors like duplicate key if index isn't perfect or race condition
+    		return nil, cher.New("db_error", cher.M{"operation": "create_example"}, err)
+    	}
+
+    	var pExample persistedExample
+    	if err := result.Decode(&pExample); err != nil {
+    		return nil, cher.New("db_decode_error", cher.M{"operation": "create_example"}, err)
+    	}
+
+    	return pExample.ToDomainModel()
+    }
+
+    // GetByID retrieves an Example by its KSUID.
+    func (r *mgoExampleRepository) GetByID(ctx context.Context, id ksuid.ID) (*models.Example, error) {
+    	filter := bson.M{"_id": id.String(), "deleted_at": nil} // Filter by string ID and not deleted
+    	result := r.c.FindOne(ctx, filter)
+
+    	if err := result.Err(); err != nil {
+    		if errors.Is(err, mongo.ErrNoDocuments) {
+    			return nil, cher.New(cher.NotFound, cher.M{"example_id": id.String()})
+    		}
+    		return nil, cher.New("db_error", cher.M{"operation": "get_example_by_id", "example_id": id.String()}, err)
+    	}
+
+    	var pExample persistedExample
+    	if err := result.Decode(&pExample); err != nil {
+    		return nil, cher.New("db_decode_error", cher.M{"operation": "get_example_by_id", "example_id": id.String()}, err)
+    	}
+
+    	return pExample.ToDomainModel()
+    }
+
+    // ToDomainModel converts the persisted BSON struct to the domain model.
+    func (p *persistedExample) ToDomainModel() (*models.Example, error) {
+    	id, err := ksuid.Parse(p.ID) // Parse string back to ksuid.ID
+    	if err != nil {
+    		// This should ideally not happen if data is saved correctly
+    		return nil, cher.New("internal_error", cher.M{"reason": "failed to parse stored ksuid", "id": p.ID}, err)
+    	}
+
+    	return &models.Example{
+    		ID:             id,
+    		IdempotencyKey: p.IdempotencyKey,
+    		Owner: &models.Actor{
+    			Type:       p.Owner.Type,
+    			Identifier: p.Owner.Identifier,
+    		},
+    		Name:      p.Name,
+    		Value:     p.Value,
+    		CreatedAt: p.CreatedAt,
+    		UpdatedAt: p.UpdatedAt,
+    		DeletedAt: p.DeletedAt,
+    	}, nil
+    }
+    ```
+
+11. **`services/example/internal/transport/rpc/rpc.go`**: RPC Server Setup.
+    *   Uses `crpc`, embeds schemas, sets up middleware (`otelchi`, CORS, etc.).
+
+    ```go
+    package rpc
+
+    import (
+    	"context"
+    	"embed"
+    	"net"
+    	"net/http"
+
+    	"github.com/go-chi/chi/v5"
+    	"github.com/go-chi/cors"
+    	"github.com/pkg/errors"
+    	"github.com/riandyrn/otelchi"
+
+    	"github.com/0xdeafcafe/bloefish/libraries/clog"
+    	"github.com/0xdeafcafe/bloefish/libraries/config"
+    	"github.com/0xdeafcafe/bloefish/libraries/contexts"
+    	"github.com/0xdeafcafe/bloefish/libraries/crpc"
+    	"github.com/0xdeafcafe/bloefish/libraries/crpc/middlewares"
+    	"github.com/0xdeafcafe/bloefish/libraries/jsonschema"
+    	"github.com/0xdeafcafe/bloefish/libraries/version"
+    	"github.com/0xdeafcafe/bloefish/services/example" // Import public interface
+    	"github.com/0xdeafcafe/bloefish/services/example/internal/app"
+    )
+
+    //go:embed *.json
+    var fs embed.FS
+    var schema = jsonschema.NewFS(fs).LoadJSONExt // Helper to load schemas
+
+    // Ensure RPC implements example.Service (compile-time check).
+    var _ example.Service = (*RPC)(nil)
+
+    type RPC struct {
+    	app *app.App // Holds the application logic instance
+
+    	httpServer *http.Server
+    }
+
+    // New creates a new RPC transport layer.
+    func New(ctx context.Context, app *app.App) *RPC {
+    	rpc := &RPC{app: app}
+
+    	svcInfo := contexts.GetServiceInfo(ctx)
+    	if svcInfo == nil {
+    		// This should be set in cmd/bloefish/main.go
+    		panic("service info not found in context")
+    	}
+
+    	// Create the CRPC server. Add authentication middleware if needed.
+    	svr := crpc.NewServer(middlewares.UnsafeNoAuthentication) // Or your auth middleware
+    	svr.Use(crpc.Logger()) // Add CRPC specific logging
+
+    	// Register RPC endpoints
+    	svr.Register("create_example", example.rpcVersion, schema("create_example"), rpc.CreateExample)
+    	svr.Register("get_example", example.rpcVersion, schema("get_example"), rpc.GetExample)
+    	// ... register other endpoints
+
+    	// Setup HTTP router (Chi)
+    	mux := chi.NewRouter()
+    	// Standard middleware stack
+    	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName)) // X-Service-Version header
+    	mux.Use(otelchi.Middleware(svcInfo.ServiceHTTPName, otelchi.WithChiRoutes(mux))) // OpenTelemetry
+    	mux.Use(cors.Handler(cors.Options{ // CORS configuration
+    		AllowedOrigins:   []string{"https://*", "http://*"},
+    		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+    		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-Request-ID"}, // Add custom headers if needed
+    		ExposedHeaders:   []string{"Link"},
+    		AllowCredentials: true, // Adjust as needed
+    		MaxAge:           300,
+    	}))
+    	mux.Get("/system/health", middlewares.HealthCheck) // Standard health check
+
+    	// Mount the CRPC handler under /rpc/*
+    	mux.
+    		With(
+    			middlewares.StripPrefix("/rpc"),          // Remove /rpc prefix for CRPC router
+    			middlewares.RequestID,                    // Add X-Request-ID
+    			middlewares.Logger(clog.Get(ctx)),        // Request logging
+    		).
+    		Handle("/rpc/*", svr)
+
+    	rpc.httpServer = &http.Server{
+    		Handler: mux,
+    		BaseContext: func(net.Listener) context.Context {
+    			// Ensure the base context carries necessary values like logger
+    			return ctx
+    		},
+    	}
+
+    	return rpc
+    }
+
+    // Run starts the HTTP server.
+    func (r *RPC) Run(ctx context.Context, cfg config.Server) error {
+    	clog.Get(ctx).WithField("addr", cfg.Addr).Info("RPC server listening")
+    	if err := cfg.ListenAndServe(r.httpServer); err != nil && !errors.Is(err, http.ErrServerClosed) {
+    		return errors.Wrap(err, "rpc server failed")
+    	}
+    	return nil
+    }
+    ```
+
+12. **`services/example/internal/transport/rpc/create_example.go`**: RPC Handler.
+    *   Implements the handler function.
+    *   Calls the corresponding `app` method.
+
+    ```go
+    package rpc
+
+    import (
+    	"context"
+
+    	"github.com/0xdeafcafe/bloefish/services/example" // Import public types
+    )
+
+    // CreateExample is the RPC handler for the create_example endpoint.
+    func (r *RPC) CreateExample(ctx context.Context, req *example.CreateExampleRequest) (*example.CreateExampleResponse, error) {
+    	// The handler's primary job is to delegate to the application layer.
+    	// Error handling (like mapping domain errors to transport errors) could happen
+    	// here or in middleware, but cher errors often translate well directly.
+    	return r.app.CreateExample(ctx, req)
+    }
+    ```
+
+13. **`services/example/internal/transport/rpc/create_example.json`**: JSON Schema.
+    *   Defines the expected structure for the `create_example` request.
+
+    ```json
+    {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "idempotency_key",
+            "owner",
+            "name",
+            "value"
+        ],
+        "properties": {
+            "idempotency_key": {
+                "type": "string",
+                "minLength": 1
+            },
+            "owner": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["type", "identifier"],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": ["user"] // Specify allowed types
+                    },
+                    "identifier": {
+                        "type": "string",
+                        "minLength": 1 // Or specific format like UUID if needed
+                    }
+                }
+            },
+            "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+            },
+            "value": {
+                "type": "integer",
+                "minimum": 0
+            }
+        }
+    }
+    ```
+
+## Integration
+
+*   **`cmd/bloefish/main.go`**:
+    *   Import the service's `cmd` package.
+    *   Add entry to `serviceDefinitions`.
+
+    ```go
+    package main
+
+    import (
+    	// ... other imports
+    	serviceExample "github.com/0xdeafcafe/bloefish/services/example/cmd" // Import example cmd
+    	// ... other service cmd imports
+    )
+
+    var (
+    	serviceDefinitions = map[string]ServiceBoot{
+    		// ... other services
+    		"example": serviceExample.Root, // Add the example service
+    	}
+    )
+
+    // ... rest of main.go
+    ```
+
+## Dependencies
+
+*   Run `go mod tidy` after adding new imports.
+*   Update `internal/service.go`'s `Config` and `Run` function to include configuration and client instantiation for any new service dependencies.
+
+This structure promotes separation of concerns, testability, and consistency across backend services, incorporating specific library usage like `ksuid` and `cher`.

@@ -1,0 +1,276 @@
+---
+description: Reference guide for creating new backend endpoints, and giving the frontend access
+globs: 
+alwaysApply: false
+---
+
+# Bloefish Backend Endpoint Creation Guide
+
+## Step-by-Step Implementation Workflow
+
+### 1. Domain Layer
+
+#### 1.1 Define Domain Models (if needed)
+- Create or update models in `internal/domain/models/{entity}.go`
+- Follow naming conventions: models for entities, commands for inputs
+
+```go
+// For new entities
+type NewEntity struct {
+    ID             string    `json:"id"`
+    CreatedAt      time.Time `json:"created_at"`
+    // Other fields...
+}
+
+// For commands
+type CreateNewEntityCommand struct {
+    IdempotencyKey string
+    // Command fields...
+}
+```
+
+#### 1.2 Update Repository Interfaces
+- Update `internal/domain/ports/ports.go` with new methods
+- Define clear method signatures with context and error handling
+
+```go
+type NewEntityRepository interface {
+    Create(ctx context.Context, cmd *models.CreateNewEntityCommand) (*models.NewEntity, error)
+    GetByID(ctx context.Context, id string) (*models.NewEntity, error)
+    // Other methods...
+}
+```
+
+### 2. Service Contract Layer
+
+#### 2.1 Define Public Contract
+- Add request/response structs in `conversation.go`
+- Add method to the `Service` interface
+- Use consistent field naming and types
+
+```go
+// Service interface update
+type Service interface {
+    // Existing methods...
+    NewEndpoint(ctx context.Context, req *NewEndpointRequest) (*NewEndpointResponse, error)
+}
+
+// Request/Response definitions
+type NewEndpointRequest struct {
+    IdempotencyKey string          `json:"idempotency_key"`
+    Owner          *Actor          `json:"owner"`
+    // Other fields...
+}
+
+type NewEndpointResponse struct {
+    ID        string    `json:"id"`
+    CreatedAt time.Time `json:"created_at"`
+    // Other fields...
+}
+```
+
+### 3. Transport Layer
+
+#### 3.1 Create JSON Schema
+- Create `internal/transport/rpc/{endpoint_name}.json`
+- Define comprehensive validation rules
+- Include required fields, types, and constraints
+
+```json
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "idempotency_key"],
+    "properties": {
+        "id": {
+            "type": "string",
+            "minLength": 1
+        },
+        "idempotency_key": {
+            "type": "string",
+            "minLength": 1
+        }
+    }
+}
+```
+
+#### 3.2 Create RPC Handler
+- Create `internal/transport/rpc/{endpoint_name}.go`
+- Keep handler simple, delegate to app layer
+
+```go
+package rpc
+
+import (
+    "context"
+    "github.com/0xdeafcafe/bloefish/services/conversation"
+)
+
+func (r *RPC) NewEndpoint(ctx context.Context, req *conversation.NewEndpointRequest) (*conversation.NewEndpointResponse, error) {
+    return r.app.NewEndpoint(ctx, req)
+}
+```
+
+#### 3.3 Register Endpoint
+- Update `internal/transport/rpc/rpc.go` to register the endpoint
+
+```go
+// In the New function
+svr.Register("new_endpoint", "2025-02-12", schema("new_endpoint"), rpc.NewEndpoint)
+```
+
+#### 3.4 Implement RPC Client
+- Add method to `rpcclient.go`
+
+```go
+func (r *RPCClient) NewEndpoint(ctx context.Context, req *NewEndpointRequest) (resp *NewEndpointResponse, err error) {
+    return resp, r.client.Do(ctx, "new_endpoint", "2025-02-12", req, &resp)
+}
+```
+
+### 4. Application Layer
+
+#### 4.1 Implement Business Logic
+- Create `internal/app/{endpoint_name}.go`
+- Include proper validation, error handling, and transaction management
+- Follow existing patterns for consistent implementation
+
+```go
+package app
+
+import (
+    "context"
+    "fmt"
+    "github.com/0xdeafcafe/bloefish/libraries/cher"
+    "github.com/0xdeafcafe/bloefish/services/conversation"
+    "github.com/0xdeafcafe/bloefish/services/conversation/internal/domain/models"
+)
+
+func (a *App) NewEndpoint(ctx context.Context, req *conversation.NewEndpointRequest) (*conversation.NewEndpointResponse, error) {
+    // Default user verification (pattern found in existing code)
+    defaultUser, err := a.UserService.GetOrCreateDefaultUser(ctx)
+    if err != nil {
+        return nil, err
+    }
+    if req.Owner.Identifier != defaultUser.User.ID {
+        return nil, cher.New("invalid_owner", cher.M{"identifier": req.Owner.Identifier})
+    }
+    
+    // Core business logic
+    // ...
+    
+    // Return response
+    return &conversation.NewEndpointResponse{
+        // Fields...
+    }, nil
+}
+```
+
+### 5. Documentation
+
+#### 5.1 Update README.md
+- Add endpoint to `services/conversation/README.md` in the "Endpoints" section
+- Follow the existing format with clear description and TypeScript contract
+- Include example usage if helpful
+
+```markdown
+#### `new_endpoint`
+
+Brief description of what this endpoint does and when to use it.
+
+**Contract**
+
+```typescript
+interface Request {
+    idempotency_key: string;
+    owner: {
+        type: 'user';
+        identifier: string;
+    };
+    // Other request fields...
+}
+
+interface Response {
+    id: string;
+    created_at: string; // ISO 8601
+    // Other response fields...
+}
+```
+```
+
+- Ensure all fields have proper descriptions
+- Include validation rules or constraints where applicable
+- Document any side effects or important behaviors
+
+## Frontend Integration
+
+### 1. TypeScript Types
+
+#### 1.1 Add Request/Response Types
+- Update `conversation.types.ts` with new interfaces
+
+```typescript
+export interface NewEndpointRequest {
+    idempotencyKey: string;
+    owner: Actor;
+    // Other fields...
+}
+
+export interface NewEndpointResponse {
+    id: string;
+    createdAt: string;
+    // Other fields...
+}
+```
+
+### 2. API Client
+
+#### 2.1 Add RTK Query Endpoint
+- Update `conversation.ts` with the new API endpoint
+- Include proper state management if needed
+
+```typescript
+newEndpoint: builder.mutation<NewEndpointResponse, NewEndpointRequest>({
+    query: (body) => ({
+        url: '2025-02-12/new_endpoint',
+        body,
+    }),
+    async onQueryStarted(req, { dispatch, queryFulfilled }) {
+        try {
+            const { data } = await queryFulfilled;
+            // Update state if needed
+            // Example: dispatch(someAction({ ...data }));
+        } catch (error) {
+            console.error(error);
+        }
+    },
+}),
+```
+
+## Testing Requirements
+
+1. **Unit Tests**
+   - Test each component in isolation
+   - Mock dependencies and external services
+
+## Error Handling
+
+1. Use `cher.New` for structured errors
+2. Return appropriate HTTP status codes
+3. Include detailed error messages for debugging
+4. Consider user-facing error messages
+
+## Security Considerations
+
+1. Validate all input data
+2. Use idempotency keys for write operations
+3. Verify user permissions
+4. Sanitize output data
+
+## Performance Best Practices
+
+1. Use appropriate database indices
+2. Consider caching for frequently accessed data
+3. Optimize database queries
+4. Use pagination for large datasets 
+
