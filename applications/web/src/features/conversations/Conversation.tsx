@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '~/store';
 import { useParams } from 'react-router';
 import { NotFound } from '~/pages/NotFound';
 import { ChatInput } from '../chat-input/ChatInput';
-import { useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { continueConversationChain } from '~/api/flows/continue-conversation';
 import { Helmet } from 'react-helmet-async';
@@ -13,15 +13,17 @@ import { userApi } from '~/api/bloefish/user';
 import { ConversationInteraction } from './components/organisms/ConversationInteraction';
 import { useIdempotencyKey } from '~/hooks/useIdempotencyKey';
 import { Panel } from '~/components/atoms/Panel';
-import React from 'react';
-import { initializeChatInput } from '../chat-input/store';
+import React, { useMemo, useState } from 'react';
+import { initializeChatInput, updateDestinationModel } from '../chat-input/store';
 import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from '~/components/ui/menu';
+import { aiRelayApi } from '~/api/bloefish/ai-relay';
 
 export const Conversation: React.FC = () => {
 	const { conversationId } = useParams();
 	const conversation = useAppSelector(s => s.conversations[conversationId ?? 'kut']);
 	const dispatch = useAppDispatch();
 	const { data: userData } = userApi.useGetOrCreateDefaultUserQuery();
+	const { data: supportedModels } = aiRelayApi.useListSupportedQuery();
 	const { isFetching: convoFetching, isLoading: convoLoading } = conversationApi.useListConversationsWithInteractionsQuery({
 		owner: {
 			type: 'user',
@@ -41,6 +43,24 @@ export const Conversation: React.FC = () => {
 			return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
 		});
 	}, [conversation?.interactions]);
+
+	// Update the ChatInput's destination model based on the last interaction
+	useEffect(() => {
+		if (!conversationId || !sortedInteractions.length || !supportedModels) return;
+
+		const lastInteraction = sortedInteractions[sortedInteractions.length - 1];
+		const model = supportedModels.models.find(
+			m => m.providerId === lastInteraction.aiRelayOptions.providerId && 
+			m.modelId === lastInteraction.aiRelayOptions.modelId
+		);
+
+		if (model) {
+			dispatch(updateDestinationModel({
+				identifier: conversationId,
+				destinationModel: model,
+			}));
+		}
+	}, [conversationId, sortedInteractions, supportedModels]);
 
 	if (!conversation) {
 		if (convoFetching || convoLoading) {
