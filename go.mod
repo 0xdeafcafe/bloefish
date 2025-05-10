@@ -12,7 +12,7 @@ require (
 	github.com/jamescun/basex v0.0.0-20180407124237-e1bcb39ab18e
 	github.com/matryer/is v1.4.1
 	github.com/minio/minio-go/v7 v7.0.85
-	github.com/openai/openai-go v0.1.0-alpha.57
+	github.com/openai/openai-go v0.1.0-beta.10
 	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/riandyrn/otelchi v0.12.1
