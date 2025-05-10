@@ -11,14 +11,13 @@ import (
 	"path"
 	"strings"
 
-	"github.com/0xdeafcafe/bloefish/libraries/clog"
-	"github.com/0xdeafcafe/bloefish/libraries/langwatch"
 	oaioption "github.com/openai/openai-go/option"
-	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
 	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
 	"go.opentelemetry.io/otel/trace"
+
+	"github.com/0xdeafcafe/bloefish/libraries/langwatch"
 )
 
 const (
@@ -36,11 +35,13 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 	if cfg.tracerProvider == nil {
 		cfg.tracerProvider = otel.GetTracerProvider()
 	}
-	tracer := langwatch.Tracer(
-		tracerName,
+	tracerOpts := []trace.TracerOption{
 		trace.WithInstrumentationVersion(instrumentationVersion),
 		trace.WithSchemaURL(semconv.SchemaURL),
-	)
+	}
+
+	tracer := langwatch.Tracer(tracerName, tracerOpts...)
+
 	if cfg.propagators == nil {
 		cfg.propagators = otel.GetTextMapPropagator()
 	}
@@ -109,13 +110,6 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 				span.SetStatus(codes.Ok, "")
 			}
 
-			// Streaming response bodies are not processed by this middleware.
-			// The `openai-go` client library's stream consumption model prevents
-			// reliable interception and parsing of stream chunks at the HTTP
-			// middleware layer. Therefore, response attributes derived from stream
-			// content (e.g., token usage, finish reasons, recorded output) are not
-			// captured for streaming calls.
-			// Only non-streaming JSON responses are fully parsed.
 			if resp.Body != nil && resp.Body != http.NoBody {
 				if isStreaming {
 					// Handle streaming response body
@@ -141,10 +135,6 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 								log.Default().Panicln("Failed to write to response pipe", err)
 								return
 							}
-
-							clog.Get(ctx).WithFields(logrus.Fields{
-								"line": string(lineBytes),
-							}).Info("line")
 
 							line := string(lineBytes)
 							if strings.HasPrefix(line, "data: ") {

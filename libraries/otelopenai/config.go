@@ -43,22 +43,6 @@ func WithPropagators(propagators propagation.TextMapPropagator) Option {
 	})
 }
 
-// WithTraceIDResponseHeader enables adding a header with the trace ID to the response.
-// If not set, no trace ID header will be added to the response.
-func WithTraceIDResponseHeader(key string) Option {
-	return optionFunc(func(c *config) {
-		c.traceIDResponseHeaderKey = key
-	})
-}
-
-// WithTraceSampledResponseHeader enables adding a header with the trace sampling decision to the response.
-// If not set, no trace sampling header will be added to the response.
-func WithTraceSampledResponseHeader(key string) Option {
-	return optionFunc(func(c *config) {
-		c.traceSampledResponseHeaderKey = key
-	})
-}
-
 // WithCaptureInput enables recording the full request body content
 // under the `langwatch.input.value` attribute.
 // Be cautious with sensitive data.
