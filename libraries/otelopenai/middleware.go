@@ -3,11 +3,13 @@ package otelopenai
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"path"
 	"strings"
 
+	"github.com/0xdeafcafe/bloefish/libraries/langwatch"
 	oaioption "github.com/openai/openai-go/option"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -31,7 +33,7 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 	if cfg.tracerProvider == nil {
 		cfg.tracerProvider = otel.GetTracerProvider()
 	}
-	tracer := cfg.tracerProvider.Tracer(
+	tracer := langwatch.Tracer(
 		tracerName,
 		oteltrace.WithInstrumentationVersion(instrumentationVersion),
 		oteltrace.WithSchemaURL(semconv.SchemaURL),
@@ -50,7 +52,7 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 				semconv.HTTPRequestMethodKey.String(req.Method),
 				semconv.ServerAddressKey.String(req.URL.Hostname()),
 				semconv.URLPathKey.String(req.URL.Path),
-				attributeGenAISystem.String(openAISystemValue), // Defined in attributes.go
+				attributeGenAISystem.String(openAISystemValue),
 				attributeGenAIOperation.String(operation),
 			),
 			oteltrace.WithSpanKind(oteltrace.SpanKindClient),
@@ -62,17 +64,18 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 		if req.Body != nil && req.Body != http.NoBody {
 			var errRead error
 			reqBody, errRead = io.ReadAll(req.Body)
-			// Restore the body so the downstream handler can read it
+			// Important!: We need to restore the body so the downstream handler can read it
 			req.Body = io.NopCloser(bytes.NewBuffer(reqBody))
 			if errRead == nil {
 				if cfg.recordInput {
 					// TODO(afr): Adjust this based on the operation
-					span.SetAttributes(attributeLangwatchInputValue.String(string(reqBody)))
+					span.RecordInput(req.Body)
 				}
 				var reqData jsonData
 				if err := json.Unmarshal(reqBody, &reqData); err == nil {
 					if model, ok := getString(reqData, "model"); ok {
-						span.SetAttributes(attributeGenAIRequestModel.String(model))
+						span.SetResponseModel(model)
+						span.SetName(fmt.Sprintf("openai.%s.%s", operation, model))
 					}
 					if temp, ok := getFloat64(reqData, "temperature"); ok {
 						span.SetAttributes(attributeGenAIRequestTemperature.Float64(temp))
@@ -100,8 +103,7 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 					span.AddEvent("Failed to parse OpenAI request body JSON", oteltrace.WithAttributes(attribute.String("error", err.Error())))
 				}
 			} else {
-				span.SetStatus(codes.Error, "failed to read request body")
-				span.RecordError(errRead)
+				span.AddEvent("Failed to read OpenAI request body", oteltrace.WithAttributes(attribute.String("error", errRead.Error())))
 			}
 		}
 
@@ -118,8 +120,8 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 		if resp != nil {
 			span.SetAttributes(semconv.HTTPResponseStatusCodeKey.Int(resp.StatusCode))
 			if resp.StatusCode >= 400 {
+				// TODO(afr): Should we read the error here? I think so
 				span.SetStatus(codes.Error, http.StatusText(resp.StatusCode))
-				// Potentially read error body here if needed, even for non-JSON
 			} else {
 				span.SetStatus(codes.Ok, "")
 			}
@@ -140,7 +142,7 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 					contentType := resp.Header.Get("Content-Type")
 					if strings.HasPrefix(contentType, "application/json") {
 						if cfg.recordOutput {
-							span.SetAttributes(attributeLangwatchOutputValue.String(string(respBody)))
+							span.RecordOutput(respBody)
 						}
 						var respData jsonData
 						if err := json.Unmarshal(respBody, &respData); err == nil {
