@@ -4,6 +4,7 @@ import (
 	"context"
 
 	ollamaClient "github.com/0xdeafcafe/bloefish/libraries/ollama"
+	"github.com/0xdeafcafe/bloefish/libraries/otelopenai"
 	oaiClient "github.com/openai/openai-go"
 	openaiOption "github.com/openai/openai-go/option"
 
@@ -104,6 +105,11 @@ func Run(ctx context.Context) error {
 			relay.WithProvider(openai.NewProvider(
 				oaiClient.NewClient(
 					openaiOption.WithAPIKey(cfg.AIProviders.OpenAI.APIKey),
+					openaiOption.WithMiddleware(otelopenai.Middleware(
+						"openai",
+						otelopenai.WithCaptureInput(),
+						otelopenai.WithCaptureOutput(),
+					)),
 				),
 				openai.WithModels([]openai.Model{{
 					ID:   string(oaiClient.ChatModelGPT4),

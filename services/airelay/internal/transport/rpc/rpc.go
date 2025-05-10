@@ -51,7 +51,6 @@ func New(ctx context.Context, app *app.App) *RPC {
 	svr.Register("invoke_streaming_conversation_message", "2025-02-12", schema("invoke_streaming_conversation_message"), rpc.InvokeStreamingConversationMessage)
 
 	mux := chi.NewRouter()
-	mux.Use(otelchi.Middleware(svcInfo.ServiceHTTPName, otelchi.WithChiRoutes(mux)))
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))
 	mux.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
@@ -62,6 +61,9 @@ func New(ctx context.Context, app *app.App) *RPC {
 		MaxAge:           300,
 	}))
 	mux.Get("/system/health", middlewares.HealthCheck)
+
+	// Ensure health check is not instrumented
+	mux.Use(otelchi.Middleware(svcInfo.ServiceHTTPName, otelchi.WithChiRoutes(mux)))
 
 	mux.
 		With(

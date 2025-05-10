@@ -5,8 +5,13 @@ import (
 	oaiClient "github.com/openai/openai-go"
 )
 
+type Provider struct {
+	client oaiClient.Client
+	models []Model
+}
+
 func NewProvider(
-	oaiClient *oaiClient.Client,
+	oaiClient oaiClient.Client,
 	opts ...ProviderOption,
 ) relay.Provider {
 	p := &Provider{
@@ -19,11 +24,6 @@ func NewProvider(
 	}
 
 	return p
-}
-
-type Provider struct {
-	client *oaiClient.Client
-	models []Model
 }
 
 func (p *Provider) GetMetadata() relay.ProviderMetadata {

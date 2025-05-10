@@ -53,7 +53,6 @@ func New(ctx context.Context, app *app.App) *RPC {
 
 	mux := chi.NewRouter()
 	mux.Use(version.HeaderMiddleware(svcInfo.ServiceHTTPName))
-	mux.Use(otelchi.Middleware(svcInfo.ServiceHTTPName, otelchi.WithChiRoutes(mux)))
 	mux.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
@@ -63,6 +62,9 @@ func New(ctx context.Context, app *app.App) *RPC {
 		MaxAge:           300,
 	}))
 	mux.Get("/system/health", middlewares.HealthCheck)
+
+	// Ensure health check is not instrumented
+	mux.Use(otelchi.Middleware(svcInfo.ServiceHTTPName, otelchi.WithChiRoutes(mux)))
 
 	mux.
 		With(
