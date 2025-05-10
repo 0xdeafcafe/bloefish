@@ -21,9 +21,9 @@ The Go SDK for tracing and evaluating LLM applications using [LangWatch](https:/
 First, get the necessary OpenTelemetry and LangWatch packages:
 
 ```bash
-go get go.opentelemetry.io/otel \\
-       go.opentelemetry.io/otel/sdk \\
-       go.opentelemetry.io/otel/trace \\
+go get go.opentelemetry.io/otel \
+       go.opentelemetry.io/otel/sdk \
+       go.opentelemetry.io/otel/trace \
        github.com/0xdeafcafe/bloefish/libraries/langwatch
 ```
 
@@ -34,7 +34,7 @@ Once OpenTelemetry is set up (see Appendix if you haven't done this yet), you ca
 ```go
 import (
 	"context"
-	"github.com/your-org/langwatch" // Replace with your actual module path
+	"github.com/0xdeafcafe/bloefish/libraries/langwatch"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -247,7 +247,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/your-org/langwatch" // Replace with your actual module path
+	"github.com/0xdeafcafe/bloefish/libraries/langwatch"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
@@ -341,4 +341,4 @@ func processTranslationRequest(ctx context.Context, tracer *langwatch.LangWatchT
 
 ```
 
-This comprehensive example demonstrates initializing OpenTelemetry, getting a `LangWatchTracer`, starting a `LangWatchSpan`, and using its various methods to record detailed information about an LLM operation. Remember to replace `"github.com/your-org/langwatch"` with the actual import path for your library.
+This comprehensive example demonstrates initializing OpenTelemetry, getting a `LangWatchTracer`, starting a `LangWatchSpan`, and using its various methods to record detailed information about an LLM operation. Remember to replace `"github.com/0xdeafcafe/bloefish/libraries/langwatch"
