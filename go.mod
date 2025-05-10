@@ -4,7 +4,6 @@ go 1.23.4
 
 require (
 	github.com/blang/semver/v4 v4.0.0
-	github.com/felixge/httpsnoop v1.0.4
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-chi/cors v1.2.1
 	github.com/google/go-cmp v0.7.0
@@ -15,7 +14,6 @@ require (
 	github.com/openai/openai-go v0.1.0-beta.10
 	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.7.0
-	github.com/riandyrn/otelchi v0.12.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0
 	github.com/uptrace/opentelemetry-go-extra/otellogrus v0.3.2
@@ -41,6 +39,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
