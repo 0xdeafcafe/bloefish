@@ -10,6 +10,7 @@ import (
 	"github.com/0xdeafcafe/bloefish/libraries/errfuncs"
 	"github.com/0xdeafcafe/bloefish/libraries/jsonclient"
 	"github.com/0xdeafcafe/bloefish/libraries/version"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 const (
@@ -26,8 +27,15 @@ type Client struct {
 // NewClient returns a client configured with a transport scheme, remote host
 // and URL prefix supplied as a URL <scheme>://<host></prefix>
 func NewClient(ctx context.Context, baseURL string, c *http.Client) *Client {
-	jcc := jsonclient.NewClient(baseURL, c)
+	if c == nil {
+		c = &http.Client{
+			Transport: otelhttp.NewTransport(http.DefaultTransport, otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
+				return fmt.Sprintf("crpc %s%s", r.URL.Hostname(), r.URL.Path)
+			})),
+		}
+	}
 
+	jcc := jsonclient.NewClient(baseURL, c)
 	svc := contexts.GetServiceInfo(ctx)
 	if svc != nil {
 		jcc.UserAgent = fmt.Sprintf(userAgentTemplateWithService, version.Truncated, svc.Service, svc.Environment)

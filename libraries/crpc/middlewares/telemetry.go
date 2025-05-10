@@ -2,16 +2,24 @@ package middlewares
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/0xdeafcafe/bloefish/libraries/cher"
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
+	"github.com/0xdeafcafe/bloefish/libraries/contexts"
 	"github.com/0xdeafcafe/bloefish/libraries/errfuncs"
 	"github.com/0xdeafcafe/bloefish/libraries/merr"
 	"github.com/0xdeafcafe/bloefish/libraries/mlog"
 	"github.com/0xdeafcafe/bloefish/libraries/slicefuncs"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/semconv/v1.13.0/httpconv"
+	"go.opentelemetry.io/otel/trace"
+
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
 type responseWriter struct {
@@ -39,7 +47,7 @@ func (rw *responseWriter) Write(bytes []byte) (int, error) {
 	return rw.ResponseWriter.Write(bytes)
 }
 
-// Logger returns a middleware handler that wraps subsequent middleware/handlers and logs
+// Telemetry returns a middleware handler that wraps subsequent middleware/handlers and logs
 // request information AFTER the request has completed. It also injects a request-scoped
 // logger on the context which can be set, read and updated using clog lib
 //
@@ -57,10 +65,27 @@ func (rw *responseWriter) Write(bytes []byte) (int, error) {
 //   - Response in bytes         (http_response_bytes)
 //   - Client Version header     (http_client_version)
 //   - User Agent header         (http_user_agent)
-func Logger(log *logrus.Entry) func(http.Handler) http.Handler {
+func Telemetry(log *logrus.Entry) func(http.Handler) http.Handler {
+	propagator := otel.GetTextMapPropagator()
+	tracer := otel.Tracer(
+		"github.com/0xdeafcafe/bloefish/libraries/crpc",
+	)
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := r.Context()
+			ctx, span := tracer.Start(
+				propagator.Extract(r.Context(), propagation.HeaderCarrier(r.Header)),
+				"crpc", // Placeholder, this will be updates below
+				trace.WithSpanKind(trace.SpanKindServer),
+			)
+			defer span.End()
+
+			// inject the span context into the response headers
+			propagator.Inject(ctx, propagation.HeaderCarrier(w.Header()))
+
+			// update the span name with the service name and endpoint
+			svcCtx := contexts.MustGetServiceInfo(ctx)
+			span.SetName(fmt.Sprintf("crpc (%s%s)", svcCtx.ServiceHTTPName, r.URL.Path))
 
 			// create a mutable logger instance which will persist for the request
 			// inject pointer to the logger into the request context
@@ -70,6 +95,7 @@ func Logger(log *logrus.Entry) func(http.Handler) http.Handler {
 			// panics inside handlers will be logged to standard before propagation
 			defer clog.HandlePanic(ctx, true)
 
+			// set useful log fields for the request
 			clog.SetFields(ctx, clog.Fields{
 				"http_remote_addr":    r.RemoteAddr,
 				"http_user_agent":     r.UserAgent(),
@@ -87,6 +113,7 @@ func Logger(log *logrus.Entry) func(http.Handler) http.Handler {
 			next.ServeHTTP(res, r)
 			tEnd := time.Now()
 
+			// set useful log fields from the response
 			clog.SetFields(ctx, clog.Fields{
 				"http_duration":       tEnd.Sub(tStart).String(),
 				"http_duration_us":    int64(tEnd.Sub(tStart) / time.Microsecond),
@@ -94,11 +121,18 @@ func Logger(log *logrus.Entry) func(http.Handler) http.Handler {
 				"http_response_bytes": res.Bytes,
 			})
 
+			// set the span attributes and status
+			span.SetAttributes(semconv.HTTPResponseStatusCode(res.Status))
+			span.SetStatus(httpconv.ServerStatus(res.Status))
+
+			// get the error if one is set on the log entry
 			err := getError(clog.Get(ctx))
 			if err == nil {
 				mlog.Info(ctx, merr.New(ctx, "request_completed", nil))
 				return
 			}
+
+			// if appropriate, log the error at the appropriate level
 			var fn func(context.Context, merr.Merrer)
 			switch clog.DetermineLevel(err, clog.TimeoutsAsErrors(ctx)) {
 			case

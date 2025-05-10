@@ -77,7 +77,7 @@ func TestLogger(t *testing.T) {
 				is.NoErr(err)
 			})
 
-			mw := Logger(log)
+			mw := Telemetry(log)
 			is.True(mw != nil)
 
 			fn := mw(next)
