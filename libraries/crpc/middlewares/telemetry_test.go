@@ -10,6 +10,8 @@ import (
 	"testing"
 
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
+	"github.com/0xdeafcafe/bloefish/libraries/config"
+	"github.com/0xdeafcafe/bloefish/libraries/contexts"
 	"github.com/matryer/is"
 	"github.com/sirupsen/logrus"
 )
@@ -58,7 +60,11 @@ func TestLogger(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			ctx := context.Background()
+			ctx := contexts.SetServiceInfo(context.Background(), contexts.ServiceInfo{
+				Service:         "test",
+				ServiceHTTPName: "test",
+				Environment:     config.EnvironmentUnitTest,
+			})
 			is := is.New(t)
 
 			log := logrus.New().WithField("foo", "bar")
