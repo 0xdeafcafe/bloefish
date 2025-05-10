@@ -1,21 +1,24 @@
 package otelopenai
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"path"
 	"strings"
 
+	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/langwatch"
 	oaioption "github.com/openai/openai-go/option"
+	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
-	oteltrace "go.opentelemetry.io/otel/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.30.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -35,29 +38,32 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 	}
 	tracer := langwatch.Tracer(
 		tracerName,
-		oteltrace.WithInstrumentationVersion(instrumentationVersion),
-		oteltrace.WithSchemaURL(semconv.SchemaURL),
+		trace.WithInstrumentationVersion(instrumentationVersion),
+		trace.WithSchemaURL(semconv.SchemaURL),
 	)
 	if cfg.propagators == nil {
 		cfg.propagators = otel.GetTextMapPropagator()
 	}
 
 	return func(req *http.Request, next oaioption.MiddlewareNext) (*http.Response, error) {
+		customSpanEndHandling := false
 		operation := path.Base(req.URL.Path)
-
-		ctx := req.Context()
 		spanName := "openai." + operation
-		ctx, span := tracer.Start(ctx, spanName,
-			oteltrace.WithAttributes(
+		ctx, span := tracer.Start(req.Context(), spanName,
+			trace.WithAttributes(
 				semconv.HTTPRequestMethodKey.String(req.Method),
 				semconv.ServerAddressKey.String(req.URL.Hostname()),
 				semconv.URLPathKey.String(req.URL.Path),
-				attributeGenAISystem.String(openAISystemValue),
-				attributeGenAIOperation.String(operation),
+				semconv.GenAISystemOpenai,
+				semconv.GenAIOperationNameChat, // TODO(afr): This is not correct, we need to set this based on the url
 			),
-			oteltrace.WithSpanKind(oteltrace.SpanKindClient),
+			trace.WithSpanKind(trace.SpanKindClient),
 		)
-		defer span.End()
+		defer func() {
+			if !customSpanEndHandling {
+				span.End()
+			}
+		}()
 
 		var reqBody []byte
 		var isStreaming bool
@@ -67,43 +73,20 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 			// Important!: We need to restore the body so the downstream handler can read it
 			req.Body = io.NopCloser(bytes.NewBuffer(reqBody))
 			if errRead == nil {
-				if cfg.recordInput {
-					// TODO(afr): Adjust this based on the operation
-					span.RecordInput(req.Body)
-				}
 				var reqData jsonData
 				if err := json.Unmarshal(reqBody, &reqData); err == nil {
-					if model, ok := getString(reqData, "model"); ok {
-						span.SetResponseModel(model)
-						span.SetName(fmt.Sprintf("openai.%s.%s", operation, model))
-					}
-					if temp, ok := getFloat64(reqData, "temperature"); ok {
-						span.SetAttributes(attributeGenAIRequestTemperature.Float64(temp))
-					}
-					if topP, ok := getFloat64(reqData, "top_p"); ok {
-						span.SetAttributes(attributeGenAIRequestTopP.Float64(topP))
-					}
-					if freqPenalty, ok := getFloat64(reqData, "frequency_penalty"); ok {
-						span.SetAttributes(attributeGenAIRequestFrequencyPenalty.Float64(freqPenalty))
-					}
-					if presPenalty, ok := getFloat64(reqData, "presence_penalty"); ok {
-						span.SetAttributes(attributeGenAIRequestPresencePenalty.Float64(presPenalty))
-					}
-					if maxTokens, ok := getInt(reqData, "max_tokens"); ok {
-						span.SetAttributes(attributeGenAIRequestMaxTokens.Int(maxTokens))
-					}
-
+					setRequestAttributes(span, reqData, operation, cfg.recordInput, reqBody)
 					if streamVal, ok := reqData["stream"].(bool); ok && streamVal {
 						isStreaming = true
-						span.SetAttributes(attributeGenAIRequestStream.Bool(true))
+						span.SetAttributes(langwatch.AttributeLangWatchStreaming.Bool(true))
 					} else {
-						span.SetAttributes(attributeGenAIRequestStream.Bool(false))
+						span.SetAttributes(langwatch.AttributeLangWatchStreaming.Bool(false))
 					}
 				} else {
-					span.AddEvent("Failed to parse OpenAI request body JSON", oteltrace.WithAttributes(attribute.String("error", err.Error())))
+					log.Default().Printf("Failed to parse OpenAI request body JSON: %v", err)
 				}
 			} else {
-				span.AddEvent("Failed to read OpenAI request body", oteltrace.WithAttributes(attribute.String("error", errRead.Error())))
+				log.Default().Printf("Failed to read OpenAI request body: %v", errRead)
 			}
 		}
 
@@ -120,7 +103,7 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 		if resp != nil {
 			span.SetAttributes(semconv.HTTPResponseStatusCodeKey.Int(resp.StatusCode))
 			if resp.StatusCode >= 400 {
-				// TODO(afr): Should we read the error here? I think so
+				// TODO(afr): Should we read the error here? I think so!
 				span.SetStatus(codes.Error, http.StatusText(resp.StatusCode))
 			} else {
 				span.SetStatus(codes.Ok, "")
@@ -133,26 +116,82 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 			// content (e.g., token usage, finish reasons, recorded output) are not
 			// captured for streaming calls.
 			// Only non-streaming JSON responses are fully parsed.
-			if !isStreaming && resp.Body != nil && resp.Body != http.NoBody {
-				// Handle non-streaming response body
-				respBody, errRead := io.ReadAll(resp.Body)
-				// Restore the *response* body so the client can read it
-				resp.Body = io.NopCloser(bytes.NewBuffer(respBody))
-				if errRead == nil {
-					contentType := resp.Header.Get("Content-Type")
-					if strings.HasPrefix(contentType, "application/json") {
-						if cfg.recordOutput {
-							span.RecordOutput(respBody)
+			if resp.Body != nil && resp.Body != http.NoBody {
+				if isStreaming {
+					// Handle streaming response body
+					pr, pw := io.Pipe()
+					originalBody := resp.Body
+					resp.Body = pr // Client will read from this pipe reader
+
+					customSpanEndHandling = true
+					go func() {
+						// Ensure original body and pipe writer are closed when goroutine exits
+						defer originalBody.Close()
+						defer pw.Close()
+						defer span.End()
+
+						state := &streamProcessingState{}
+
+						scanner := bufio.NewScanner(originalBody)
+						for scanner.Scan() {
+							lineBytes := scanner.Bytes()
+							// Write the current line (event) to the pipe for the client
+							if _, err := pw.Write(append(lineBytes, '\n')); err != nil {
+								log.Default().Printf("Error writing to response pipe: %v", err)
+								log.Default().Panicln("Failed to write to response pipe", err)
+								return
+							}
+
+							clog.Get(ctx).WithFields(logrus.Fields{
+								"line": string(lineBytes),
+							}).Info("line")
+
+							line := string(lineBytes)
+							if strings.HasPrefix(line, "data: ") {
+								jsonDataStr := strings.TrimPrefix(line, "data: ")
+								if jsonDataStr == "" { // Skip empty data lines (e.g. SSE comments or keep-alives)
+									continue
+								}
+								if jsonDataStr == "[DONE]" { // Stream finished
+									break
+								}
+
+								var eventData jsonData
+								if errUnmarshal := json.Unmarshal([]byte(jsonDataStr), &eventData); errUnmarshal == nil {
+									setStreamEventAttributes(span, eventData, state, cfg.recordOutput)
+								} else {
+									log.Default().Printf("Failed to parse stream event JSON. Error: %v. Data: %s", errUnmarshal, jsonDataStr)
+								}
+							}
 						}
-						var respData jsonData
-						if err := json.Unmarshal(respBody, &respData); err == nil {
-							setNonStreamResponseAttributes(span, respData)
-						} else {
-							span.AddEvent("Failed to parse non-stream OpenAI response body JSON", oteltrace.WithAttributes(attribute.String("error", err.Error())))
+
+						if errScan := scanner.Err(); errScan != nil {
+							log.Default().Printf("Error reading streaming response body: %v", errScan)
 						}
-					}
+
+						setAggregatedStreamAttributes(span, state, cfg.recordOutput)
+					}()
 				} else {
-					span.AddEvent("Failed to read non-stream OpenAI response body", oteltrace.WithAttributes(attribute.String("error", errRead.Error())))
+					// Handle non-streaming response body
+					respBody, errRead := io.ReadAll(resp.Body)
+					// Restore the *response* body so the client can read it
+					resp.Body = io.NopCloser(bytes.NewBuffer(respBody))
+					if errRead == nil {
+						contentType := resp.Header.Get("Content-Type")
+						if strings.HasPrefix(contentType, "application/json") {
+							var respData jsonData
+							if cfg.recordOutput {
+								span.RecordOutput(respData)
+							}
+							if err := json.Unmarshal(respBody, &respData); err == nil {
+								setNonStreamResponseAttributes(span, respData)
+							} else {
+								log.Default().Printf("Failed to parse non-stream OpenAI response body JSON: %v", err)
+							}
+						}
+					} else {
+						log.Default().Printf("Failed to read non-stream OpenAI response body: %v", errRead)
+					}
 				}
 			}
 		}
@@ -161,26 +200,150 @@ func Middleware(name string, opts ...Option) oaioption.Middleware {
 	}
 }
 
+// streamProcessingState holds variables that are updated during stream processing.
+type streamProcessingState struct {
+	id                string
+	model             string
+	systemFingerprint string
+	finishReasons     []string
+	accumulatedOutput strings.Builder
+	usageDataFound    bool
+	promptTokens      int
+	completionTokens  int
+	totalTokens       int
+	inputRecorded     bool // to ensure input is recorded only once if present in stream
+	outputRecorded    bool // to ensure output is recorded only once if present in stream
+}
+
+// setRequestAttributes sets attributes on the span based on the initial OpenAI request data.
+func setRequestAttributes(span *langwatch.Span, reqData jsonData, operation string, recordInput bool, rawReqBody []byte) {
+	if recordInput {
+		// Record the raw request body first if configured.
+		// Avoids double-recording if messages are also explicitly recorded.
+		span.RecordInput(rawReqBody)
+	}
+
+	if model, ok := getString(reqData, "model"); ok {
+		span.SetRequestModel(model)
+		span.SetName(fmt.Sprintf("openai.%s.%s", operation, model))
+	}
+	if temp, ok := getFloat64(reqData, "temperature"); ok {
+		span.SetAttributes(semconv.GenAIRequestTemperature(temp))
+	}
+	if topP, ok := getFloat64(reqData, "top_p"); ok {
+		span.SetAttributes(semconv.GenAIRequestTopP(topP))
+	}
+	if topK, ok := getFloat64(reqData, "top_k"); ok {
+		span.SetAttributes(semconv.GenAIRequestTopK(topK))
+	}
+	if freqPenalty, ok := getFloat64(reqData, "frequency_penalty"); ok {
+		span.SetAttributes(semconv.GenAIRequestFrequencyPenalty(freqPenalty))
+	}
+	if presPenalty, ok := getFloat64(reqData, "presence_penalty"); ok {
+		span.SetAttributes(semconv.GenAIRequestPresencePenalty(presPenalty))
+	}
+	if maxTokens, ok := getInt(reqData, "max_tokens"); ok {
+		span.SetAttributes(semconv.GenAIRequestMaxTokens(maxTokens))
+	}
+	if messages, ok := reqData["messages"]; ok && recordInput {
+		// If messages are present and recordInput is true, record them specifically.
+		// This might be redundant if the whole body is already recorded,
+		// but provides more specific input if desired.
+		span.RecordInput(messages)
+	}
+}
+
+// setStreamEventAttributes sets attributes on the span based on a single SSE event from OpenAI.
+// It updates the streamProcessingState with data from the event.
+func setStreamEventAttributes(span *langwatch.Span, eventData jsonData, state *streamProcessingState, recordOutput bool) {
+	if id, ok := getString(eventData, "id"); ok && state.id == "" {
+		state.id = id
+		span.SetAttributes(semconv.GenAIResponseID(id))
+	}
+	if model, ok := getString(eventData, "model"); ok && state.model == "" {
+		state.model = model
+		span.SetAttributes(semconv.GenAIResponseModel(model))
+	}
+	if sysFingerprint, ok := getString(eventData, "system_fingerprint"); ok && state.systemFingerprint == "" {
+		state.systemFingerprint = sysFingerprint
+		span.SetAttributes(semconv.GenAIOpenaiResponseSystemFingerprint(sysFingerprint))
+	}
+
+	if choices, ok := eventData["choices"].([]any); ok {
+		for _, choiceRaw := range choices {
+			if choice, choiceOk := choiceRaw.(jsonData); choiceOk {
+				if reason, reasonOk := getString(choice, "finish_reason"); reasonOk && reason != "" {
+					state.finishReasons = append(state.finishReasons, reason)
+				}
+				if delta, deltaOk := choice["delta"].(jsonData); deltaOk {
+					if content, contentOk := getString(delta, "content"); contentOk {
+						if recordOutput {
+							state.accumulatedOutput.WriteString(content)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Check for usage object, which typically appears at the end of a stream with Azure OpenAI,
+	// or sometimes in the last regular data event for OpenAI.
+	if usage, usageOk := eventData["usage"].(jsonData); usageOk && !state.usageDataFound {
+		if pt, ptOk := getInt(usage, "prompt_tokens"); ptOk {
+			state.promptTokens = pt
+			span.SetAttributes(semconv.GenAIUsageInputTokens(pt))
+		}
+		if ct, ctOk := getInt(usage, "completion_tokens"); ctOk {
+			state.completionTokens = ct
+			span.SetAttributes(semconv.GenAIUsageOutputTokens(ct))
+		}
+		if rt, rtOk := getInt(usage, "total_tokens"); rtOk {
+			state.totalTokens = rt
+		}
+		state.usageDataFound = true
+	}
+}
+
+// setAggregatedStreamAttributes sets the final attributes on the span after stream processing is complete.
+func setAggregatedStreamAttributes(span *langwatch.Span, state *streamProcessingState, recordOutput bool) {
+	if len(state.finishReasons) > 0 {
+		uniqueReasons := make(map[string]struct{})
+		var finalReasons []string
+		for _, r := range state.finishReasons {
+			if _, exists := uniqueReasons[r]; !exists {
+				uniqueReasons[r] = struct{}{}
+				finalReasons = append(finalReasons, r)
+			}
+		}
+		span.SetAttributes(semconv.GenAIResponseFinishReasons(finalReasons...))
+	}
+
+	if recordOutput && state.accumulatedOutput.Len() > 0 && !state.outputRecorded {
+		span.RecordOutputString(state.accumulatedOutput.String())
+		state.outputRecorded = true
+	}
+}
+
 // setNonStreamResponseAttributes extracts attributes from a standard JSON response body.
-func setNonStreamResponseAttributes(span oteltrace.Span, respData jsonData) {
+func setNonStreamResponseAttributes(span *langwatch.Span, respData jsonData) {
 	if id, ok := getString(respData, "id"); ok {
-		span.SetAttributes(attributeGenAIResponseID.String(id))
+		span.SetAttributes(semconv.GenAIResponseID(id))
 	}
 	if model, ok := getString(respData, "model"); ok {
-		span.SetAttributes(attributeGenAIResponseModel.String(model))
+		span.SetAttributes(semconv.GenAIResponseModel(model))
 	}
 	if sysFingerprint, ok := getString(respData, "system_fingerprint"); ok {
-		span.SetAttributes(attributeGenAIOpenAIResponseSysFinger.String(sysFingerprint))
+		span.SetAttributes(semconv.GenAIOpenaiResponseSystemFingerprint(sysFingerprint))
 	}
 	if usage, ok := respData["usage"].(jsonData); ok {
 		if promptTokens, ok := getInt(usage, "prompt_tokens"); ok {
-			span.SetAttributes(attributeGenAIUsageInputTokens.Int(promptTokens))
+			span.SetAttributes(semconv.GenAIUsageInputTokens(promptTokens))
 		}
 		if completionTokens, ok := getInt(usage, "completion_tokens"); ok {
-			span.SetAttributes(attributeGenAIUsageOutputTokens.Int(completionTokens))
+			span.SetAttributes(semconv.GenAIUsageOutputTokens(completionTokens))
 		}
 	}
-	if choices, ok := respData["choices"].([]interface{}); ok {
+	if choices, ok := respData["choices"].([]any); ok {
 		finishReasons := make([]string, 0, len(choices))
 		for _, choiceRaw := range choices {
 			if choice, ok := choiceRaw.(jsonData); ok {
@@ -190,7 +353,7 @@ func setNonStreamResponseAttributes(span oteltrace.Span, respData jsonData) {
 			}
 		}
 		if len(finishReasons) > 0 {
-			span.SetAttributes(attributeGenAIResponseFinishReasons.StringSlice(finishReasons))
+			span.SetAttributes(semconv.GenAIResponseFinishReasons(finishReasons...))
 		}
 	}
 }
