@@ -872,7 +872,7 @@ When adding a new service like `svc_example`, you also need to update the main `
 Remember to rebuild and restart your Docker Compose environment after making these changes:
 
 ```bash
-docker-compose down && docker-compose up -d --build
+docker compose up -d --build --force-recreate
 ```
 
 ## Dependencies
