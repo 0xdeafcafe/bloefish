@@ -17,7 +17,7 @@ install:
 build: build-js build-go build-docker
 
 start:
-	docker-compose up --build -d
+	docker compose up --build -d
 
 # Aliases for build&start, but only does what is necessary
 services: build-go build-docker start
