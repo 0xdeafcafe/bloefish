@@ -61,7 +61,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: go_service.Dockerfile
+      dockerfile: Dockerfile.svc_go
     command: ["ai_relay"]
     hostname: svc_ai_relay
     env_file: "services/airelay/.env"
@@ -82,7 +82,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: go_service.Dockerfile
+      dockerfile: Dockerfile.svc_go
     command: ["conversation"]
     hostname: svc_conversation
     env_file: "services/conversation/.env"
@@ -106,7 +106,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: go_service.Dockerfile
+      dockerfile: Dockerfile.svc_go
     command: ["user"]
     hostname: svc_user
     env_file: "services/user/.env"
@@ -126,7 +126,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: go_service.Dockerfile
+      dockerfile: Dockerfile.svc_go
     command: ["file_upload"]
     hostname: svc_file_upload
     env_file: "services/fileupload/.env"
@@ -150,7 +150,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: go_service.Dockerfile
+      dockerfile: Dockerfile.svc_go
     command: ["stream"]
     hostname: svc_stream
     env_file: "services/stream/.env"
@@ -167,7 +167,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: go_service.Dockerfile
+      dockerfile: Dockerfile.svc_go
     command: ["skill_set"]
     hostname: svc_skill_set
     env_file: "services/skillset/.env"
