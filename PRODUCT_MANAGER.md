@@ -23,6 +23,7 @@
 - Dynamic model support (ollama)
 - Redesign provider system in relay
 - New conversation header UI
+- Improve model handling
 
 ## Doing
 
@@ -30,34 +31,34 @@
 
 ## Plans
 
+- Move all config from .env files to preferences and db storage
+- Fix initial loading state of interaction response (skeleton?)
 - Create preferences for title generation/default model
-- Improve model handling
+- Link up preferences (local ones at least)
 
 - Support think tags
 
+- Move model selection/config to preferences
+
 - Export conversations
 
-- Show files on interactions
+- Show files on input interactions
 - Show skill sets on interactions
 
 - delete skill sets
-- Fix initial loading state of interaction response
-- Fix alert scrolling issue
-- Link up preferences (local ones at least)
+- Edit skill sets
+
+- Icons for skill sets
+- How should skill set persistence work?
 
 - Add file revisions
 - Add support for tools
-
-- Edit skill sets
-- Icons for skill sets
-- Testing skill sets
-- How should skill set persistence work?
 
 - Improve error handling between services
 
 ## Ideas
 
-- Structured output nodes
-	- Create workflows
-	- External triggers
-	- Scheduled triggers
+- Workflow system
+	- Input triggers (hooks, api, schedule/cron)
+	- Strucutred output from each node
+	- Output triggers (hooks, api, notifications)
