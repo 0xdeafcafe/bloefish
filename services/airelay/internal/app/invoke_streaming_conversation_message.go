@@ -65,8 +65,9 @@ func (a *App) InvokeStreamingConversationMessage(ctx context.Context, req *airel
 	}}, messages...)
 
 	chatStream, err := a.Relay.With(req.AIRelayOptions.ProviderID).NewChatStream(ctx, relay.ChatStreamParams{
-		ModelID:  req.AIRelayOptions.ModelID,
-		Messages: messages,
+		ModelID:      req.AIRelayOptions.ModelID,
+		Messages:     messages,
+		IncludeUsage: true,
 	})
 	if err != nil {
 		if errors.Is(err, relay.ErrRequiredProviderMissing) {

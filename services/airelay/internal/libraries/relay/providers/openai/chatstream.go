@@ -30,9 +30,11 @@ func (i *openAIChatStreamIterator) Next() bool {
 	chunk := i.inner.Current()
 	i.acc.AddChunk(chunk)
 
-	i.current = &relay.ChatStreamEvent{
-		Content: chunk.Choices[0].Delta.Content,
-		Done:    false,
+	if len(chunk.Choices) > 0 {
+		i.current = &relay.ChatStreamEvent{
+			Content: chunk.Choices[0].Delta.Content,
+			Done:    false,
+		}
 	}
 
 	return true
@@ -65,8 +67,11 @@ func (p *Provider) NewChatStream(ctx context.Context, params relay.ChatStreamPar
 	}
 
 	stream := p.client.Chat.Completions.NewStreaming(ctx, openai.ChatCompletionNewParams{
-		Messages: openai.F(messages),
-		Model:    openai.F(params.ModelID),
+		Messages: messages,
+		Model:    params.ModelID,
+		StreamOptions: oaiClient.ChatCompletionStreamOptionsParam{
+			IncludeUsage: openai.Bool(params.IncludeUsage),
+		},
 	})
 
 	return &openAIChatStreamIterator{

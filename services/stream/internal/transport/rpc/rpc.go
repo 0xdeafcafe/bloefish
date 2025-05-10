@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
-	"github.com/riandyrn/otelchi"
 
 	"github.com/0xdeafcafe/bloefish/libraries/clog"
 	"github.com/0xdeafcafe/bloefish/libraries/contexts"
@@ -55,14 +54,11 @@ func New(ctx context.Context, app *app.App, mux *chi.Mux) *RPC {
 	}))
 	mux.Get("/system/health", middlewares.HealthCheck)
 
-	// Ensure health check is not instrumented
-	mux.Use(otelchi.Middleware(svcInfo.ServiceHTTPName, otelchi.WithChiRoutes(mux)))
-
 	mux.
 		With(
 			middlewares.StripPrefix("/rpc"),
 			middlewares.RequestID,
-			middlewares.Logger(clog.Get(ctx)),
+			middlewares.Telemetry(clog.Get(ctx)),
 		).
 		Handle("/rpc/*", svr)
 
