@@ -93,7 +93,7 @@ func (c Config) Configure(ctx context.Context) *logrus.Entry {
 	log = log.WithField(HostKey, hostname)
 
 	switch c.Format {
-	case "json", "logstash":
+	case "json":
 		log.Logger.Formatter = &logrus.JSONFormatter{
 			FieldMap: logrus.FieldMap{
 				logrus.FieldKeyLevel: LevelKey,
