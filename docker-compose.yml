@@ -66,6 +66,7 @@ services:
     hostname: svc_ai_relay
     env_file: "services/airelay/.env"
     environment:
+      LOGGING_FORMAT: json
       STREAM_SERVICE_BASE_URL: http://svc_stream:4000/rpc
       FILE_UPLOAD_SERVICE_BASE_URL: http://svc_file_upload:4000/rpc
       CONVERSATION_SERVICE_BASE_URL: http://svc_conversation:4000/rpc
@@ -84,7 +85,9 @@ services:
       dockerfile: go_service.Dockerfile
     command: ["conversation"]
     hostname: svc_conversation
+    env_file: "services/conversation/.env"
     environment:
+      LOGGING_FORMAT: json
       MONGO_URI: mongodb://db_mongodb:27017
       AI_RELAY_SERVICE_BASE_URL: http://svc_ai_relay:4000/rpc
       STREAM_SERVICE_BASE_URL: http://svc_stream:4000/rpc
@@ -106,7 +109,9 @@ services:
       dockerfile: go_service.Dockerfile
     command: ["user"]
     hostname: svc_user
+    env_file: "services/user/.env"
     environment:
+      LOGGING_FORMAT: json
       MONGO_URI: mongodb://db_mongodb:27017
     depends_on:
       - db_mongodb
@@ -124,7 +129,9 @@ services:
       dockerfile: go_service.Dockerfile
     command: ["file_upload"]
     hostname: svc_file_upload
+    env_file: "services/fileupload/.env"
     environment:
+      LOGGING_FORMAT: json
       MONGO_URI: mongodb://db_mongodb:27017
       MINIO_ENDPOINT: storageminio:9000
       MINIO_ACCESS_KEY_ID: admin
@@ -146,6 +153,9 @@ services:
       dockerfile: go_service.Dockerfile
     command: ["stream"]
     hostname: svc_stream
+    env_file: "services/stream/.env"
+    environment:
+      LOGGING_FORMAT: json
     ports:
       - "4004:4000"
     networks:
@@ -160,7 +170,9 @@ services:
       dockerfile: go_service.Dockerfile
     command: ["skill_set"]
     hostname: svc_skill_set
+    env_file: "services/skillset/.env"
     environment:
+      LOGGING_FORMAT: json
       MONGO_URI: mongodb://db_mongodb:27017
     ports:
       - "4006:4000"

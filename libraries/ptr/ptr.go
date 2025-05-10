@@ -4,7 +4,7 @@ func P[T any](v T) *T {
 	return &v
 }
 
-func POrNil[T comparable](v T) *T {
+func ValueOrNil[T comparable](v T) *T {
 	var zero T
 	if v == zero {
 		return nil
@@ -13,7 +13,7 @@ func POrNil[T comparable](v T) *T {
 	}
 }
 
-func POrZero[T comparable](v T) T {
+func ValueOrZero[T comparable](v T) T {
 	var zero T
 	if v == zero {
 		return zero
