@@ -17,7 +17,7 @@ func Tracer(name string, options ...trace.TracerOption) *LangWatchTracer {
 	}
 }
 
-func (t *LangWatchTracer) Start(ctx context.Context, name string, opts ...trace.SpanStartOption) (context.Context, *LangWatchSpan) {
+func (t *LangWatchTracer) Start(ctx context.Context, name string, opts ...trace.SpanStartOption) (context.Context, *Span) {
 	ctx, span := t.tracer.Start(ctx, name, opts...)
-	return ctx, &LangWatchSpan{span}
+	return ctx, &Span{span}
 }
