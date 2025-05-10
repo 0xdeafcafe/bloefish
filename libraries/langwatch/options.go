@@ -6,7 +6,6 @@ import (
 )
 
 type ClientOption func(*client)
-type TraceOption func(*trace)
 
 // WithEndpointURL sets a custom endpoint URL for the client. By default
 // `defaultEndpointURL` is used.
@@ -34,12 +33,5 @@ func WithEnvironmentApiKey(environmentVariable string) ClientOption {
 func WithHTTPClient(httpClient *http.Client) ClientOption {
 	return func(c *client) {
 		c.httpClient = httpClient
-	}
-}
-
-// WithTraceMetadata sets attributes on a trace to attach as metadata.
-func WithTraceMetadata(attributes ...attribute[any]) TraceOption {
-	return func(t *trace) {
-		t.attributes = attributes
 	}
 }

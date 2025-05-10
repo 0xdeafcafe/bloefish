@@ -1,10 +1,8 @@
 package langwatch
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 	"os"
 )
@@ -21,7 +19,8 @@ type client struct {
 }
 
 type Client interface {
-	CreateTrace(ctx context.Context, threadID string, opts ...TraceOption) (context.Context, Trace)
+	AddEvaluation(ctx context.Context) error
+	Evaluate(ctx context.Context) error
 }
 
 func NewClient(opts ...ClientOption) Client {
@@ -38,25 +37,10 @@ func NewClient(opts ...ClientOption) Client {
 	return c
 }
 
-func (c *client) Collect(ctx context.Context, body interface{}) error {
-	jsonBytes, err := json.Marshal(body)
-	if err != nil {
-		return fmt.Errorf("failed to marshal collector request: %w", err)
-	}
+func (c *client) AddEvaluation(ctx context.Context) error {
+	return errors.New("not implemented")
+}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.endpointURL+"/api/collector", bytes.NewReader(jsonBytes))
-	if err != nil {
-		return fmt.Errorf("failed to create collector request: %w", err)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to make collector request: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("failed to successfully make collector request: %w", err)
-	}
-
-	return nil
+func (c *client) Evaluate(ctx context.Context) error {
+	return errors.New("not implemented")
 }
